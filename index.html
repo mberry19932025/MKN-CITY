@@ -241,7 +241,9 @@
       </div>
       <section class="candidate-roster" aria-labelledby="candidate-roster-title">
         <div class="roster-heading"><div><p class="eyebrow">Employment Center</p><h3 id="candidate-roster-title">Probationary Candidates</h3></div><span id="candidate-roster-count">0 candidates</span></div>
+        <div class="workforce-filters"><label><i data-lucide="search"></i><input id="agent-roster-search" type="search" autocomplete="off" placeholder="Search workforce"></label><select id="agent-roster-department" aria-label="Filter by department"><option value="all">All departments</option><option>Research</option><option>Creative</option><option>Business</option><option>Operations</option><option>Unassigned</option></select><span id="agent-roster-window">Showing 0</span></div>
         <div id="candidate-roster-list" class="candidate-roster-list"><p class="empty-roster">No custom candidates created yet.</p></div>
+        <div class="workforce-pager"><button id="agent-page-prev" type="button"><i data-lucide="chevron-left"></i><span>Previous</span></button><span id="agent-page-status">Page 1</span><button id="agent-page-next" type="button"><span>Next</span><i data-lucide="chevron-right"></i></button></div>
       </section>
       <section class="command-chain" aria-labelledby="command-chain-title">
         <div><p class="eyebrow">Authority</p><h3 id="command-chain-title">City Escalation Chain</h3></div>
@@ -803,6 +805,10 @@
       <p class="field-note">This becomes the agent's focus lock. New responsibilities require a new specialist or formal retraining.</p>
       <label for="agent-department">Department</label>
       <select id="agent-department"><option>Research</option><option>Creative</option><option>Business</option><option>Operations</option><option>Unassigned</option></select>
+      <label for="agent-building">Assigned building</label>
+      <select id="agent-building"><option>Research Lab</option><option>Creative Studio</option><option>Commerce Office</option><option>Production Works</option><option>Founder Tower</option><option>Unassigned</option></select>
+      <label for="agent-shift">Work shift</label>
+      <select id="agent-shift"><option>Morning</option><option>Workday</option><option>Afternoon</option><option>Evening</option><option>Night</option></select>
       <label for="agent-personality">Personality</label>
       <select id="agent-personality"><option>Analytical</option><option>Creative</option><option>Bold</option><option>Patient</option><option>Skeptical</option><option>Social</option></select>
       <label for="agent-traits">Traits</label><input id="agent-traits" maxlength="80" autocomplete="off" placeholder="Curious, careful, persistent">

@@ -997,23 +997,50 @@ const agentName = document.querySelector('#agent-name');
 const agentRole = document.querySelector('#agent-role');
 const agentTask = document.querySelector('#agent-task');
 const agentDepartment = document.querySelector('#agent-department');
+const agentBuilding = document.querySelector('#agent-building');
+const agentShift = document.querySelector('#agent-shift');
 const agentPersonality = document.querySelector('#agent-personality');
 const agentTraits = document.querySelector('#agent-traits');
 const agentCount = document.querySelector('#agent-count');
 const candidateRosterList = document.querySelector('#candidate-roster-list');
 const candidateRosterCount = document.querySelector('#candidate-roster-count');
+const rosterSearch = document.querySelector('#agent-roster-search');
+const rosterDepartment = document.querySelector('#agent-roster-department');
+const rosterWindow = document.querySelector('#agent-roster-window');
+const rosterPageStatus = document.querySelector('#agent-page-status');
+const rosterPageSize = 12;
+let rosterPage = 1;
 
 function renderCandidateRoster() {
   const candidates = JSON.parse(localStorage.getItem('mkn-agent-candidates') || '[]');
   candidateRosterCount.textContent = `${candidates.length} candidate${candidates.length === 1 ? '' : 's'}`;
-  if (!candidates.length) {
-    candidateRosterList.innerHTML = '<p class="empty-roster">No custom candidates created yet.</p>';
+  const query = rosterSearch.value.trim().toLowerCase();
+  const department = rosterDepartment.value;
+  const filtered = candidates.filter((candidate) => {
+    const departmentMatch = department === 'all' || candidate.department === department;
+    const searchText = `${candidate.name} ${candidate.role} ${candidate.primaryTask} ${candidate.building || ''} ${candidate.shift || ''}`.toLowerCase();
+    return departmentMatch && (!query || searchText.includes(query));
+  }).reverse();
+  const pageCount = Math.max(1, Math.ceil(filtered.length / rosterPageSize));
+  rosterPage = Math.min(rosterPage, pageCount);
+  const start = (rosterPage - 1) * rosterPageSize;
+  const visible = filtered.slice(start, start + rosterPageSize);
+  rosterWindow.textContent = `Showing ${visible.length} of ${filtered.length}`;
+  rosterPageStatus.textContent = `Page ${rosterPage} of ${pageCount}`;
+  document.querySelector('#agent-page-prev').disabled = rosterPage <= 1;
+  document.querySelector('#agent-page-next').disabled = rosterPage >= pageCount;
+  if (!visible.length) {
+    candidateRosterList.innerHTML = `<p class="empty-roster">${candidates.length ? 'No agents match this workforce filter.' : 'No custom candidates created yet.'}</p>`;
     return;
   }
-  candidateRosterList.innerHTML = candidates.slice().reverse().map((candidate) => `
-    <article><div class="candidate-avatar">${escapeHtml(candidate.name.slice(0, 1).toUpperCase())}</div><div><small>${escapeHtml(candidate.department)} · ${escapeHtml(candidate.personality || 'Analytical')}</small><strong>${escapeHtml(candidate.name)}</strong><p>${escapeHtml(candidate.role)} · ${escapeHtml(candidate.primaryTask)}</p><div class="candidate-traits">${(candidate.traits || []).map((trait) => `<span>${escapeHtml(trait)}</span>`).join('')}</div></div><b>30-task probation</b></article>
+  candidateRosterList.innerHTML = visible.map((candidate) => `
+    <article><div class="candidate-avatar">${escapeHtml(candidate.name.slice(0, 1).toUpperCase())}</div><div><small>${escapeHtml(candidate.department)} · ${escapeHtml(candidate.building || 'Unassigned')} · ${escapeHtml(candidate.shift || 'Workday')}</small><strong>${escapeHtml(candidate.name)}</strong><p>${escapeHtml(candidate.role)} · ${escapeHtml(candidate.primaryTask)}</p><div class="candidate-traits">${(candidate.traits || []).map((trait) => `<span>${escapeHtml(trait)}</span>`).join('')}</div></div><b>30-task probation</b></article>
   `).join('');
 }
+
+[rosterSearch, rosterDepartment].forEach((control) => control.addEventListener('input', () => { rosterPage = 1; renderCandidateRoster(); }));
+document.querySelector('#agent-page-prev').addEventListener('click', () => { rosterPage = Math.max(1, rosterPage - 1); renderCandidateRoster(); });
+document.querySelector('#agent-page-next').addEventListener('click', () => { rosterPage += 1; renderCandidateRoster(); });
 
 document.querySelectorAll('.template-card button').forEach((button) => {
   button.addEventListener('click', () => {
@@ -1025,6 +1052,10 @@ document.querySelectorAll('.template-card button').forEach((button) => {
       : template.dataset.template === 'Etsy Listing Specialist' ? 'Prepare one compliant Etsy listing at a time'
       : '';
     agentDepartment.value = template.dataset.department;
+    agentBuilding.value = template.dataset.department === 'Research' ? 'Research Lab'
+      : template.dataset.department === 'Creative' ? 'Creative Studio'
+      : template.dataset.department === 'Business' ? 'Commerce Office' : 'Unassigned';
+    agentShift.value = template.dataset.department === 'Research' ? 'Morning' : 'Workday';
     agentPersonality.value = template.dataset.department === 'Creative' ? 'Creative' : template.dataset.department === 'Research' ? 'Skeptical' : 'Analytical';
     agentTraits.value = '';
     agentDialog.showModal();
@@ -1042,17 +1073,17 @@ agentForm.addEventListener('submit', (event) => {
   }
   const createdAgents = JSON.parse(localStorage.getItem('mkn-agent-candidates') || '[]');
   const traits = agentTraits.value.split(',').map((trait) => trait.trim()).filter(Boolean).slice(0, 3);
-  createdAgents.push({ name: agentName.value.trim(), role: agentRole.value.trim(), department: agentDepartment.value, personality: agentPersonality.value, traits, primaryTask, status: 'probation', tasksCompleted: 0, createdAt: new Date().toISOString() });
+  createdAgents.push({ name: agentName.value.trim(), role: agentRole.value.trim(), department: agentDepartment.value, building: agentBuilding.value, shift: agentShift.value, personality: agentPersonality.value, traits, primaryTask, status: 'probation', tasksCompleted: 0, createdAt: new Date().toISOString() });
   localStorage.setItem('mkn-agent-candidates', JSON.stringify(createdAgents));
   const current = Number(localStorage.getItem('mkn-created-agents') || '0') + 1;
   localStorage.setItem('mkn-created-agents', String(current));
-  agentCount.textContent = `${8 + current} active`;
+  agentCount.textContent = `8 active · ${current} probation`;
   renderCandidateRoster();
   showToast(`${agentName.value.trim()} created with one focus-locked task.`);
 });
 
 const savedAgentCount = Number(localStorage.getItem('mkn-created-agents') || '0');
-agentCount.textContent = `${8 + savedAgentCount} active`;
+agentCount.textContent = `8 active · ${savedAgentCount} probation`;
 renderCandidateRoster();
 
 const connectionDialog = document.querySelector('#connection-dialog');

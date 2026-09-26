@@ -558,6 +558,13 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .agent-dialog select { width: 100%; height: 42px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; background: white; }
 .agent-dialog label { margin-top: 12px; }
 .candidate-roster { margin-top: 18px; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.workforce-filters { margin-top: 13px; display: grid; grid-template-columns: minmax(180px,1fr) 170px auto; align-items: center; gap: 8px; }
+.workforce-filters label { height: 36px; padding: 0 9px; display: flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); }
+.workforce-filters label svg { width: 14px; color: var(--muted); }
+.workforce-filters input, .workforce-filters select { width: 100%; height: 36px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font-size: .64rem; }
+.workforce-filters input { height: auto; padding: 0; border: 0; outline: 0; background: transparent; }
+.workforce-filters select { padding: 0 8px; }
+.workforce-filters > span { color: var(--muted); font-size: .58rem; font-weight: 700; white-space: nowrap; }
 .candidate-roster-list { margin-top: 13px; display: grid; gap: 8px; }
 .candidate-roster-list > article { padding: 11px; display: grid; grid-template-columns: 38px minmax(0,1fr) auto; align-items: center; gap: 11px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
 .candidate-avatar { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: #151817; color: var(--gold); font-weight: 800; }
@@ -569,6 +576,11 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .candidate-traits { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
 .candidate-traits span { padding: 2px 5px; border: 1px solid var(--line); border-radius: 3px; color: var(--muted); font-size: .54rem; }
 .empty-roster { padding: 14px; color: var(--muted); text-align: center; font-size: .68rem; }
+.workforce-pager { margin-top: 11px; display: flex; align-items: center; justify-content: flex-end; gap: 9px; }
+.workforce-pager button { min-height: 31px; padding: 0 8px; display: flex; align-items: center; gap: 4px; border: 1px solid var(--line); border-radius: 5px; background: transparent; color: var(--ink); cursor: pointer; font-size: .58rem; font-weight: 700; }
+.workforce-pager button:disabled { opacity: .38; cursor: default; }
+.workforce-pager button svg { width: 13px; }
+.workforce-pager > span { color: var(--muted); font-size: .58rem; }
 .permission-check { display: flex !important; align-items: flex-start; gap: 9px; padding: 12px; background: #eef3ef; border-radius: 6px; cursor: pointer; }
 .permission-check input { width: 16px; height: 16px; margin-top: 2px; }
 .permission-check strong, .permission-check small { display: block; }
@@ -1534,6 +1546,8 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
   .identity-fields { grid-template-columns: 1fr; }
   .candidate-roster-list > article { grid-template-columns: 38px minmax(0,1fr); }
   .candidate-roster-list > article > b { grid-column: 2; }
+  .workforce-filters { grid-template-columns: 1fr; }
+  .workforce-pager { justify-content: space-between; }
   .verified-money-grid { grid-template-columns: 1fr 1fr; }
   .verified-money-grid > div { border-bottom: 1px solid var(--line); }
   .verified-money-grid > div:nth-child(even) { border-right: 0; }
