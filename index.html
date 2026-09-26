@@ -34,7 +34,7 @@
 
       <section class="founder-command-card" aria-labelledby="founder-command-title">
         <div class="founder-seal"><i data-lucide="crown"></i></div>
-        <div><p class="eyebrow">Founder / Final Authority</p><h3 id="founder-command-title">MICHH</h3><p>Owns the city, appoints the Director, controls capital, and approves every high-risk external action.</p></div>
+        <div><p class="eyebrow"><span data-leader-title>Founder</span> / Final Authority</p><h3 id="founder-command-title" data-leader-name>MICHH</h3><p>Owns the city, appoints the Director, controls capital, and approves every high-risk external action.</p></div>
         <div class="founder-authority"><span><b id="founder-approval-count">3</b> approvals waiting</span><span><b>5</b> direct reports</span><span><b>$100</b> protected reserve</span></div>
         <button type="button" data-enter-founder-office><i data-lucide="building-2"></i><span>Enter Founder Tower</span></button>
       </section>
@@ -231,6 +231,10 @@
         <article class="template-card" data-template="Etsy Listing Specialist" data-department="Business"><div class="template-avatar business-avatar"><i data-lucide="shopping-bag"></i></div><span>Business</span><h3>Etsy Listing Specialist</h3><p>Prepares compliant listing drafts, keywords, and product information.</p><button type="button">Use template</button></article>
         <article class="template-card" data-template="Custom Agent" data-department="Unassigned"><div class="template-avatar custom-avatar"><i data-lucide="settings-2"></i></div><span>Custom</span><h3>Build your own</h3><p>Define a narrow role, success criteria, department, and tool access.</p><button type="button">Configure</button></article>
       </div>
+      <section class="candidate-roster" aria-labelledby="candidate-roster-title">
+        <div class="roster-heading"><div><p class="eyebrow">Employment Center</p><h3 id="candidate-roster-title">Probationary Candidates</h3></div><span id="candidate-roster-count">0 candidates</span></div>
+        <div id="candidate-roster-list" class="candidate-roster-list"><p class="empty-roster">No custom candidates created yet.</p></div>
+      </section>
       <section class="command-chain" aria-labelledby="command-chain-title">
         <div><p class="eyebrow">Authority</p><h3 id="command-chain-title">City Escalation Chain</h3></div>
         <ol><li><i data-lucide="bot"></i><span>Worker Agent</span><small>Performs assigned task</small></li><li><i data-lucide="arrow-right"></i></li><li><i data-lucide="users"></i><span>Department Manager</span><small>Reviews team decisions</small></li><li><i data-lucide="arrow-right"></i></li><li><i data-lucide="briefcase-business"></i><span>Overseer</span><small>Coordinates city operations</small></li><li><i data-lucide="arrow-right"></i></li><li class="owner-authority"><i data-lucide="crown"></i><span>Michh / Owner</span><small>Final authority</small></li></ol>
@@ -639,6 +643,11 @@
       <div class="account-notice"><i data-lucide="landmark"></i><div><strong>MKN City does not hold wagering funds</strong><p>Deposits, withdrawals, identity checks, and entries happen directly on the licensed platform. MKN provides research, manual tracking, limits, and approval controls.</p></div></div>
 
       <div class="account-grid">
+        <section class="settings-panel city-identity-panel" aria-labelledby="city-identity-title">
+          <header><i data-lucide="crown"></i><div><h3 id="city-identity-title">City leadership</h3><p>Your command identity across MKN City.</p></div></header>
+          <div class="identity-fields"><label>Leader name<input id="leader-name" maxlength="28" autocomplete="off" value="MICHH"></label><label>Leadership title<input id="leader-title" list="leader-title-options" maxlength="24" autocomplete="off" value="Founder"><datalist id="leader-title-options"><option value="Founder"><option value="Big Boss"><option value="Mayor"><option value="Chief"><option value="Don"><option value="CEO"></datalist></label></div>
+          <button id="save-city-identity" class="primary-action" type="button"><i data-lucide="save"></i> Save identity</button>
+        </section>
         <section class="settings-panel demo-wallet-panel" aria-labelledby="demo-wallet-title">
           <header><i data-lucide="coins"></i><div><h3 id="demo-wallet-title">MKN Demo Wallet</h3><p>Practice the city economy with simulated credits.</p></div><span class="demo-only">No cash value</span></header>
           <div class="demo-wallet-balance"><span>Available demo balance</span><strong id="demo-wallet-balance">$150.00</strong><small>Demo Credits</small></div>
@@ -781,6 +790,9 @@
       <p class="field-note">This becomes the agent's focus lock. New responsibilities require a new specialist or formal retraining.</p>
       <label for="agent-department">Department</label>
       <select id="agent-department"><option>Research</option><option>Creative</option><option>Business</option><option>Operations</option><option>Unassigned</option></select>
+      <label for="agent-personality">Personality</label>
+      <select id="agent-personality"><option>Analytical</option><option>Creative</option><option>Bold</option><option>Patient</option><option>Skeptical</option><option>Social</option></select>
+      <label for="agent-traits">Traits</label><input id="agent-traits" maxlength="80" autocomplete="off" placeholder="Curious, careful, persistent">
       <label class="permission-check"><input type="checkbox" id="agent-draft-only" checked><span><strong>Draft-only access</strong><small>Agent cannot publish, spend, message customers, or place orders.</small></span></label>
       <div class="dialog-actions"><button value="cancel" type="submit">Cancel</button><button class="primary-action" value="default" type="submit">Create candidate</button></div>
     </form>

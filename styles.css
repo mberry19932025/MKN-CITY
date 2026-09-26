@@ -211,8 +211,8 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .district.locked-district > b svg { width: 10px; }
 .traveling-agent { position: absolute; z-index: 5; right: 18%; top: 42%; width: 34px; height: 34px; display: grid; place-items: center; color: white; background: var(--green); border: 3px solid var(--surface); border-radius: 50%; box-shadow: 0 5px 12px rgba(23,33,29,.3); opacity: 0; }
 .traveling-agent svg { width: 17px; height: 17px; }
-.map-agent { --face: 1; position: absolute; z-index: 6; width: 52px; height: 102px; padding: 0; border: 0; background: transparent; cursor: pointer; transition-property: left, top; transition-timing-function: linear; filter: drop-shadow(0 7px 5px rgba(5,13,9,.5)); }
-.agent-sprite { position: relative; width: 42px; height: 94px; margin: 0 auto; display: block; background-image: url("assets/mkn-agent-team-v1.png"); background-repeat: no-repeat; background-size: 500% 100%; background-position: 0 center; transform: scaleX(var(--face)); transform-origin: center bottom; }
+.map-agent { --face: 1; position: absolute; z-index: 6; width: 38px; height: 74px; padding: 0; border: 0; background: transparent; cursor: pointer; transition-property: left, top; transition-timing-function: linear; filter: drop-shadow(0 5px 4px rgba(5,13,9,.55)); }
+.agent-sprite { position: relative; width: 31px; height: 69px; margin: 0 auto; display: block; background-image: url("assets/mkn-agent-team-v1.png"); background-repeat: no-repeat; background-size: 500% 100%; background-position: 0 center; transform: scaleX(var(--face)); transform-origin: center bottom; }
 .agent-sprite::before, .agent-sprite::after { content: none; }
 .agent-sprite b { display: none; }
 .creative-sprite { background-position: 25% center; }
@@ -534,6 +534,18 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .connection-list button { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: transparent; cursor: pointer; font-size: .68rem; font-weight: 700; }
 .agent-dialog select { width: 100%; height: 42px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; background: white; }
 .agent-dialog label { margin-top: 12px; }
+.candidate-roster { margin-top: 18px; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.candidate-roster-list { margin-top: 13px; display: grid; gap: 8px; }
+.candidate-roster-list > article { padding: 11px; display: grid; grid-template-columns: 38px minmax(0,1fr) auto; align-items: center; gap: 11px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
+.candidate-avatar { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: #151817; color: var(--gold); font-weight: 800; }
+.candidate-roster-list small, .candidate-roster-list strong { display: block; }
+.candidate-roster-list small { color: var(--muted); font-size: .56rem; text-transform: uppercase; }
+.candidate-roster-list strong { margin-top: 2px; font-size: .78rem; }
+.candidate-roster-list p { margin-top: 3px; color: var(--muted); font-size: .64rem; }
+.candidate-roster-list > article > b { color: #875e13; font-size: .59rem; text-transform: uppercase; }
+.candidate-traits { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
+.candidate-traits span { padding: 2px 5px; border: 1px solid var(--line); border-radius: 3px; color: var(--muted); font-size: .54rem; }
+.empty-roster { padding: 14px; color: var(--muted); text-align: center; font-size: .68rem; }
 .permission-check { display: flex !important; align-items: flex-start; gap: 9px; padding: 12px; background: #eef3ef; border-radius: 6px; cursor: pointer; }
 .permission-check input { width: 16px; height: 16px; margin-top: 2px; }
 .permission-check strong, .permission-check small { display: block; }
@@ -1007,6 +1019,9 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .settings-panel > header > svg { width: 21px; color: var(--green); }
 .settings-panel h3 { font-size: .92rem; }
 .settings-panel header p, .settings-panel .fine-print { margin-top: 3px; color: var(--muted); font-size: .66rem; line-height: 1.45; }
+.identity-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.identity-fields label { color: var(--muted); font-size: .62rem; font-weight: 700; }
+.identity-fields input, .identity-fields select { width: 100%; height: 38px; margin-top: 5px; padding: 0 9px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); }
 .demo-wallet-panel { grid-column: 1 / -1; }
 .demo-wallet-panel > header .demo-only { margin-left: auto; padding: 5px 7px; border: 1px solid #725f2f; border-radius: 5px; background: #352d1c; color: #f0d278; font-size: .57rem; font-weight: 700; text-transform: uppercase; }
 .demo-wallet-balance { min-height: 112px; padding: 17px; display: grid; place-items: center; align-content: center; border: 1px solid #3d624f; border-radius: 7px; background: #122b20; text-align: center; }
@@ -1414,6 +1429,9 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
   .market-summary { grid-template-columns: 1fr 1fr; }
   .platform-grid { grid-template-columns: 1fr; }
   .account-grid { grid-template-columns: 1fr; }
+  .identity-fields { grid-template-columns: 1fr; }
+  .candidate-roster-list > article { grid-template-columns: 38px minmax(0,1fr); }
+  .candidate-roster-list > article > b { grid-column: 2; }
   .verified-money-grid { grid-template-columns: 1fr 1fr; }
   .verified-money-grid > div { border-bottom: 1px solid var(--line); }
   .verified-money-grid > div:nth-child(even) { border-right: 0; }

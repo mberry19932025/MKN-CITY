@@ -240,6 +240,21 @@ const officeData = {
   ] }
 };
 
+const defaultCityIdentity = { name: 'MICHH', title: 'Founder' };
+function getCityIdentity() {
+  try { return { ...defaultCityIdentity, ...JSON.parse(localStorage.getItem('mkn-city-identity') || '{}') }; }
+  catch { return defaultCityIdentity; }
+}
+
+function renderCityIdentity() {
+  const identity = getCityIdentity();
+  document.querySelectorAll('[data-leader-name]').forEach((node) => { node.textContent = identity.name; });
+  document.querySelectorAll('[data-leader-title]').forEach((node) => { node.textContent = identity.title; });
+  return identity;
+}
+
+renderCityIdentity();
+
 function renderOffice(officeId) {
   const office = officeData[officeId];
   if (!office) return;
@@ -266,10 +281,11 @@ function renderOffice(officeId) {
     </article>
   `;
   }).join('');
+  const identity = getCityIdentity();
   const ownerDesk = officeId === 'founder' ? `
     <article class="office-desk owner-desk">
       <div class="owner-office-seal"><i data-lucide="crown"></i></div>
-      <small>Founder / Big Boss</small><strong>MICHH</strong>
+      <small>${escapeHtml(identity.title)} / Final Authority</small><strong>${escapeHtml(identity.name)}</strong>
       <p>Final authority for money, hiring, external actions, and city expansion.</p>
       <div><span>Capital control</span><span>Final approval</span><span>Director oversight</span></div>
       <button type="button" data-owner-approvals><i data-lucide="badge-check"></i><span>Open approvals</span></button>
@@ -366,6 +382,7 @@ function updateCityTime() {
   const period = getCityPeriod(displayHour);
   cityMap.classList.remove('time-morning', 'time-day', 'time-evening', 'time-night');
   cityMap.classList.add(period.className);
+  cityMap.dataset.schedule = String(period.schedule);
   cityTime.textContent = cityTimeMode === 'auto'
     ? now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
     : cityTimeMode === 'day' ? '12:00 PM' : '11:00 PM';
@@ -390,6 +407,18 @@ const agentWaypoints = [
   [16, 24], [27, 35], [42, 40], [53, 51], [68, 35], [77, 25],
   [72, 61], [57, 69], [41, 66], [25, 70], [33, 52], [60, 43]
 ];
+const phaseWaypoints = {
+  0: [[18, 31], [25, 40], [34, 46], [67, 31]],
+  1: [[18, 66], [55, 61], [70, 63], [78, 29]],
+  2: [[39, 50], [47, 55], [55, 50], [62, 46]],
+  3: [[43, 42], [49, 47], [56, 43], [67, 34]],
+  4: [[22, 74], [34, 72], [45, 70], [57, 72]],
+  5: [[13, 75], [18, 78], [23, 74], [28, 77]]
+};
+const phaseLines = [
+  'Planning today\'s assignment.', 'Working the focus task.', 'Reviewing with the team.',
+  'Saving today\'s lesson.', 'Off shift. Sharing ideas.', 'Memory consolidation active.'
+];
 const roamingLines = {
   Maya: ['Checking a new signal.', 'Taking research downtown.', 'Evidence first, Founder.'],
   Marcus: ['Heading to the studio.', 'New concept in progress.', 'Reviewing Design #7.'],
@@ -403,7 +432,9 @@ function moveAgent(agent, index) {
   const moveId = Number(agent.dataset.moveId || 0) + 1;
   agent.dataset.moveId = String(moveId);
   const currentLeft = Number.parseFloat(agent.style.left || getComputedStyle(agent).left) || 0;
-  const point = agentWaypoints[(Math.floor(Math.random() * agentWaypoints.length) + index) % agentWaypoints.length];
+  const schedule = Number(cityMap.dataset.schedule || 1);
+  const activeWaypoints = phaseWaypoints[schedule] || agentWaypoints;
+  const point = activeWaypoints[(Math.floor(Math.random() * activeWaypoints.length) + index) % activeWaypoints.length];
   const duration = cityMap.classList.contains('time-night') ? 7 + Math.random() * 4 : 4 + Math.random() * 4;
   const mapWidth = cityMap.clientWidth || 1;
   const targetPixels = mapWidth * point[0] / 100;
@@ -420,7 +451,7 @@ function moveAgent(agent, index) {
     if (agent.dataset.meeting === 'true') return;
     if (Math.random() > .56) {
       const lines = roamingLines[agent.dataset.agentChat] || ['On my way, Founder.'];
-      agent.querySelector('.speech-bubble').textContent = lines[Math.floor(Math.random() * lines.length)];
+      agent.querySelector('.speech-bubble').textContent = Math.random() > .45 ? phaseLines[schedule] : lines[Math.floor(Math.random() * lines.length)];
       agent.classList.add('speaking');
       setTimeout(() => agent.classList.remove('speaking'), 2600);
     }
@@ -440,7 +471,7 @@ const agentConversations = [
 let conversationIndex = 0;
 
 function showAgentExchange() {
-  if (!cityMap.classList.contains('time-night') && document.visibilityState === 'hidden') return;
+  if (cityMap.dataset.schedule === '5' || document.visibilityState === 'hidden') return;
   const exchange = agentConversations[conversationIndex % agentConversations.length];
   conversationIndex += 1;
   const first = roamingAgents.find((agent) => agent.dataset.agentChat === exchange.agents[0]);
@@ -585,7 +616,23 @@ const agentName = document.querySelector('#agent-name');
 const agentRole = document.querySelector('#agent-role');
 const agentTask = document.querySelector('#agent-task');
 const agentDepartment = document.querySelector('#agent-department');
+const agentPersonality = document.querySelector('#agent-personality');
+const agentTraits = document.querySelector('#agent-traits');
 const agentCount = document.querySelector('#agent-count');
+const candidateRosterList = document.querySelector('#candidate-roster-list');
+const candidateRosterCount = document.querySelector('#candidate-roster-count');
+
+function renderCandidateRoster() {
+  const candidates = JSON.parse(localStorage.getItem('mkn-agent-candidates') || '[]');
+  candidateRosterCount.textContent = `${candidates.length} candidate${candidates.length === 1 ? '' : 's'}`;
+  if (!candidates.length) {
+    candidateRosterList.innerHTML = '<p class="empty-roster">No custom candidates created yet.</p>';
+    return;
+  }
+  candidateRosterList.innerHTML = candidates.slice().reverse().map((candidate) => `
+    <article><div class="candidate-avatar">${escapeHtml(candidate.name.slice(0, 1).toUpperCase())}</div><div><small>${escapeHtml(candidate.department)} · ${escapeHtml(candidate.personality || 'Analytical')}</small><strong>${escapeHtml(candidate.name)}</strong><p>${escapeHtml(candidate.role)} · ${escapeHtml(candidate.primaryTask)}</p><div class="candidate-traits">${(candidate.traits || []).map((trait) => `<span>${escapeHtml(trait)}</span>`).join('')}</div></div><b>30-task probation</b></article>
+  `).join('');
+}
 
 document.querySelectorAll('.template-card button').forEach((button) => {
   button.addEventListener('click', () => {
@@ -597,6 +644,8 @@ document.querySelectorAll('.template-card button').forEach((button) => {
       : template.dataset.template === 'Etsy Listing Specialist' ? 'Prepare one compliant Etsy listing at a time'
       : '';
     agentDepartment.value = template.dataset.department;
+    agentPersonality.value = template.dataset.department === 'Creative' ? 'Creative' : template.dataset.department === 'Research' ? 'Skeptical' : 'Analytical';
+    agentTraits.value = '';
     agentDialog.showModal();
     agentName.focus();
   });
@@ -611,16 +660,19 @@ agentForm.addEventListener('submit', (event) => {
     return showToast('Give this candidate one clear primary task.');
   }
   const createdAgents = JSON.parse(localStorage.getItem('mkn-agent-candidates') || '[]');
-  createdAgents.push({ name: agentName.value.trim(), role: agentRole.value.trim(), department: agentDepartment.value, primaryTask, status: 'probation' });
+  const traits = agentTraits.value.split(',').map((trait) => trait.trim()).filter(Boolean).slice(0, 3);
+  createdAgents.push({ name: agentName.value.trim(), role: agentRole.value.trim(), department: agentDepartment.value, personality: agentPersonality.value, traits, primaryTask, status: 'probation', tasksCompleted: 0, createdAt: new Date().toISOString() });
   localStorage.setItem('mkn-agent-candidates', JSON.stringify(createdAgents));
   const current = Number(localStorage.getItem('mkn-created-agents') || '0') + 1;
   localStorage.setItem('mkn-created-agents', String(current));
   agentCount.textContent = `${8 + current} active`;
+  renderCandidateRoster();
   showToast(`${agentName.value.trim()} created with one focus-locked task.`);
 });
 
 const savedAgentCount = Number(localStorage.getItem('mkn-created-agents') || '0');
 agentCount.textContent = `${8 + savedAgentCount} active`;
+renderCandidateRoster();
 
 const connectionDialog = document.querySelector('#connection-dialog');
 const connectionTitle = document.querySelector('#connection-title');
@@ -982,6 +1034,22 @@ document.querySelector('.agent-profile header button').addEventListener('click',
 });
 
 const safetyInputs = document.querySelectorAll('[data-safety-setting]');
+const leaderNameInput = document.querySelector('#leader-name');
+const leaderTitleInput = document.querySelector('#leader-title');
+const savedIdentity = getCityIdentity();
+leaderNameInput.value = savedIdentity.name;
+leaderTitleInput.value = savedIdentity.title;
+document.querySelector('#save-city-identity').addEventListener('click', () => {
+  const name = leaderNameInput.value.trim().slice(0, 28);
+  const title = leaderTitleInput.value.trim().slice(0, 24);
+  if (name.length < 2) return showToast('Enter a leader name with at least two characters.');
+  if (title.length < 2) return showToast('Enter a leadership title with at least two characters.');
+  const identity = { name, title };
+  localStorage.setItem('mkn-city-identity', JSON.stringify(identity));
+  renderCityIdentity();
+  showToast(`${identity.title} ${identity.name} now leads the city.`);
+});
+
 const savedSafety = JSON.parse(localStorage.getItem('mkn-safety-settings') || '{}');
 safetyInputs.forEach((input) => {
   const savedValue = savedSafety[input.dataset.safetySetting];
