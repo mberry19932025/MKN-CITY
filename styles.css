@@ -149,7 +149,16 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .crew-console footer, .intel-console footer { padding: 8px; }.crew-console footer button, .intel-console footer button { width: 100%; min-height: 34px; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #6e5c2d; border-radius: 4px; background: #292617; color: #e7c666; cursor: pointer; font-size: .57rem; font-weight: 700; }.crew-console footer svg, .intel-console footer svg { width: 14px; }
 .intel-console .live-chip { display: flex; align-items: center; gap: 4px; color: #78d7a4; }.live-chip i { width: 6px; height: 6px; border-radius: 50%; background: #45cc87; box-shadow: 0 0 8px #45cc87; }
 .intel-console > section { padding: 12px 11px; border-bottom: 1px solid #293a31; }.intel-console section > small { color: #d9ba61; font-size: .47rem; font-weight: 700; text-transform: uppercase; }.intel-console h3 { margin-top: 5px; font-size: .68rem; line-height: 1.3; }.intel-console p { margin-top: 5px; color: #91a299; font-size: .53rem; line-height: 1.5; }.intel-console .intel-alert { background: #1b251d; }.intel-console section button { width: 100%; margin-top: 9px; min-height: 30px; border: 1px solid #526a5c; border-radius: 4px; background: #20352a; color: #a9e1c2; cursor: pointer; font-size: .52rem; font-weight: 700; }.intel-progress { height: 4px; margin-top: 9px; overflow: hidden; background: #2a3931; }.intel-progress i { display: block; width: 87%; height: 100%; background: #e5b94f; }
-.stage-tool-dock { min-height: 48px; display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid #354b3f; border-radius: 5px; background: #111a16; }.stage-tool-dock button { display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-right: 1px solid #293a31; background: transparent; color: #a9b8b0; cursor: pointer; font-size: .55rem; font-weight: 700; }.stage-tool-dock button:last-child { border: 0; }.stage-tool-dock button:hover { background: #1d2d25; color: #edcb6a; }.stage-tool-dock svg { width: 15px; }
+.stage-tool-dock { min-height: 48px; display: grid; grid-template-columns: repeat(6, 1fr); border: 1px solid #354b3f; border-radius: 5px; background: #111a16; }.stage-tool-dock button { display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-right: 1px solid #293a31; background: transparent; color: #a9b8b0; cursor: pointer; font-size: .55rem; font-weight: 700; }.stage-tool-dock button:last-child { border: 0; }.stage-tool-dock button:hover { background: #1d2d25; color: #edcb6a; }.stage-tool-dock svg { width: 15px; }
+.map-hud button { display: none; width: 27px; height: 27px; place-items: center; border: 1px solid rgba(233,185,79,.35); border-radius: 4px; background: #211e13; color: #edc862; cursor: pointer; }.map-hud button svg { width: 14px; }
+.city-focus-mode { overflow: hidden; }
+.city-focus-mode .topbar, .city-focus-mode .bottom-nav, .city-focus-mode .command-launcher { display: none; }
+.city-focus-mode .game-command-deck { position: fixed; z-index: 80; inset: 8px; margin: 0; grid-template-columns: 210px minmax(0, 1fr) 230px; box-shadow: 0 0 0 8px #050605; }
+.city-focus-mode .game-stage { min-height: 0; }
+.city-focus-mode .city-map { flex: 1; min-height: 0; aspect-ratio: auto; }
+.city-focus-mode .map-hud button { display: grid; }
+.city-focus-mode .deck-panel { overflow-y: auto; }
+.city-focus-mode .stage-tool-dock { flex: 0 0 52px; }
 .mission-goals .in-progress { border-color: #9ec3b1; background: #f4faf7; opacity: 1; }
 .mission-goals .in-progress > b { background: var(--green-soft); color: var(--green); }
 .mission-goals .complete-goal { border-color: #9ec3b1; opacity: 1; }
@@ -1199,6 +1208,9 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 #manual-entry-fields label { margin-top: 12px; }
 
 @media (max-width: 680px) {
+  .city-focus-mode .game-command-deck { inset: 4px; grid-template-columns: 1fr; }
+  .city-focus-mode .crew-console, .city-focus-mode .intel-console { display: none; }
+  .city-focus-mode .city-map { min-height: 0; }
   .research-task-grid { grid-template-columns: 1fr; }
   .research-task-grid article { border-right: 0; border-bottom: 1px solid var(--line); }
   .research-operations > footer, .approval-page-heading { align-items: stretch; flex-direction: column; }

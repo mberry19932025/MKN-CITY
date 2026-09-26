@@ -21,6 +21,7 @@ async function checkSystemHealth() {
 checkSystemHealth();
 
 function openView(viewId) {
+  if (viewId !== 'city' && document.body.classList.contains('city-focus-mode')) setCityFocus(false);
   views.forEach((view) => view.classList.toggle('active', view.id === viewId));
   navItems.forEach((item) => {
     const active = item.dataset.view === viewId;
@@ -67,6 +68,20 @@ const officeShift = document.querySelector('#office-shift');
 const founderDeck = document.querySelector('.game-command-deck');
 const founderCard = document.querySelector('.founder-command-card');
 if (founderDeck && founderCard) founderCard.after(founderDeck);
+const enterCityFocus = document.querySelector('#enter-city-focus');
+const exitCityFocus = document.querySelector('#exit-city-focus');
+
+function setCityFocus(active) {
+  document.body.classList.toggle('city-focus-mode', active);
+  enterCityFocus.setAttribute('aria-pressed', String(active));
+  if (active) founderDeck.scrollIntoView({ block: 'start' });
+}
+
+enterCityFocus.addEventListener('click', () => setCityFocus(true));
+exitCityFocus.addEventListener('click', () => setCityFocus(false));
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && document.body.classList.contains('city-focus-mode')) setCityFocus(false);
+});
 const officeData = {
   research: { district: 'Research District', title: 'Market Intelligence Lab', description: 'Evidence collection, source checks, and opportunity reports.', agents: [
     { name: 'Maya', role: 'Trend Researcher', task: 'Find and verify one product trend', sprite: 'research-sprite', status: 'Researching' },

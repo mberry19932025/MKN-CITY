@@ -113,7 +113,7 @@
         <div class="game-stage">
       <div class="city-map" aria-label="MKN City district map">
         <div class="map-title"><span>Live MKN City</span><small>Tap districts or agents to interact</small></div>
-        <div class="map-hud"><span><i></i> Live</span><b>Founder Level 1</b></div>
+        <div class="map-hud"><span><i></i> Live</span><b>Founder Level 1</b><button type="button" id="exit-city-focus" title="Exit large city view" aria-label="Exit large city view"><i data-lucide="minimize-2"></i></button></div>
         <div class="city-clock" aria-live="polite"><i data-lucide="sun"></i><div><strong id="city-time">--:--</strong><span id="city-phase">Loading city time</span></div></div>
         <div class="time-controls" role="group" aria-label="City time display">
           <button class="active" type="button" data-time-mode="auto">Auto</button>
@@ -139,6 +139,7 @@
         <button class="map-agent director-map-agent" type="button" data-agent-chat="Director" aria-label="Talk to the Director"><span class="agent-sprite director-sprite"><b>D</b></span><span class="agent-name">Director</span><span class="speech-bubble">City systems are under review.</span></button>
       </div>
           <nav class="stage-tool-dock" aria-label="City tools">
+            <button type="button" id="enter-city-focus" title="Large city view"><i data-lucide="maximize-2"></i><span>City View</span></button>
             <button type="button" data-open-view="agents" title="Agents"><i data-lucide="users"></i><span>Crew</span></button>
             <button type="button" data-open-view="businesses" title="Businesses"><i data-lucide="factory"></i><span>Build</span></button>
             <button type="button" data-open-view="memory" title="Memory"><i data-lucide="brain-circuit"></i><span>Memory</span></button>
