@@ -40,6 +40,7 @@ h2 { font-size: clamp(1.65rem, 4vw, 2.25rem); }
 .eyebrow { color: var(--green); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 3px; }
 .status { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: .86rem; font-weight: 600; }
 .status span { width: 9px; height: 9px; border-radius: 50%; background: #26a269; box-shadow: 0 0 0 4px #dff3e9; }
+.status b, .status small { display: block; }.status b { color: var(--ink); font-size: .68rem; }.status small { color: var(--muted); font-size: .48rem; }.status.demo-mode span { background: var(--gold); box-shadow: 0 0 0 4px rgba(233,185,79,.12); }.status.offline-mode span { background: var(--coral); box-shadow: 0 0 0 4px rgba(237,118,95,.12); }
 .topbar-tools { display: flex; align-items: center; gap: 24px; }
 .founder-level { min-width: 150px; }
 .founder-level > span, .founder-level > small { display: block; font-size: .58rem; font-weight: 700; }

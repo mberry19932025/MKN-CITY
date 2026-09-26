@@ -6,6 +6,7 @@ const { getPool, initializeDatabase, recordLedgerEvent, getEconomySummary } = re
 
 const port = Number(process.env.PORT || 4173);
 const root = __dirname;
+const buildId = String(process.env.RENDER_GIT_COMMIT || process.env.MKN_BUILD_ID || 'local').slice(0, 7);
 const rateWindows = new Map();
 let activeAiRequests = 0;
 const RATE_WINDOW_MS = 5 * 60 * 1000;
@@ -189,6 +190,7 @@ const server = http.createServer(async (request, response) => {
   });
   if (request.method === 'GET' && request.url === '/api/health') return sendJson(response, 200, {
     status: 'ok',
+    build: buildId,
     openai: Boolean(process.env.OPENAI_API_KEY),
     paidAiReady: Boolean(process.env.OPENAI_API_KEY && process.env.FOUNDER_ACCESS_CODE),
     verifiedLedgerReady: Boolean(getPool() && process.env.LEDGER_WEBHOOK_SECRET)
@@ -201,7 +203,10 @@ const server = http.createServer(async (request, response) => {
     response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
     return response.end('Not found');
   }
-  response.writeHead(200, { 'Content-Type': contentTypes[path.extname(filePath)] || 'application/octet-stream' });
+  response.writeHead(200, {
+    'Content-Type': contentTypes[path.extname(filePath)] || 'application/octet-stream',
+    'Cache-Control': ['.html', '.js', '.css'].includes(path.extname(filePath)) ? 'no-store, max-age=0' : 'public, max-age=86400'
+  });
   if (request.method === 'HEAD') return response.end();
   fs.createReadStream(filePath).pipe(response);
 });

@@ -1,6 +1,25 @@
 const navItems = document.querySelectorAll('.nav-item');
 const views = document.querySelectorAll('.view');
 
+async function checkSystemHealth() {
+  const status = document.querySelector('#system-status');
+  const label = status.querySelector('b');
+  try {
+    const response = await fetch('/api/health', { cache: 'no-store' });
+    if (!response.ok) throw new Error('Health check failed');
+    const health = await response.json();
+    label.textContent = health.paidAiReady ? 'Paid AI ready' : 'Demo AI ready';
+    document.querySelector('#build-status').textContent = `Build ${health.build || 'unknown'}`;
+    status.classList.toggle('demo-mode', !health.paidAiReady);
+  } catch {
+    label.textContent = 'City offline';
+    document.querySelector('#build-status').textContent = 'Navigation only';
+    status.classList.add('offline-mode');
+  }
+}
+
+checkSystemHealth();
+
 function openView(viewId) {
   views.forEach((view) => view.classList.toggle('active', view.id === viewId));
   navItems.forEach((item) => {
