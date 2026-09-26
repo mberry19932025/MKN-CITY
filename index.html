@@ -103,11 +103,11 @@
           <button type="button" data-time-mode="night">Night</button>
         </div>
         <div class="night-lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="district university"><i data-lucide="graduation-cap"></i><span>AI University</span></div>
-        <div class="district research"><i data-lucide="microscope"></i><span>Research</span></div>
-        <div class="district founder"><i data-lucide="landmark"></i><span>Founder Tower</span></div>
-        <div class="district creative"><i data-lucide="palette"></i><span>Creative</span></div>
-        <div class="district business"><i data-lucide="briefcase-business"></i><span>Business</span></div>
+        <button class="district university" type="button" data-office="university"><i data-lucide="graduation-cap"></i><span>AI University</span></button>
+        <button class="district research" type="button" data-office="research"><i data-lucide="microscope"></i><span>Research</span></button>
+        <button class="district founder" type="button" data-office="founder"><i data-lucide="landmark"></i><span>Founder Tower</span></button>
+        <button class="district creative" type="button" data-office="creative"><i data-lucide="palette"></i><span>Creative</span></button>
+        <button class="district business" type="button" data-office="business"><i data-lucide="briefcase-business"></i><span>Commerce &amp; Ops</span></button>
         <div class="road road-horizontal"></div>
         <div class="road road-vertical"></div>
         <div class="traveling-agent" id="research-agent" aria-label="Research agent traveling downtown">
@@ -575,6 +575,15 @@
         <button value="cancel" type="submit">Cancel</button>
         <button class="primary-action" id="reserve-property" value="default" type="submit">Request reservation</button>
       </div>
+    </form>
+  </dialog>
+
+  <dialog class="office-dialog" id="office-dialog">
+    <form method="dialog">
+      <button class="dialog-close" value="cancel" title="Leave office" aria-label="Leave office"><i data-lucide="x"></i></button>
+      <header class="office-header"><div><p class="eyebrow" id="office-district">District Office</p><h2 id="office-title">Research Lab</h2><p id="office-description">Focused work floor</p></div><span id="office-shift"><i></i> Active shift</span></header>
+      <div class="office-floor" id="office-floor"></div>
+      <footer class="office-footer"><span><i data-lucide="shield-check"></i> One agent, one primary task</span><button value="cancel" type="submit">Return to city</button></footer>
     </form>
   </dialog>
 

@@ -788,6 +788,40 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
 .property-dialog input { width: 100%; height: 42px; padding: 0 11px; border: 1px solid var(--line); border-radius: 6px; background: white; color: var(--ink); outline: none; }
 .property-dialog input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
 .property-dialog .field-note { margin: -10px 0 14px; font-size: .62rem; }
+.office-dialog { width: min(880px, calc(100vw - 28px)); padding: 0; border: 1px solid #46584f; border-radius: 7px; background: #131b17; color: var(--ink); box-shadow: 0 26px 80px rgba(0,0,0,.58); }
+.office-dialog::backdrop { background: rgba(5,9,7,.72); backdrop-filter: blur(5px); }
+.office-dialog form { position: relative; }
+.office-header { min-height: 112px; padding: 24px 66px 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid #34433b; background: #18231d; }
+.office-header h2 { font-size: 1.45rem; }
+.office-header p:last-child { margin-top: 4px; color: var(--muted); font-size: .71rem; }
+.office-header > span { padding: 7px 9px; display: flex; align-items: center; gap: 7px; border: 1px solid #365c48; border-radius: 5px; color: #83dbae; font-size: .62rem; font-weight: 700; white-space: nowrap; }
+.office-header > span i { width: 7px; height: 7px; border-radius: 50%; background: #56d18e; box-shadow: 0 0 10px rgba(86,209,142,.55); }
+.office-floor { min-height: 360px; padding: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; background: #101713; }
+.office-desk { position: relative; min-height: 285px; padding: 14px; overflow: hidden; border: 1px solid #34443b; border-radius: 6px; background: #1a2520; }
+.desk-workstation { height: 72px; display: grid; place-items: center; border: 1px solid #3c4b43; border-radius: 5px; background: #0d1310; }
+.desk-workstation svg { width: 35px; color: #78b99a; }
+.desk-workstation span { position: absolute; top: 78px; width: 72%; height: 5px; border-radius: 2px; background: #3b3021; }
+.office-agent { margin-top: 12px; display: flex; align-items: end; gap: 10px; }
+.office-agent-sprite { flex: 0 0 auto; width: 42px; height: 94px; display: block; background: url("assets/mkn-agent-team-v1.png") 0 center / 500% 100% no-repeat; filter: drop-shadow(0 6px 4px rgba(0,0,0,.45)); }
+.office-agent-sprite.creative-sprite { background-position: 25% center; }.office-agent-sprite.business-sprite { background-position: 50% center; }.office-agent-sprite.operations-sprite { background-position: 75% center; }.office-agent-sprite.director-sprite { background-position: 100% center; }
+.office-agent small, .office-agent strong, .office-agent span { display: block; }
+.office-agent small { color: var(--muted); font-size: .54rem; }
+.office-agent strong { margin: 2px 0 5px; font-size: .78rem; }
+.office-agent span { color: #78d9a5; font-size: .55rem; }
+.office-agent span i { width: 6px; height: 6px; margin-right: 4px; display: inline-block; border-radius: 50%; background: #56d18e; }
+.desk-task { min-height: 58px; margin-top: 10px; padding: 8px; border-left: 2px solid #4c8066; background: #152019; }
+.desk-task small { color: #78d9a5; font-size: .52rem; font-weight: 700; text-transform: uppercase; }
+.desk-task p { margin-top: 3px; color: #c8d2cc; font-size: .62rem; line-height: 1.35; }
+.occupied-desk > button { width: 100%; height: 34px; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #40544a; border-radius: 5px; background: transparent; color: #dce5df; cursor: pointer; font-size: .62rem; font-weight: 700; }
+.occupied-desk > button:hover { background: #24352c; }
+.occupied-desk > button svg { width: 14px; }
+.vacant-desk { display: grid; place-items: center; align-content: center; border-style: dashed; color: #68776f; text-align: center; }
+.vacant-desk svg { width: 30px; margin-bottom: 8px; }
+.vacant-desk strong { font-size: .7rem; }.vacant-desk span { margin-top: 3px; font-size: .59rem; }
+.office-footer { min-height: 58px; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #34433b; }
+.office-footer > span { display: flex; align-items: center; gap: 7px; color: #9fb0a7; font-size: .62rem; }
+.office-footer svg { width: 15px; color: #69c996; }
+.office-footer button { padding: 8px 11px; border: 1px solid #405149; border-radius: 5px; background: #202c26; color: white; cursor: pointer; font-size: .64rem; font-weight: 700; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
 .dialog-actions button { padding: 9px 13px; border: 1px solid var(--line); border-radius: 6px; background: transparent; cursor: pointer; font-weight: 700; }
 .dialog-actions .primary-action { border-color: var(--green); background: var(--green); color: white; }
@@ -1120,6 +1154,9 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
   .template-grid { grid-template-columns: 1fr 1fr; }
   .focus-doctrine { grid-template-columns: auto 1fr; }
   .focus-doctrine > b { grid-column: 2; justify-self: start; }
+  .office-header { align-items: flex-start; flex-direction: column; }
+  .office-floor { grid-template-columns: 1fr; }
+  .office-desk { min-height: 250px; }
   .command-chain { grid-template-columns: 1fr; }
   .command-chain ol { grid-template-columns: 1fr; }
   .command-chain li:nth-child(even) > svg { transform: rotate(90deg); }

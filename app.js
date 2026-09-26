@@ -29,13 +29,58 @@ function showToast(message) {
   toastTimer = setTimeout(() => gameToast.classList.remove('show'), 3200);
 }
 
-document.querySelectorAll('.district').forEach((district) => {
-  district.addEventListener('click', () => {
-    const name = district.textContent.trim();
-    showToast(`${name} selected. Building detail mode will unlock as the city levels up.`);
-    setConsole(true);
-    addConsoleMessage('City Guide', `${name} is active. Ask what this district is working on or give it a command.`);
-  });
+const officeDialog = document.querySelector('#office-dialog');
+const officeTitle = document.querySelector('#office-title');
+const officeDistrict = document.querySelector('#office-district');
+const officeDescription = document.querySelector('#office-description');
+const officeFloor = document.querySelector('#office-floor');
+const officeData = {
+  research: { district: 'Research District', title: 'Market Intelligence Lab', description: 'Evidence collection, source checks, and opportunity reports.', agents: [
+    { name: 'Maya', role: 'Trend Researcher', task: 'Find and verify one product trend', sprite: 'research-sprite', status: 'Researching' }
+  ] },
+  creative: { district: 'Creative District', title: 'Production Studio', description: 'Focused visual production and controlled design tests.', agents: [
+    { name: 'Marcus', role: 'Thumbnail Designer', task: 'Create one approved thumbnail assignment', sprite: 'creative-sprite', status: 'Designing' }
+  ] },
+  business: { district: 'Commerce & Operations', title: 'Commerce Operations Floor', description: 'Listings, order flow, capacity, and customer operations.', agents: [
+    { name: 'Avery', role: 'Listing / SEO Specialist', task: 'Prepare one compliant marketplace listing', sprite: 'business-sprite', status: 'Optimizing' },
+    { name: 'Nova', role: 'Operations Specialist', task: 'Monitor one active production queue', sprite: 'operations-sprite', status: 'Monitoring' }
+  ] },
+  founder: { district: 'Downtown', title: 'Founder Tower', description: 'City oversight, approvals, budgets, and department coordination.', agents: [
+    { name: 'Director', role: 'Chief Director', task: 'Review city performance and escalate decisions', sprite: 'director-sprite', status: 'Reviewing' }
+  ] },
+  university: { district: 'North MKN City', title: 'AI University', description: 'Training, work samples, certification, and formal retraining.', agents: [] }
+};
+
+function renderOffice(officeId) {
+  const office = officeData[officeId];
+  if (!office) return;
+  officeDistrict.textContent = office.district;
+  officeTitle.textContent = office.title;
+  officeDescription.textContent = office.description;
+  const desks = office.agents.map((agent) => `
+    <article class="office-desk occupied-desk">
+      <div class="desk-workstation"><i data-lucide="monitor"></i><span></span></div>
+      <div class="office-agent"><span class="office-agent-sprite ${agent.sprite}"></span><div><small>${agent.role}</small><strong>${agent.name}</strong><span><i></i>${agent.status}</span></div></div>
+      <div class="desk-task"><small>Focus-locked task</small><p>${agent.task}</p></div>
+      <button type="button" data-office-command="${agent.name}"><i data-lucide="message-square"></i><span>Command</span></button>
+    </article>
+  `).join('');
+  const vacantCount = Math.max(1, 3 - office.agents.length);
+  const vacancies = Array.from({ length: vacantCount }, (_, index) => `
+    <article class="office-desk vacant-desk"><i data-lucide="armchair"></i><strong>${officeId === 'university' ? 'Training station' : `Desk ${office.agents.length + index + 1}`}</strong><span>${officeId === 'university' ? 'Ready for a candidate' : 'Vacant'}</span></article>
+  `).join('');
+  officeFloor.innerHTML = desks + vacancies;
+  lucide.createIcons();
+  officeDialog.showModal();
+}
+
+document.querySelectorAll('[data-office]').forEach((district) => district.addEventListener('click', () => renderOffice(district.dataset.office)));
+officeFloor.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-office-command]');
+  if (!button) return;
+  officeDialog.close();
+  setConsole(true);
+  submitCommand(`talk to ${button.dataset.officeCommand}`);
 });
 
 const workflowSteps = document.querySelectorAll('.workflow-steps li');
