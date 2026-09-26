@@ -371,6 +371,16 @@
           <article><i data-lucide="file-pen-line"></i><strong>Proposal Writer</strong><span>Draft from verified facts</span></article>
           <article><i data-lucide="shield-check"></i><strong>Red Team Reviewer</strong><span>Check the final package</span></article>
         </div>
+        <section class="bid-workspace" aria-labelledby="bid-workspace-title">
+          <header><div><small>Source-controlled workspace</small><strong id="bid-workspace-title">Live Bid Intake</strong></div><span><i data-lucide="radio"></i> AI-ready</span></header>
+          <form id="bid-intake-form">
+            <label><span>SAM.gov notice URL or notice ID</span><input id="bid-notice" type="text" required placeholder="Paste the exact opportunity URL or notice ID"></label>
+            <label><span>Verified MKN capability for this requirement</span><textarea id="bid-capability" required rows="3" placeholder="Describe only services, staff, tools, delivery capacity, and past work you can prove"></textarea></label>
+            <button type="submit"><i data-lucide="scan-search"></i><span>Research and build bid brief</span></button>
+          </form>
+          <div class="bid-output" id="bid-output"><i data-lucide="file-search"></i><div><strong>No solicitation loaded</strong><p>The team will not draft from a title alone. Load the notice, amendments, attachments, deadline, instructions, and evaluation factors first.</p></div></div>
+          <div class="bid-guardrails"><span>Official source required</span><span>Bid/no-bid before drafting</span><span>No invented past performance</span><span>Founder signs and submits</span></div>
+        </section>
         <div class="contract-flow"><span>Discover</span><i data-lucide="arrow-right"></i><span>Qualify</span><i data-lucide="arrow-right"></i><span>Bid / no-bid</span><i data-lucide="arrow-right"></i><span>Draft + price</span><i data-lucide="arrow-right"></i><span>Red team</span><i data-lucide="arrow-right"></i><strong>Michh approval</strong><i data-lucide="arrow-right"></i><span>Manual submission</span></div>
         <footer><p>Agents assist with research and drafts. They cannot certify eligibility, sign, or submit a government offer.</p><div><button type="button" data-office="government"><i data-lucide="building-2"></i> Enter office</button><a href="https://sam.gov/content/entity-registration" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i> Official SAM.gov</a></div></footer>
       </section>

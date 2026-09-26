@@ -171,7 +171,7 @@ const demoDayPlans = [
   { work: 'Demo thumbnail order completed after QA and owner approval.', tasks: 5, revenue: 35, expenses: 8.4, lesson: 'Fast delivery and a focused brief reduced simulated revision time.' },
   { work: 'POD test spent its cap but produced no demo sale.', tasks: 3, revenue: 0, expenses: 12, lesson: 'Preserve the design engagement data; do not scale the supplier setup.' },
   { work: 'Thumbnail package generated a second simulated client outcome.', tasks: 5, revenue: 65, expenses: 14.75, lesson: 'Package pricing outperformed a single-image offer in this simulation.' },
-  { work: 'Director consolidated the week and promoted repeated evidence to playbooks.', tasks: 4, revenue: 90, expenses: 19.5, lesson: 'Scale the thumbnail service cautiously; revise POD before another test.' }
+  { work: 'Director consolidated the week while the contracting team completed a fictional bid/no-bid training drill.', tasks: 4, revenue: 90, expenses: 19.5, lesson: 'Scale the thumbnail service cautiously; government drafts require a real notice and verified capabilities.' }
 ];
 
 const founderEdition = true;
@@ -182,6 +182,7 @@ const systemAuditChecks = [
   { id: 'workforce', label: 'Agent creation and hiring tools', test: () => Boolean(document.querySelector('[data-open-view="agents"]') && Object.values(officeData).some((office) => office.agents.length > 0)) },
   { id: 'orders', label: 'Customer orders and profit ledger', test: () => Boolean(document.querySelector('#customer-ledger') || document.querySelector('[data-open-view="businesses"]')) },
   { id: 'treasury', label: 'Treasury limits and growth plan', test: () => { const plan = getGrowthPlan(); return plan.reserve + plan.activeCapital <= plan.capital && plan.experimentCap <= plan.activeCapital; } },
+  { id: 'contracts', label: 'Government bid intake and safeguards', test: () => Boolean(document.querySelector('#bid-intake-form') && document.querySelector('#bid-notice') && document.querySelector('#bid-capability')) },
   { id: 'ai', label: 'OpenAI command and live research route', external: true }
 ];
 
@@ -1433,9 +1434,9 @@ function runLocalCommand(command) {
   return { handled: false };
 }
 
-async function submitCommand(command) {
+async function submitCommand(command, { skipLocal = false } = {}) {
   addConsoleMessage('Michh', command, true);
-  const local = runLocalCommand(command);
+  const local = skipLocal ? { handled: false } : runLocalCommand(command);
   if (local.handled) return addConsoleMessage('Director', local.reply);
   const thinking = addConsoleMessage('Director', 'Reviewing your command...');
   thinking.classList.add('thinking');
@@ -1468,6 +1469,27 @@ async function submitCommand(command) {
     addConsoleMessage('Director · Offline', 'The server is unavailable. Navigation commands still work locally.');
   }
 }
+
+const bidIntakeForm = document.querySelector('#bid-intake-form');
+bidIntakeForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const notice = document.querySelector('#bid-notice').value.trim();
+  const capability = document.querySelector('#bid-capability').value.trim();
+  if (!notice || !capability) return showToast('Add the exact notice and a verified capability summary first.');
+  const intake = { notice, capability, createdAt: new Date().toISOString(), status: 'research-requested' };
+  localStorage.setItem('mkn-bid-intake', JSON.stringify(intake));
+  let liveAi = false;
+  try {
+    const healthResponse = await fetch('/api/health', { headers: { Accept: 'application/json' } });
+    liveAi = healthResponse.ok && Boolean((await healthResponse.json()).openai);
+  } catch {}
+  document.querySelector('#bid-output').innerHTML = liveAi
+    ? '<i data-lucide="loader-circle"></i><div><strong>Live source review sent to the contracting team</strong><p>First deliverable: sourced bid/no-bid brief. Drafting remains blocked until requirements and capability evidence are verified.</p></div>'
+    : '<i data-lucide="key-round"></i><div><strong>Demo intake saved · live research not started</strong><p>The workflow is ready, but an OpenAI API key is required to inspect the notice and return sourced findings.</p></div>';
+  refreshIcons();
+  submitCommand(`Research this government solicitation using the official notice and current attachments: ${notice}. Our verified capability summary is: ${capability}. Return a sourced bid/no-bid brief first. Identify every missing fact and do not invent qualifications, past performance, pricing, or compliance.`, { skipLocal: true });
+  showToast(liveAi ? 'Contracting team started a live source-controlled review.' : 'Bid intake saved in demo mode. Add the key for live research.');
+});
 
 commandLauncher.addEventListener('click', () => setConsole(!commandConsole.classList.contains('open')));
 closeConsole.addEventListener('click', () => setConsole(false));
