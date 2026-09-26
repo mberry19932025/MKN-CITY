@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "start:windows": "node server.js",
-    "check": "node --check server.js && node --check app.js"
+    "check": "node --check server.js && node --check app.js && node --check smoke-test.js",
+    "test": "node smoke-test.js"
   },
   "engines": {
     "node": ">=20"

@@ -1,6 +1,10 @@
 const navItems = document.querySelectorAll('.nav-item');
 const views = document.querySelectorAll('.view');
 
+function refreshIcons() {
+  if (window.lucide?.createIcons) window.lucide.createIcons();
+}
+
 async function checkSystemHealth() {
   const status = document.querySelector('#system-status');
   const label = status.querySelector('b');
@@ -148,7 +152,7 @@ function renderOffice(officeId) {
     <article class="office-desk vacant-desk"><i data-lucide="armchair"></i><strong>${officeId === 'university' ? 'Training station' : `Desk ${office.agents.length + index + 1}`}</strong><span>${officeId === 'university' ? 'Ready for a candidate' : 'Vacant'}</span></article>
   `).join('');
   officeFloor.innerHTML = ownerDesk + desks + vacancies;
-  lucide.createIcons();
+  refreshIcons();
   officeDialog.showModal();
 }
 
@@ -234,7 +238,7 @@ function updateCityTime() {
   cityClockIcon.setAttribute('data-lucide', period.icon);
   schedulePhases.forEach((phase, index) => phase.classList.toggle('active-phase', index === period.schedule));
   timeModeButtons.forEach((button) => button.classList.toggle('active', button.dataset.timeMode === cityTimeMode));
-  lucide.createIcons();
+  refreshIcons();
 }
 
 timeModeButtons.forEach((button) => button.addEventListener('click', () => {
@@ -405,7 +409,7 @@ function renderMarketLedger() {
     ledgerContent.className = '';
     ledgerContent.innerHTML = `<ul class="ledger-list">${entries.map((entry) => `<li><div><strong>${escapeHtml(entry.description)}</strong><small>PrizePicks · ${escapeHtml(entry.date)}</small></div><b>$${entry.risk.toFixed(2)}</b></li>`).join('')}</ul>`;
   }
-  lucide.createIcons();
+  refreshIcons();
 }
 
 document.querySelectorAll('[data-market-action]').forEach((button) => {
@@ -562,7 +566,7 @@ function markMemoryReviewed() {
     validationApprove.title = '';
     validationApprove.innerHTML = '<i data-lucide="check"></i><span>Approve $10</span>';
   }
-  lucide.createIcons();
+  refreshIcons();
 }
 
 reviewMemory.addEventListener('click', () => {
@@ -977,4 +981,4 @@ document.querySelector('#clear-local-data').addEventListener('click', () => {
   window.location.reload();
 });
 
-lucide.createIcons();
+refreshIcons();

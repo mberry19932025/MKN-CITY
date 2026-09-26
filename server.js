@@ -153,7 +153,7 @@ async function handleCommand(request, response) {
     if (!apiResponse.ok) {
       const errorText = await apiResponse.text();
       console.error('OpenAI request failed:', apiResponse.status, errorText.slice(0, 500));
-      return sendJson(response, 502, { error: 'The city AI could not respond. Demo commands still work.' });
+      return sendJson(response, 200, { reply: `${demoReply(message)} Paid AI is temporarily unavailable.`, mode: 'demo-fallback' });
     }
 
     const data = await apiResponse.json();
@@ -179,16 +179,17 @@ async function handleCommand(request, response) {
 }
 
 const server = http.createServer(async (request, response) => {
-  if (request.method === 'POST' && request.url === '/api/command') return handleCommand(request, response);
-  if (request.method === 'GET' && request.url === '/api/economy') return handleEconomy(request, response).catch((error) => {
+  const pathname = new URL(request.url, 'http://localhost').pathname;
+  if (request.method === 'POST' && pathname === '/api/command') return handleCommand(request, response);
+  if (request.method === 'GET' && pathname === '/api/economy') return handleEconomy(request, response).catch((error) => {
     console.error('Economy API failed:', error);
     return sendJson(response, 500, { error: 'Verified economy data is unavailable.' });
   });
-  if (request.method === 'POST' && request.url === '/api/webhooks/ledger') return handleLedgerWebhook(request, response).catch((error) => {
+  if (request.method === 'POST' && pathname === '/api/webhooks/ledger') return handleLedgerWebhook(request, response).catch((error) => {
     console.error('Ledger webhook failed:', error);
     return sendJson(response, 500, { error: 'Ledger event could not be recorded.' });
   });
-  if (request.method === 'GET' && request.url === '/api/health') return sendJson(response, 200, {
+  if (request.method === 'GET' && pathname === '/api/health') return sendJson(response, 200, {
     status: 'ok',
     build: buildId,
     openai: Boolean(process.env.OPENAI_API_KEY),
@@ -197,10 +198,9 @@ const server = http.createServer(async (request, response) => {
   });
   if (request.method !== 'GET' && request.method !== 'HEAD') return sendJson(response, 405, { error: 'Method not allowed.' });
 
-  const pathname = new URL(request.url, 'http://localhost').pathname;
   const requestPath = pathname === '/' ? '/index.html' : pathname;
   const filePath = path.resolve(root, `.${requestPath}`);
-  if (!filePath.startsWith(root) || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+  if (!(filePath === root || filePath.startsWith(`${root}${path.sep}`)) || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
     response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
     return response.end('Not found');
   }
@@ -219,5 +219,5 @@ initializeDatabase()
   })
   .catch((error) => {
     console.error('Database initialization failed:', error.message);
-    process.exitCode = 1;
+    server.listen(port, '0.0.0.0', () => console.log(`MKN AI City running without database on port ${port}`));
   });
