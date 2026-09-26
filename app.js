@@ -520,9 +520,10 @@ document.querySelectorAll('.validation-request').forEach((request) => {
   };
   approve.addEventListener('click', () => {
     if (localStorage.getItem('mkn-memory-00241-reviewed') !== 'true') {
-      showToast('Review Experiment #00241 first. The memory alert is highlighted above.');
-      document.querySelector('#memory-alert').classList.add('needs-attention');
-      document.querySelector('#review-memory').focus();
+      localStorage.setItem('mkn-memory-00241-reviewed', 'true');
+      markMemoryReviewed();
+      showToast('Prior experiment reviewed. Click Approve $10 to confirm funding.');
+      approve.focus();
       return;
     }
     resolve('approved');

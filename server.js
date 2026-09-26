@@ -197,7 +197,8 @@ const server = http.createServer(async (request, response) => {
   });
   if (request.method !== 'GET' && request.method !== 'HEAD') return sendJson(response, 405, { error: 'Method not allowed.' });
 
-  const requestPath = request.url === '/' ? '/index.html' : request.url.split('?')[0];
+  const pathname = new URL(request.url, 'http://localhost').pathname;
+  const requestPath = pathname === '/' ? '/index.html' : pathname;
   const filePath = path.resolve(root, `.${requestPath}`);
   if (!filePath.startsWith(root) || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
     response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
