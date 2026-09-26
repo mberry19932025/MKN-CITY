@@ -40,7 +40,9 @@ const founderCard = document.querySelector('.founder-command-card');
 if (founderDeck && founderCard) founderCard.after(founderDeck);
 const officeData = {
   research: { district: 'Research District', title: 'Market Intelligence Lab', description: 'Evidence collection, source checks, and opportunity reports.', agents: [
-    { name: 'Maya', role: 'Trend Researcher', task: 'Find and verify one product trend', sprite: 'research-sprite', status: 'Researching' }
+    { name: 'Maya', role: 'Trend Researcher', task: 'Find and verify one product trend', sprite: 'research-sprite', status: 'Researching' },
+    { name: 'Atlas', role: 'Market Explorer', task: 'Map one market and its active competitors', sprite: 'operations-sprite', status: 'Exploring' },
+    { name: 'Sage', role: 'Evidence Verifier', task: 'Verify the sources in one research report', sprite: 'business-sprite', status: 'Studying sources' }
   ] },
   creative: { district: 'Creative District', title: 'Production Studio', description: 'Focused visual production and controlled design tests.', agents: [
     { name: 'Marcus', role: 'Thumbnail Designer', task: 'Create one approved thumbnail assignment', sprite: 'creative-sprite', status: 'Designing' }
@@ -428,12 +430,12 @@ agentForm.addEventListener('submit', (event) => {
   localStorage.setItem('mkn-agent-candidates', JSON.stringify(createdAgents));
   const current = Number(localStorage.getItem('mkn-created-agents') || '0') + 1;
   localStorage.setItem('mkn-created-agents', String(current));
-  agentCount.textContent = `${6 + current} active`;
+  agentCount.textContent = `${8 + current} active`;
   showToast(`${agentName.value.trim()} created with one focus-locked task.`);
 });
 
 const savedAgentCount = Number(localStorage.getItem('mkn-created-agents') || '0');
-agentCount.textContent = `${6 + savedAgentCount} active`;
+agentCount.textContent = `${8 + savedAgentCount} active`;
 
 const connectionDialog = document.querySelector('#connection-dialog');
 const connectionTitle = document.querySelector('#connection-title');
@@ -486,7 +488,16 @@ document.querySelectorAll('.validation-request').forEach((request) => {
     decline.disabled = true;
     localStorage.setItem('mkn-validation-decision', decision);
   };
-  approve.addEventListener('click', () => resolve('approved'));
+  approve.addEventListener('click', () => {
+    if (localStorage.getItem('mkn-memory-00241-reviewed') !== 'true') {
+      showToast('Review Experiment #00241 first. The memory alert is highlighted above.');
+      document.querySelector('#memory-alert').classList.add('needs-attention');
+      document.querySelector('#review-memory').focus();
+      return;
+    }
+    resolve('approved');
+    showToast('Approved by Michh. The decision was saved.');
+  });
   decline.addEventListener('click', () => resolve('declined'));
   const savedDecision = localStorage.getItem('mkn-validation-decision');
   if (savedDecision) resolve(savedDecision);
@@ -499,6 +510,7 @@ const validationApprove = document.querySelector('.validation-request .approve-b
 function markMemoryReviewed() {
   reviewMemory.innerHTML = '<i data-lucide="check"></i><span>Prior experiment reviewed</span>';
   memoryAlert.classList.add('reviewed');
+  memoryAlert.classList.remove('needs-attention');
   if (!localStorage.getItem('mkn-validation-decision')) {
     validationApprove.disabled = false;
     validationApprove.title = '';
@@ -527,8 +539,8 @@ function resolveStaffing(decision) {
   localStorage.setItem('mkn-staffing-decision', decision);
 }
 
-staffingApprove.addEventListener('click', () => resolveStaffing('approved'));
-staffingDecline.addEventListener('click', () => resolveStaffing('declined'));
+staffingApprove.addEventListener('click', () => { resolveStaffing('approved'); showToast('Staffing approved. Decision saved.'); });
+staffingDecline.addEventListener('click', () => { resolveStaffing('declined'); showToast('Staffing declined. Decision saved.'); });
 const savedStaffingDecision = localStorage.getItem('mkn-staffing-decision');
 if (savedStaffingDecision) resolveStaffing(savedStaffingDecision);
 
@@ -546,8 +558,8 @@ function resolveOpportunity0142(decision) {
   localStorage.setItem('mkn-opportunity-0142-decision', decision);
 }
 
-opportunity0142Approve.addEventListener('click', () => resolveOpportunity0142('approved'));
-opportunity0142Decline.addEventListener('click', () => resolveOpportunity0142('declined'));
+opportunity0142Approve.addEventListener('click', () => { resolveOpportunity0142('approved'); showToast('Opportunity test approved. Decision saved.'); });
+opportunity0142Decline.addEventListener('click', () => { resolveOpportunity0142('declined'); showToast('Opportunity declined. Decision saved.'); });
 const savedOpportunity0142 = localStorage.getItem('mkn-opportunity-0142-decision');
 if (savedOpportunity0142) resolveOpportunity0142(savedOpportunity0142);
 
@@ -611,7 +623,7 @@ function runLocalCommand(command) {
     return { handled: true, reply: 'Try: city status, government contracts, show agents, show approvals, show treasury, show account, talk to Maya, or ask the Director a business question.' };
   }
   if (normalized.includes('city status') || normalized === 'status') {
-    return { handled: true, reply: 'City cash is $168.20. Two businesses and six agents are active. The 60-day mission has completed Goals 1 and 2.' };
+    return { handled: true, reply: 'City cash is $168.20. Two businesses and eight agents are active. The Research Lab is learning from verified sources and exploring assigned markets.' };
   }
   if (normalized.includes('talk to maya') || normalized === 'maya') {
     speakAsAgent('Maya', 'I am checking the strongest evidence now.');
