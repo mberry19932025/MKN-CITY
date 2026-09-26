@@ -124,6 +124,7 @@
           <label><span>Blueprint</span><select id="city-blueprint"><option value="founder">Founder City</option><option value="grid">Business Grid</option><option value="campus">Open Campus</option></select></label>
           <label><span>Roads</span><select id="road-style"><option value="boulevard">Boulevard</option><option value="grid">City Grid</option><option value="loop">Loop Road</option></select></label>
           <button type="button" id="save-blueprint" title="Save city blueprint"><i data-lucide="save"></i><span>Save</span></button>
+          <button type="button" id="open-interior-builder" title="Build rooms and hallways"><i data-lucide="panels-top-left"></i><span>Rooms</span></button>
           <button type="button" id="reset-blueprint" title="Reset Founder blueprint"><i data-lucide="rotate-ccw"></i><span>Reset</span></button>
           <button type="button" id="close-build-mode" title="Finish building"><i data-lucide="check"></i><span>Done</span></button>
         </div>
@@ -845,6 +846,29 @@
       </div>
       <p class="field-note">Targets guide the simulation; they do not guarantee revenue. Reserve funds remain unavailable to autonomous experiments.</p>
       <div class="dialog-actions"><button value="cancel" type="submit">Cancel</button><button class="primary-action" value="default" type="submit">Save growth plan</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="interior-builder-dialog" id="interior-builder-dialog">
+    <form method="dialog" id="interior-builder-form">
+      <header><div><p class="eyebrow">Construction Studio</p><h2>Interior Builder</h2><span id="interior-capacity">Founder lot · 12 × 8</span></div><button class="dialog-close" value="cancel" title="Close" aria-label="Close interior builder"><i data-lucide="x"></i></button></header>
+      <div class="interior-builder-body">
+        <aside class="interior-tools">
+          <label>Building<select id="interior-building"><option value="founder">Founder Tower</option><option value="research">Research Lab</option><option value="creative">Creative Studio</option><option value="business">Commerce Office</option><option value="factory">Production Works</option></select></label>
+          <label>Template<select id="interior-template"><option value="founder">Founder Office</option><option value="starter">Starter Office</option><option value="blank">Empty Lot</option></select></label>
+          <div class="construction-tools" role="toolbar" aria-label="Construction tools">
+            <button class="active" type="button" data-build-tool="floor"><i data-lucide="square"></i><span>Floor</span></button>
+            <button type="button" data-build-tool="wall"><i data-lucide="brick-wall"></i><span>Wall</span></button>
+            <button type="button" data-build-tool="hall"><i data-lucide="move-horizontal"></i><span>Hallway</span></button>
+            <button type="button" data-build-tool="door"><i data-lucide="door-open"></i><span>Door</span></button>
+            <button type="button" data-build-tool="desk"><i data-lucide="monitor"></i><span>Workstation</span></button>
+            <button type="button" data-build-tool="erase"><i data-lucide="eraser"></i><span>Erase</span></button>
+          </div>
+          <div class="interior-budget"><span>Placed tiles</span><strong id="interior-tile-count">0</strong><small>Construction is simulated in this prototype.</small></div>
+        </aside>
+        <section class="interior-canvas-wrap" aria-label="Buildable office floor"><div class="interior-grid" id="interior-grid"></div></section>
+      </div>
+      <footer><button type="button" id="reset-interior"><i data-lucide="rotate-ccw"></i> Reset template</button><div><button value="cancel" type="submit">Close</button><button class="primary-action" id="save-interior" value="default" type="submit"><i data-lucide="save"></i> Save interior</button></div></footer>
     </form>
   </dialog>
 

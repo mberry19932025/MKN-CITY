@@ -564,6 +564,106 @@ cityDistricts.forEach((district) => {
   district.addEventListener('pointercancel', () => district.classList.remove('district-dragging'));
 });
 
+const interiorDialog = document.querySelector('#interior-builder-dialog');
+const interiorForm = document.querySelector('#interior-builder-form');
+const interiorGrid = document.querySelector('#interior-grid');
+const interiorBuilding = document.querySelector('#interior-building');
+const interiorTemplate = document.querySelector('#interior-template');
+const interiorCells = [];
+let interiorTool = 'floor';
+let interiorPainting = false;
+let currentInterior = [];
+
+function createInteriorTemplate(type) {
+  const tiles = Array(96).fill('empty');
+  if (type === 'blank') return tiles;
+  const bounds = type === 'starter' ? { left: 2, right: 9, top: 1, bottom: 6 } : { left: 0, right: 11, top: 0, bottom: 7 };
+  for (let row = bounds.top; row <= bounds.bottom; row += 1) {
+    for (let column = bounds.left; column <= bounds.right; column += 1) {
+      const edge = row === bounds.top || row === bounds.bottom || column === bounds.left || column === bounds.right;
+      tiles[(row * 12) + column] = edge ? 'wall' : 'floor';
+    }
+  }
+  const hallRow = type === 'starter' ? 4 : 4;
+  for (let column = bounds.left + 1; column < bounds.right; column += 1) tiles[(hallRow * 12) + column] = 'hall';
+  tiles[(hallRow * 12) + bounds.left] = 'door';
+  tiles[((bounds.top + 2) * 12) + bounds.left + 2] = 'desk';
+  tiles[((bounds.top + 2) * 12) + bounds.right - 2] = 'desk';
+  if (type === 'founder') {
+    tiles[(2 * 12) + 5] = 'wall'; tiles[(3 * 12) + 5] = 'door';
+    tiles[(5 * 12) + 7] = 'desk'; tiles[(6 * 12) + 9] = 'desk';
+  }
+  return tiles;
+}
+
+function getInteriorLayouts() {
+  try { return JSON.parse(localStorage.getItem('mkn-interior-layouts') || '{}'); }
+  catch { return {}; }
+}
+
+function renderInterior() {
+  currentInterior.forEach((tile, index) => {
+    interiorCells[index].dataset.tile = tile;
+    interiorCells[index].setAttribute('aria-label', `Row ${Math.floor(index / 12) + 1}, column ${(index % 12) + 1}: ${tile}`);
+  });
+  document.querySelector('#interior-tile-count').textContent = String(currentInterior.filter((tile) => tile !== 'empty').length);
+}
+
+function loadInterior() {
+  const saved = getInteriorLayouts()[interiorBuilding.value];
+  currentInterior = Array.isArray(saved?.tiles) && saved.tiles.length === 96 ? saved.tiles.slice() : createInteriorTemplate(interiorBuilding.value === 'founder' ? 'founder' : 'starter');
+  interiorTemplate.value = saved?.template || (interiorBuilding.value === 'founder' ? 'founder' : 'starter');
+  renderInterior();
+}
+
+function paintInteriorCell(cell) {
+  const index = Number(cell.dataset.cell);
+  currentInterior[index] = interiorTool === 'erase' ? 'empty' : interiorTool;
+  cell.dataset.tile = currentInterior[index];
+  cell.setAttribute('aria-label', `Row ${Math.floor(index / 12) + 1}, column ${(index % 12) + 1}: ${currentInterior[index]}`);
+  document.querySelector('#interior-tile-count').textContent = String(currentInterior.filter((tile) => tile !== 'empty').length);
+}
+
+for (let index = 0; index < 96; index += 1) {
+  const cell = document.createElement('button');
+  cell.type = 'button';
+  cell.className = 'interior-cell';
+  cell.dataset.cell = String(index);
+  cell.dataset.tile = 'empty';
+  cell.addEventListener('pointerdown', (event) => { event.preventDefault(); interiorPainting = true; paintInteriorCell(cell); });
+  cell.addEventListener('pointerenter', () => { if (interiorPainting) paintInteriorCell(cell); });
+  interiorCells.push(cell);
+  interiorGrid.append(cell);
+}
+document.addEventListener('pointerup', () => { interiorPainting = false; });
+
+document.querySelectorAll('[data-build-tool]').forEach((button) => button.addEventListener('click', () => {
+  interiorTool = button.dataset.buildTool;
+  document.querySelectorAll('[data-build-tool]').forEach((tool) => tool.classList.toggle('active', tool === button));
+}));
+
+document.querySelector('#open-interior-builder').addEventListener('click', () => {
+  loadInterior();
+  interiorDialog.showModal();
+});
+interiorBuilding.addEventListener('change', loadInterior);
+interiorTemplate.addEventListener('change', () => {
+  currentInterior = createInteriorTemplate(interiorTemplate.value);
+  renderInterior();
+});
+document.querySelector('#reset-interior').addEventListener('click', () => {
+  currentInterior = createInteriorTemplate(interiorTemplate.value);
+  renderInterior();
+  showToast('Interior reset to the selected template.');
+});
+interiorForm.addEventListener('submit', (event) => {
+  if (event.submitter?.value === 'cancel') return;
+  const layouts = getInteriorLayouts();
+  layouts[interiorBuilding.value] = { template: interiorTemplate.value, tiles: currentInterior, savedAt: new Date().toISOString() };
+  localStorage.setItem('mkn-interior-layouts', JSON.stringify(layouts));
+  showToast(`${interiorBuilding.options[interiorBuilding.selectedIndex].text} interior saved.`);
+});
+
 function getCityPeriod(hour) {
   if (hour >= 6 && hour < 10) return { className: 'time-morning', phase: 'Morning research + planning', schedule: 0, icon: 'sunrise' };
   if (hour >= 10 && hour < 15) return { className: 'time-day', phase: 'Production + operations', schedule: 1, icon: 'sun' };
