@@ -680,7 +680,10 @@ commandForm.addEventListener('submit', (event) => {
   commandInput.value = '';
   submitCommand(command);
 });
-document.querySelectorAll('[data-command]').forEach((button) => button.addEventListener('click', () => submitCommand(button.dataset.command)));
+document.querySelectorAll('[data-command]').forEach((button) => button.addEventListener('click', () => {
+  setConsole(true);
+  submitCommand(button.dataset.command);
+}));
 document.querySelectorAll('[data-agent-chat]').forEach((agent) => agent.addEventListener('click', () => {
   setConsole(true);
   submitCommand(`talk to ${agent.dataset.agentChat}`);
