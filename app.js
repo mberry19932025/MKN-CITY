@@ -34,6 +34,7 @@ const officeTitle = document.querySelector('#office-title');
 const officeDistrict = document.querySelector('#office-district');
 const officeDescription = document.querySelector('#office-description');
 const officeFloor = document.querySelector('#office-floor');
+const officeShift = document.querySelector('#office-shift');
 const officeData = {
   research: { district: 'Research District', title: 'Market Intelligence Lab', description: 'Evidence collection, source checks, and opportunity reports.', agents: [
     { name: 'Maya', role: 'Trend Researcher', task: 'Find and verify one product trend', sprite: 'research-sprite', status: 'Researching' }
@@ -54,17 +55,28 @@ const officeData = {
 function renderOffice(officeId) {
   const office = officeData[officeId];
   if (!office) return;
+  const now = new Date();
+  const displayHour = cityTimeMode === 'day' ? 12 : cityTimeMode === 'night' ? 23 : now.getHours();
+  const period = getCityPeriod(displayHour);
+  const isNightCycle = period.schedule === 5;
   officeDistrict.textContent = office.district;
   officeTitle.textContent = office.title;
   officeDescription.textContent = office.description;
-  const desks = office.agents.map((agent) => `
+  officeShift.innerHTML = `<i></i>${isNightCycle ? 'Low-cost night cycle' : period.phase}`;
+  const desks = office.agents.map((agent) => {
+    const liveStatus = isNightCycle && agent.name !== 'Director' ? 'Consolidating memory'
+      : period.schedule === 4 ? 'Knowledge exchange'
+      : period.schedule === 3 ? 'Filing daily report'
+      : agent.status;
+    return `
     <article class="office-desk occupied-desk">
       <div class="desk-workstation"><i data-lucide="monitor"></i><span></span></div>
-      <div class="office-agent"><span class="office-agent-sprite ${agent.sprite}"></span><div><small>${agent.role}</small><strong>${agent.name}</strong><span><i></i>${agent.status}</span></div></div>
+      <div class="office-agent"><span class="office-agent-sprite ${agent.sprite}"></span><div><small>${agent.role}</small><strong>${agent.name}</strong><span><i></i>${liveStatus}</span></div></div>
       <div class="desk-task"><small>Focus-locked task</small><p>${agent.task}</p></div>
       <button type="button" data-office-command="${agent.name}"><i data-lucide="message-square"></i><span>Command</span></button>
     </article>
-  `).join('');
+  `;
+  }).join('');
   const vacantCount = Math.max(1, 3 - office.agents.length);
   const vacancies = Array.from({ length: vacantCount }, (_, index) => `
     <article class="office-desk vacant-desk"><i data-lucide="armchair"></i><strong>${officeId === 'university' ? 'Training station' : `Desk ${office.agents.length + index + 1}`}</strong><span>${officeId === 'university' ? 'Ready for a candidate' : 'Vacant'}</span></article>

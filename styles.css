@@ -796,8 +796,9 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
 .office-header p:last-child { margin-top: 4px; color: var(--muted); font-size: .71rem; }
 .office-header > span { padding: 7px 9px; display: flex; align-items: center; gap: 7px; border: 1px solid #365c48; border-radius: 5px; color: #83dbae; font-size: .62rem; font-weight: 700; white-space: nowrap; }
 .office-header > span i { width: 7px; height: 7px; border-radius: 50%; background: #56d18e; box-shadow: 0 0 10px rgba(86,209,142,.55); }
-.office-floor { min-height: 360px; padding: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; background: #101713; }
-.office-desk { position: relative; min-height: 285px; padding: 14px; overflow: hidden; border: 1px solid #34443b; border-radius: 6px; background: #1a2520; }
+.office-floor { min-height: 450px; padding: 24px; display: grid; grid-template-columns: repeat(3, 1fr); align-items: end; gap: 14px; background: #101713 url("assets/mkn-office-night-v1.png") center / cover no-repeat; }
+.office-desk { position: relative; min-height: 285px; padding: 14px; overflow: hidden; border: 1px solid rgba(125,148,136,.48); border-radius: 6px; background: rgba(18,27,22,.92); box-shadow: 0 15px 32px rgba(0,0,0,.36); backdrop-filter: blur(9px); }
+.occupied-desk::after { content: "At desk"; position: absolute; right: 9px; top: 9px; padding: 3px 5px; border-radius: 3px; background: #214231; color: #83dbae; font-size: .48rem; font-weight: 700; text-transform: uppercase; }
 .desk-workstation { height: 72px; display: grid; place-items: center; border: 1px solid #3c4b43; border-radius: 5px; background: #0d1310; }
 .desk-workstation svg { width: 35px; color: #78b99a; }
 .desk-workstation span { position: absolute; top: 78px; width: 72%; height: 5px; border-radius: 2px; background: #3b3021; }
@@ -815,7 +816,7 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
 .occupied-desk > button { width: 100%; height: 34px; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #40544a; border-radius: 5px; background: transparent; color: #dce5df; cursor: pointer; font-size: .62rem; font-weight: 700; }
 .occupied-desk > button:hover { background: #24352c; }
 .occupied-desk > button svg { width: 14px; }
-.vacant-desk { display: grid; place-items: center; align-content: center; border-style: dashed; color: #68776f; text-align: center; }
+.vacant-desk { min-height: 210px; display: grid; place-items: center; align-content: center; border-style: dashed; background: rgba(14,21,17,.82); color: #87958e; text-align: center; }
 .vacant-desk svg { width: 30px; margin-bottom: 8px; }
 .vacant-desk strong { font-size: .7rem; }.vacant-desk span { margin-top: 3px; font-size: .59rem; }
 .office-footer { min-height: 58px; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #34433b; }
