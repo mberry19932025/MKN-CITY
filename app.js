@@ -174,6 +174,51 @@ const demoDayPlans = [
   { work: 'Director consolidated the week and promoted repeated evidence to playbooks.', tasks: 4, revenue: 90, expenses: 19.5, lesson: 'Scale the thumbnail service cautiously; revise POD before another test.' }
 ];
 
+const founderEdition = true;
+const systemAuditChecks = [
+  { id: 'navigation', label: 'Navigation and district routing', test: () => Boolean(document.querySelector('[data-open-view="agents"]') && document.querySelector('[data-office="research"]')) },
+  { id: 'memory', label: 'Agent and city memory storage', test: () => { localStorage.setItem('mkn-audit-memory', 'ready'); return localStorage.getItem('mkn-audit-memory') === 'ready'; } },
+  { id: 'builder', label: 'Room, hallway, and city builder', test: () => Boolean(document.querySelector('#toggle-build-mode') && document.querySelector('[data-build-tool="wall"]')) },
+  { id: 'workforce', label: 'Agent creation and hiring tools', test: () => Boolean(document.querySelector('[data-open-view="agents"]') && Object.values(officeData).some((office) => office.agents.length > 0)) },
+  { id: 'orders', label: 'Customer orders and profit ledger', test: () => Boolean(document.querySelector('#customer-ledger') || document.querySelector('[data-open-view="businesses"]')) },
+  { id: 'treasury', label: 'Treasury limits and growth plan', test: () => { const plan = getGrowthPlan(); return plan.reserve + plan.activeCapital <= plan.capital && plan.experimentCap <= plan.activeCapital; } },
+  { id: 'ai', label: 'OpenAI command and live research route', external: true }
+];
+
+function renderSystemsAudit(results = []) {
+  const resultMap = new Map(results.map((result) => [result.id, result]));
+  const passed = results.filter((result) => result.status === 'pass').length;
+  const setup = results.filter((result) => result.status === 'setup').length;
+  document.querySelector('#systems-audit-score').textContent = results.length ? `${passed}/${systemAuditChecks.length} ready${setup ? ` · ${setup} setup` : ''}` : 'Not run';
+  document.querySelector('#systems-audit-results').innerHTML = systemAuditChecks.map((check) => {
+    const result = resultMap.get(check.id) || { status: 'pending', detail: 'Waiting to test' };
+    const icon = result.status === 'pass' ? 'check' : result.status === 'setup' ? 'key-round' : result.status === 'fail' ? 'x' : 'clock-3';
+    return `<article class="audit-${result.status}"><i data-lucide="${icon}"></i><div><strong>${safeDemoText(check.label)}</strong><span>${safeDemoText(result.detail)}</span></div></article>`;
+  }).join('');
+  refreshIcons();
+}
+
+async function runSystemsAudit({ quiet = false } = {}) {
+  const results = systemAuditChecks.filter((check) => !check.external).map((check) => {
+    try {
+      const passed = check.test();
+      return { id: check.id, status: passed ? 'pass' : 'fail', detail: passed ? 'Local tool passed' : 'Tool control missing' };
+    }
+    catch { return { id: check.id, status: 'fail', detail: 'Local check failed' }; }
+  });
+  try {
+    const response = await fetch('/api/health', { headers: { Accept: 'application/json' } });
+    const health = response.ok ? await response.json() : {};
+    results.push({ id: 'ai', status: health.openai ? 'pass' : 'setup', detail: health.openai ? 'Live AI route connected' : 'Route ready · OpenAI key required' });
+  } catch {
+    results.push({ id: 'ai', status: 'setup', detail: 'Backend unavailable in this preview' });
+  }
+  localStorage.setItem('mkn-systems-audit', JSON.stringify({ checkedAt: new Date().toISOString(), results }));
+  renderSystemsAudit(results);
+  if (!quiet) showToast(`${results.filter((result) => result.status === 'pass').length} city systems passed. External setup is labeled separately.`);
+  return results;
+}
+
 function getDemoSeason() {
   try { return JSON.parse(localStorage.getItem('mkn-demo-season') || '{"day":0,"records":[]}'); }
   catch { return { day: 0, records: [] }; }
@@ -250,12 +295,12 @@ function updateCityGrowth(netProfit) {
     item.classList.toggle('growth-complete', index + 1 < stage);
   });
   document.querySelectorAll('[data-unlock-profit]').forEach((district) => {
-    const unlocked = netProfit >= Number(district.dataset.unlockProfit);
+    const unlocked = founderEdition || netProfit >= Number(district.dataset.unlockProfit);
     district.classList.toggle('locked-district', !unlocked);
     district.setAttribute('aria-disabled', String(!unlocked));
   });
   const factoryState = document.querySelector('#factory-state');
-  factoryState.innerHTML = netProfit >= 25 ? '<i></i> Production district unlocked' : '<i></i> Locked until $25 demo profit';
+  factoryState.innerHTML = founderEdition || netProfit >= 25 ? '<i></i> Founder production district online' : '<i></i> Locked until $25 demo profit';
 }
 
 const demoAutonomy = document.querySelector('#demo-autonomy');
@@ -279,11 +324,13 @@ function runDemoDay(source = 'manual') {
   localStorage.setItem('mkn-demo-last-run', new Date().toISOString());
   renderDemoSeason();
   updateDemoAutonomyStatus();
+  runSystemsAudit({ quiet: true });
   showToast(`${source === 'autonomous' ? 'Autonomous shift' : 'Demo Day'} ${season.day} recorded. City health recalculated.`);
   return true;
 }
 
 document.querySelector('#advance-demo-day').addEventListener('click', () => runDemoDay('manual'));
+document.querySelector('#run-systems-audit').addEventListener('click', () => runSystemsAudit());
 
 demoAutonomy.addEventListener('change', () => {
   localStorage.setItem('mkn-demo-autonomy', demoAutonomy.checked ? 'active' : 'paused');
@@ -368,7 +415,11 @@ const officeData = {
   founder: { district: 'Downtown', title: 'Founder Tower', description: 'City oversight, approvals, budgets, and department coordination.', agents: [
     { name: 'Director', role: 'Chief Director', task: 'Review city performance and escalate decisions', sprite: 'director-sprite', status: 'Reviewing' }
   ] },
-  university: { district: 'North MKN City', title: 'AI University', description: 'Training, work samples, certification, and formal retraining.', agents: [] },
+  university: { district: 'North MKN City', title: 'AI University', description: 'Classroom instruction, practical work samples, exams, certification, and formal retraining.', agents: [
+    { name: 'Dean Ellis', role: 'Training Director', task: 'Evaluate one probationary agent work sample', sprite: 'director-sprite', status: 'Teaching' },
+    { name: 'Imani', role: 'Skills Coach', task: 'Train one agent on source verification', sprite: 'research-sprite', status: 'Leading class' },
+    { name: 'Jordan', role: 'Probationary Analyst', task: 'Complete one supervised market research exam', sprite: 'operations-sprite', status: 'Taking exam' }
+  ] },
   government: { district: 'Government Contracting District', title: 'Capture & Proposal Center', description: 'Opportunity qualification, compliant proposal development, and human-controlled submissions.', agents: [
     { name: 'Grant', role: 'Opportunity Scout', task: 'Find one solicitation that matches verified capabilities', sprite: 'research-sprite', status: 'Scanning' },
     { name: 'Carmen', role: 'Capture Analyst', task: 'Produce one evidence-based bid or no-bid brief', sprite: 'operations-sprite', status: 'Qualifying' },
@@ -378,6 +429,13 @@ const officeData = {
     { name: 'Redd', role: 'Red Team Reviewer', task: 'Review one proposal package against its requirements', sprite: 'director-sprite', status: 'Reviewing' }
   ] }
 };
+
+try {
+  const savedAudit = JSON.parse(localStorage.getItem('mkn-systems-audit') || '{}');
+  renderSystemsAudit(Array.isArray(savedAudit.results) ? savedAudit.results : []);
+} catch {
+  renderSystemsAudit();
+}
 
 const defaultCityIdentity = { name: 'MICHH', title: 'Founder' };
 function getCityIdentity() {
@@ -445,7 +503,7 @@ document.querySelectorAll('[data-office]').forEach((district) => district.addEve
   const threshold = thresholds[district.dataset.office];
   const records = getDemoSeason().records;
   const net = records.reduce((total, record) => total + record.revenue - record.expenses, 0);
-  if (threshold && net < threshold) return showToast(`This district unlocks at $${threshold} cumulative demo net.`);
+  if (!founderEdition && threshold && net < threshold) return showToast(`This district unlocks at $${threshold} cumulative demo net.`);
   renderOffice(district.dataset.office);
 }));
 document.querySelector('[data-enter-founder-office]').addEventListener('click', () => renderOffice('founder'));
