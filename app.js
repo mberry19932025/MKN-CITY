@@ -1013,6 +1013,11 @@ let rosterPage = 1;
 
 function renderCandidateRoster() {
   const candidates = JSON.parse(localStorage.getItem('mkn-agent-candidates') || '[]');
+  const totalWorkforce = 8 + candidates.length;
+  document.querySelector('#workforce-total').textContent = String(totalWorkforce);
+  const scaleState = document.querySelector('#workforce-scale-state');
+  scaleState.textContent = totalWorkforce > 60 ? 'Create department divisions' : totalWorkforce > 24 ? 'Add another manager' : 'Capacity healthy';
+  scaleState.classList.toggle('needs-scale', totalWorkforce > 24);
   candidateRosterCount.textContent = `${candidates.length} candidate${candidates.length === 1 ? '' : 's'}`;
   const query = rosterSearch.value.trim().toLowerCase();
   const department = rosterDepartment.value;
