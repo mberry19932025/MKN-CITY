@@ -22,6 +22,16 @@ document.querySelectorAll('[data-open-view]').forEach((button) => {
 const gameToast = document.querySelector('#game-toast');
 let toastTimer;
 
+const decisionKeys = ['mkn-staffing-decision', 'mkn-opportunity-0142-decision', 'mkn-validation-decision'];
+
+function updateApprovalCount() {
+  const waiting = decisionKeys.filter((key) => !localStorage.getItem(key)).length;
+  document.querySelector('#founder-approval-count').textContent = waiting;
+  document.querySelector('#nav-approval-count').textContent = waiting;
+  document.querySelector('#approval-summary').textContent = waiting ? `${waiting} ${waiting === 1 ? 'decision' : 'decisions'} waiting` : 'All decisions reviewed';
+  document.querySelector('.notification-dot').hidden = waiting === 0;
+}
+
 function showToast(message) {
   clearTimeout(toastTimer);
   gameToast.textContent = message;
@@ -487,6 +497,7 @@ document.querySelectorAll('.validation-request').forEach((request) => {
     approve.disabled = true;
     decline.disabled = true;
     localStorage.setItem('mkn-validation-decision', decision);
+    updateApprovalCount();
   };
   approve.addEventListener('click', () => {
     if (localStorage.getItem('mkn-memory-00241-reviewed') !== 'true') {
@@ -537,6 +548,7 @@ function resolveStaffing(decision) {
   staffingApprove.disabled = true;
   staffingDecline.disabled = true;
   localStorage.setItem('mkn-staffing-decision', decision);
+  updateApprovalCount();
 }
 
 staffingApprove.addEventListener('click', () => { resolveStaffing('approved'); showToast('Staffing approved. Decision saved.'); });
@@ -556,12 +568,21 @@ function resolveOpportunity0142(decision) {
   opportunity0142Approve.disabled = true;
   opportunity0142Decline.disabled = true;
   localStorage.setItem('mkn-opportunity-0142-decision', decision);
+  updateApprovalCount();
 }
 
 opportunity0142Approve.addEventListener('click', () => { resolveOpportunity0142('approved'); showToast('Opportunity test approved. Decision saved.'); });
 opportunity0142Decline.addEventListener('click', () => { resolveOpportunity0142('declined'); showToast('Opportunity declined. Decision saved.'); });
 const savedOpportunity0142 = localStorage.getItem('mkn-opportunity-0142-decision');
 if (savedOpportunity0142) resolveOpportunity0142(savedOpportunity0142);
+
+document.querySelector('#reset-demo-decisions').addEventListener('click', () => {
+  decisionKeys.forEach((key) => localStorage.removeItem(key));
+  localStorage.removeItem('mkn-memory-00241-reviewed');
+  window.location.reload();
+});
+
+updateApprovalCount();
 
 const commandLauncher = document.querySelector('#command-launcher');
 const commandConsole = document.querySelector('#command-console');

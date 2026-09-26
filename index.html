@@ -35,7 +35,7 @@
       <section class="founder-command-card" aria-labelledby="founder-command-title">
         <div class="founder-seal"><i data-lucide="crown"></i></div>
         <div><p class="eyebrow">Founder / Final Authority</p><h3 id="founder-command-title">MICHH</h3><p>Owns the city, appoints the Director, controls capital, and approves every high-risk external action.</p></div>
-        <div class="founder-authority"><span><b>2</b> approvals waiting</span><span><b>5</b> direct reports</span><span><b>$100</b> protected reserve</span></div>
+        <div class="founder-authority"><span><b id="founder-approval-count">3</b> approvals waiting</span><span><b>5</b> direct reports</span><span><b>$100</b> protected reserve</span></div>
         <button type="button" data-enter-founder-office><i data-lucide="building-2"></i><span>Enter Founder Tower</span></button>
       </section>
 
@@ -204,6 +204,15 @@
           <article><span class="roster-rank">03</span><div class="roster-agent-avatar business-sprite"></div><div><small>Commerce</small><strong>Avery</strong><p>Marketplace listing quality</p></div><b>90</b></article>
           <article><span class="roster-rank">04</span><div class="roster-agent-avatar creative-sprite"></div><div><small>Creative</small><strong>Marcus</strong><p>Thumbnail production</p></div><b>89</b></article>
         </div>
+      </section>
+      <section class="research-operations" aria-labelledby="research-operations-title">
+        <header><div><p class="eyebrow">Research District</p><h3 id="research-operations-title">Live Research Operations</h3></div><span><i></i> 3 focused assignments</span></header>
+        <div class="research-task-grid">
+          <article><div class="research-agent-badge research-sprite"></div><div><small>Maya · Trend Research</small><strong>Verify one emerging demand signal</strong><p>Deliverable: sourced trend brief with confidence score.</p></div><span class="task-state active-task">Researching</span></article>
+          <article><div class="research-agent-badge operations-sprite"></div><div><small>Atlas · Market Exploration</small><strong>Map one market and active competitors</strong><p>Deliverable: market map, gaps, risks, and stop condition.</p></div><span class="task-state">Exploring</span></article>
+          <article><div class="research-agent-badge business-sprite"></div><div><small>Sage · Evidence Verification</small><strong>Audit one report's source package</strong><p>Deliverable: verified claims, rejected claims, and source dates.</p></div><span class="task-state">Checking</span></article>
+        </div>
+        <footer><div><i data-lucide="shield-check"></i><p><strong>Evidence rule</strong><span>No finding becomes company memory without a source, date, confidence level, and reviewer.</span></p></div><div><button type="button" data-agent-chat="Maya"><i data-lucide="message-square"></i> Ask Maya</button><button type="button" data-office="research"><i data-lucide="microscope"></i> Enter lab</button></div></footer>
       </section>
       <div class="agent-toolbar"><div><h3>Create from a template</h3><p>Start with a focused role, then customize its department and permissions.</p></div><span id="agent-count">8 active</span></div>
       <div class="template-grid">
@@ -419,7 +428,7 @@
       </section>
     </section>
     <section class="view" id="approvals" aria-labelledby="approvals-title">
-      <p class="eyebrow">Mayor's Desk</p><h2 id="approvals-title">Approvals</h2>
+      <div class="approval-page-heading"><div><p class="eyebrow">Mayor's Desk</p><h2 id="approvals-title">Approvals</h2></div><div><span id="approval-summary">3 decisions waiting</span><button type="button" id="reset-demo-decisions"><i data-lucide="rotate-ccw"></i> Reset demo decisions</button></div></div>
       <aside class="memory-alert" id="memory-alert">
         <div class="memory-alert-icon"><i data-lucide="triangle-alert"></i></div>
         <div class="memory-alert-copy"><p class="eyebrow">City Memory Alert</p><h3>Similar opportunity previously tested</h3><span>Experiment #00241 · Loss: <b>-$18.42</b></span></div>
@@ -638,7 +647,7 @@
     <button class="nav-item active" data-view="city" type="button"><i data-lucide="map"></i><span>City</span></button>
     <button class="nav-item" data-view="agents" type="button"><i data-lucide="bot"></i><span>Agents</span></button>
     <button class="nav-item" data-view="businesses" type="button"><i data-lucide="store"></i><span>Business</span></button>
-    <button class="nav-item approval-link" data-view="approvals" type="button"><i data-lucide="circle-check-big"></i><span>Approvals</span><b>2</b></button>
+    <button class="nav-item approval-link" data-view="approvals" type="button"><i data-lucide="circle-check-big"></i><span>Approvals</span><b id="nav-approval-count">3</b></button>
     <button class="nav-item" data-view="memory" type="button"><i data-lucide="brain"></i><span>Memory</span></button>
     <button class="nav-item" data-view="treasury" type="button"><i data-lucide="landmark"></i><span>Treasury</span></button>
     <button class="nav-item" data-view="markets" type="button"><i data-lucide="chart-candlestick"></i><span>Markets</span></button>
