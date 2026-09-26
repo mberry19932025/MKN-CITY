@@ -396,31 +396,31 @@ setInterval(() => {
   if (demoAutonomy.checked && document.visibilityState === 'visible') runDemoDay('autonomous');
 }, 90000);
 const officeData = {
-  research: { district: 'Research District', title: 'Market Intelligence Lab', description: 'Evidence collection, source checks, and opportunity reports.', agents: [
+  research: { district: 'Research District', title: 'Market Intelligence Lab', description: 'Evidence collection, source checks, and opportunity reports.', zone: 'Evidence Bay', zoneDetail: 'Trend wall active · source verification in progress', zoneIcon: 'scan-search', agents: [
     { name: 'Maya', role: 'Trend Researcher', task: 'Find and verify one product trend', sprite: 'research-sprite', status: 'Researching' },
     { name: 'Atlas', role: 'Market Explorer', task: 'Map one market and its active competitors', sprite: 'operations-sprite', status: 'Exploring' },
     { name: 'Sage', role: 'Evidence Verifier', task: 'Verify the sources in one research report', sprite: 'business-sprite', status: 'Studying sources' }
   ] },
-  creative: { district: 'Creative District', title: 'Production Studio', description: 'Focused visual production and controlled design tests.', agents: [
+  creative: { district: 'Creative District', title: 'Production Studio', description: 'Focused visual production and controlled design tests.', zone: 'Edit Suite', zoneDetail: 'Three concept bays · quality proofing online', zoneIcon: 'clapperboard', agents: [
     { name: 'Marcus', role: 'Thumbnail Designer', task: 'Create one approved thumbnail assignment', sprite: 'creative-sprite', status: 'Designing' }
   ] },
-  business: { district: 'Commerce & Operations', title: 'Commerce Operations Floor', description: 'Listings, order flow, capacity, and customer operations.', agents: [
+  business: { district: 'Commerce & Operations', title: 'Commerce Operations Floor', description: 'Listings, order flow, capacity, and customer operations.', zone: 'Order Control', zoneDetail: 'Listings, customer care, and delivery queues', zoneIcon: 'shopping-bag', agents: [
     { name: 'Avery', role: 'Listing / SEO Specialist', task: 'Prepare one compliant marketplace listing', sprite: 'business-sprite', status: 'Optimizing' },
     { name: 'Nova', role: 'Operations Specialist', task: 'Monitor one active production queue', sprite: 'operations-sprite', status: 'Monitoring' }
   ] },
-  factory: { district: 'Industrial District', title: 'MKN Production Works', description: 'Approved work orders move through creation, quality control, and delivery.', agents: [
+  factory: { district: 'Industrial District', title: 'MKN Production Works', description: 'Approved work orders move through creation, quality control, and delivery.', zone: 'Production Line', zoneDetail: 'Create · inspect · package · release', zoneIcon: 'factory', agents: [
     { name: 'Forge', role: 'Production Manager', task: 'Move one approved work order through production', sprite: 'operations-sprite', status: 'Scheduling' },
     { name: 'Quinn', role: 'Quality Inspector', task: 'Inspect one completed output against its brief', sprite: 'business-sprite', status: 'Inspecting' }
   ] },
-  founder: { district: 'Downtown', title: 'Founder Tower', description: 'City oversight, approvals, budgets, and department coordination.', agents: [
+  founder: { district: 'Downtown', title: 'Founder Tower', description: 'City oversight, approvals, budgets, and department coordination.', zone: 'Command Deck', zoneDetail: 'Treasury, approvals, and city intelligence', zoneIcon: 'crown', agents: [
     { name: 'Director', role: 'Chief Director', task: 'Review city performance and escalate decisions', sprite: 'director-sprite', status: 'Reviewing' }
   ] },
-  university: { district: 'North MKN City', title: 'AI University', description: 'Classroom instruction, practical work samples, exams, certification, and formal retraining.', agents: [
+  university: { district: 'North MKN City', title: 'AI University', description: 'Classroom instruction, practical work samples, exams, certification, and formal retraining.', zone: 'Skills Campus', zoneDetail: 'Classroom, practical lab, exams, and certification', zoneIcon: 'graduation-cap', agents: [
     { name: 'Dean Ellis', role: 'Training Director', task: 'Evaluate one probationary agent work sample', sprite: 'director-sprite', status: 'Teaching' },
     { name: 'Imani', role: 'Skills Coach', task: 'Train one agent on source verification', sprite: 'research-sprite', status: 'Leading class' },
     { name: 'Jordan', role: 'Probationary Analyst', task: 'Complete one supervised market research exam', sprite: 'operations-sprite', status: 'Taking exam' }
   ] },
-  government: { district: 'Government Contracting District', title: 'Capture & Proposal Center', description: 'Opportunity qualification, compliant proposal development, and human-controlled submissions.', agents: [
+  government: { district: 'Government Contracting District', title: 'Capture & Proposal Center', description: 'Opportunity qualification, compliant proposal development, and human-controlled submissions.', zone: 'Secure Proposal Room', zoneDetail: 'Qualification · compliance · pricing · red team', zoneIcon: 'shield-check', agents: [
     { name: 'Grant', role: 'Opportunity Scout', task: 'Find one solicitation that matches verified capabilities', sprite: 'research-sprite', status: 'Scanning' },
     { name: 'Carmen', role: 'Capture Analyst', task: 'Produce one evidence-based bid or no-bid brief', sprite: 'operations-sprite', status: 'Qualifying' },
     { name: 'Clara', role: 'Compliance Specialist', task: 'Build one solicitation compliance matrix', sprite: 'business-sprite', status: 'Checking' },
@@ -464,6 +464,7 @@ function renderOffice(officeId) {
   officeDescription.textContent = office.description;
   officeShift.innerHTML = `<i></i>${isNightCycle ? 'Low-cost night cycle' : period.phase}`;
   officeDialog.dataset.office = officeId;
+  const zone = `<aside class="office-zone"><i data-lucide="${office.zoneIcon}"></i><div><small>Active location</small><strong>${office.zone}</strong><span>${office.zoneDetail}</span></div><b><i></i> Online</b></aside>`;
   const desks = office.agents.map((agent) => {
     const liveStatus = isNightCycle && agent.name !== 'Director' ? 'Consolidating memory'
       : period.schedule === 4 ? 'Knowledge exchange'
@@ -492,9 +493,17 @@ function renderOffice(officeId) {
   const vacancies = Array.from({ length: vacantCount }, (_, index) => `
     <article class="office-desk vacant-desk"><i data-lucide="armchair"></i><strong>${officeId === 'university' ? 'Training station' : `Desk ${office.agents.length + index + 1}`}</strong><span>${officeId === 'university' ? 'Ready for a candidate' : 'Vacant'}</span></article>
   `).join('');
-  officeFloor.innerHTML = ownerDesk + desks + vacancies;
+  officeFloor.innerHTML = zone + ownerDesk + desks + vacancies;
   refreshIcons();
   officeDialog.showModal();
+  let discovered;
+  try { discovered = new Set(JSON.parse(localStorage.getItem('mkn-discovered-offices') || '[]')); }
+  catch { discovered = new Set(); }
+  if (!discovered.has(officeId)) {
+    discovered.add(officeId);
+    localStorage.setItem('mkn-discovered-offices', JSON.stringify([...discovered]));
+    showToast(`Location discovered: ${office.title}`);
+  }
 }
 
 document.querySelectorAll('[data-office]').forEach((district) => district.addEventListener('click', () => {
