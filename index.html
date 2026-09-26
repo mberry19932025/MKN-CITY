@@ -258,6 +258,7 @@
         <div class="connection-list">
           <article><div class="service-mark openai">AI</div><div><h3>OpenAI API</h3><p>Server-side project key for approved agents.</p></div><span class="not-connected">Not configured</span><button type="button" data-connection="openai">Setup</button></article>
           <article><div class="service-mark etsy">E</div><div><h3>Etsy</h3><p>OAuth connection with listing and shop scopes.</p></div><span class="not-connected">Not connected</span><button type="button" data-connection="etsy">Connect</button></article>
+          <article><div class="service-mark fiverr-service">F</div><div><h3>Fiverr Seller</h3><p>Assisted workflow for research, gig drafts, creative production, and order tracking.</p></div><span class="assisted-connection">Assisted mode</span><button type="button" data-connection="fiverr">Setup</button></article>
           <article><div class="service-mark kalshi-service">K</div><div><h3>Kalshi</h3><p>Official API connection for personal market data.</p></div><span class="not-connected">Not connected</span><button type="button" data-connection="kalshi">Setup</button></article>
         </div>
       </section>
@@ -274,6 +275,16 @@
         </div>
         <footer><i data-lucide="circle-alert"></i><span>Division totals are awaiting Treasury reconciliation before changing citywide cash.</span></footer>
       </article>
+      <section class="fiverr-operations" aria-labelledby="fiverr-operations-title">
+        <header><div><p class="eyebrow">Creative Services</p><h3 id="fiverr-operations-title">Fiverr Thumbnail Operations</h3></div><span><i data-lucide="shield-check"></i> Assisted mode</span></header>
+        <div class="fiverr-workflow">
+          <article><i data-lucide="radar"></i><div><small>Research</small><strong>Demand patterns</strong><p>Study categories, buyer language, pricing ranges, and recurring problems.</p></div></article>
+          <article><i data-lucide="sparkles"></i><div><small>Create</small><strong>Original MKN concepts</strong><p>Use trend insights without copying another seller's image, wording, identity, or protected style.</p></div></article>
+          <article><i data-lucide="file-pen-line"></i><div><small>Prepare</small><strong>Gig and delivery drafts</strong><p>Queue titles, packages, FAQs, thumbnails, and customer replies for review.</p></div></article>
+          <article><i data-lucide="user-check"></i><div><small>Approve</small><strong>Michh publishes</strong><p>Pricing changes, messages, offers, delivery, and account actions stay human-controlled.</p></div></article>
+        </div>
+        <footer><div><i data-lucide="key-round"></i><p><strong>No Fiverr password storage</strong><span>Use official OAuth only if Fiverr grants an approved seller integration. Until then, actions remain manual.</span></p></div><button type="button" data-connection="fiverr">Open Fiverr setup</button></footer>
+      </section>
       <section class="government-center" aria-labelledby="government-center-title">
         <header><div><p class="eyebrow">Public Sector Division</p><h3 id="government-center-title">Government Contracting Center</h3></div><span><i data-lucide="shield-alert"></i> Readiness required</span></header>
         <div class="government-readiness">

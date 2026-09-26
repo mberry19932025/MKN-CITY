@@ -507,7 +507,9 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .service-mark { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 6px; color: white; font: 700 .75rem "Space Grotesk", sans-serif; }
 .service-mark.openai { background: #202c27; }
 .service-mark.etsy { background: #e56627; }
+.service-mark.fiverr-service { background: #1dbf73; }
 .service-mark.kalshi-service { background: #178064; }
+.assisted-connection { color: var(--gold); font-size: .61rem; font-weight: 700; }
 .connection-list h3 { font-size: .82rem; }
 .connection-list p { margin-top: 2px; color: var(--muted); font-size: .68rem; }
 .not-connected { color: var(--muted); font-size: .66rem; font-weight: 700; }
@@ -670,6 +672,7 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .etsy-division > footer { padding: 9px 18px; display: flex; align-items: center; gap: 7px; border-top: 1px solid #eadfb8; background: #fffbef; color: #765414; font-size: .61rem; }
 .etsy-division > footer svg { width: 14px; }
 .handoff-pipeline { margin-top: 16px; padding: 17px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.fiverr-operations { margin-top: 16px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }.fiverr-operations > header { padding: 15px 17px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }.fiverr-operations h3 { font-size: .94rem; }.fiverr-operations > header > span { display: flex; align-items: center; gap: 5px; color: var(--gold); font-size: .58rem; font-weight: 700; }.fiverr-operations > header svg { width: 15px; }.fiverr-workflow { display: grid; grid-template-columns: repeat(4, 1fr); }.fiverr-workflow article { min-width: 0; padding: 14px; display: grid; grid-template-columns: auto 1fr; gap: 8px; border-right: 1px solid var(--line); }.fiverr-workflow article:last-child { border: 0; }.fiverr-workflow svg { width: 18px; color: var(--gold); }.fiverr-workflow small, .fiverr-workflow strong { display: block; }.fiverr-workflow small { color: var(--muted); font-size: .48rem; text-transform: uppercase; }.fiverr-workflow strong { margin-top: 3px; font-size: .66rem; }.fiverr-workflow p { margin-top: 4px; color: var(--muted); font-size: .54rem; line-height: 1.45; }.fiverr-operations > footer { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); background: #0d0f0d; }.fiverr-operations > footer > div { display: flex; align-items: center; gap: 8px; }.fiverr-operations footer svg { flex: 0 0 auto; width: 16px; color: var(--gold); }.fiverr-operations footer strong, .fiverr-operations footer span { display: block; }.fiverr-operations footer strong { font-size: .61rem; }.fiverr-operations footer span { color: var(--muted); font-size: .53rem; }.fiverr-operations footer button { min-height: 34px; padding: 0 10px; border: 1px solid #5e5130; border-radius: 5px; background: #1d1a11; color: #edcb6a; cursor: pointer; font-size: .56rem; font-weight: 700; }
 .handoff-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .handoff-heading h3 { font-size: .92rem; }
 .handoff-heading > span { padding: 5px 8px; border-radius: 5px; background: #fff0cc; color: #755313; font-size: .61rem; font-weight: 700; text-transform: uppercase; }
@@ -1210,6 +1213,9 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 #manual-entry-fields label { margin-top: 12px; }
 
 @media (max-width: 680px) {
+  .fiverr-workflow { grid-template-columns: 1fr 1fr; }
+  .fiverr-workflow article:nth-child(even) { border-right: 0; }
+  .fiverr-operations > footer { align-items: stretch; flex-direction: column; }
   .memory-playbooks, .memory-learning-loop { grid-template-columns: 1fr; }
   .memory-playbooks > article { border-right: 0; border-bottom: 1px solid var(--line); }
   .business-memory-system > header { align-items: flex-start; flex-direction: column; gap: 6px; }

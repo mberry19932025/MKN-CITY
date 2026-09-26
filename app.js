@@ -514,6 +514,7 @@ const connectionCopy = document.querySelector('#connection-copy');
 const connectionDetails = {
   openai: { title: 'Configure OpenAI API', copy: '<p>OpenAI application access uses an API project key, not a ChatGPT password.</p><ul><li>Store the key as a private Render environment variable.</li><li>Never put it in browser code or GitHub.</li><li>Set project spend limits before enabling agents.</li></ul>' },
   etsy: { title: 'Connect Etsy', copy: '<p>Etsy uses OAuth 2.0 with explicit scopes.</p><ul><li>Start with a Seller App for your own shop.</li><li>Use read-only scopes first.</li><li>A private backend is required for token exchange and refresh.</li></ul>' },
+  fiverr: { title: 'Set Up Fiverr Assisted Mode', copy: '<p>MKN City will not request or store your Fiverr password. A generally available seller-control API has not been verified for this build.</p><ul><li>Researchers may study approved public evidence and information you provide.</li><li>Agents create original MKN concepts, gig drafts, FAQs, packages, and delivery drafts.</li><li>You manually review and perform publishing, messaging, pricing, offers, and delivery on Fiverr.</li><li>If Fiverr grants official OAuth credentials later, connect them only through the private Render backend.</li></ul>' },
   kalshi: { title: 'Configure Kalshi API', copy: '<p>Kalshi provides an official API for market and personal account data.</p><ul><li>Credentials stay on the Render backend.</li><li>Begin with read-only analysis.</li><li>Keep all trading actions behind owner approval.</li></ul>' }
 };
 
