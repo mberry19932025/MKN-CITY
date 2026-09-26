@@ -166,10 +166,28 @@ function renderDemoSeason() {
   document.querySelector('#season-net').textContent = `${net < 0 ? '-' : ''}$${Math.abs(net).toFixed(2)}`;
   document.querySelector('#season-health').textContent = health;
   document.querySelector('#season-health-fill').style.width = `${health}%`;
+  updateCityGrowth(net);
   document.querySelector('#season-ledger').innerHTML = season.records.length ? season.records.slice().reverse().map((record) => `<article><b>Day ${record.day}</b><div><strong>${safeDemoText(record.work)}</strong><span>${safeDemoText(record.lesson)}</span></div><small>${record.tasks} tasks · $${record.revenue.toFixed(2)} revenue · $${record.expenses.toFixed(2)} cost</small></article>`).join('') : '<p>No simulated workdays recorded yet.</p>';
   document.querySelector('#advance-demo-day').disabled = season.day >= 7;
   document.querySelector('#advance-demo-day').innerHTML = season.day >= 7 ? '<i data-lucide="check"></i> Week complete' : '<i data-lucide="play"></i> Run next demo day';
   refreshIcons();
+}
+
+function updateCityGrowth(netProfit) {
+  const stage = netProfit >= 250 ? 4 : netProfit >= 100 ? 3 : netProfit >= 25 ? 2 : 1;
+  const stageNames = ['Starter Block', 'Working District', 'Business City', 'Full MKN City'];
+  document.querySelector('#growth-stage').textContent = stageNames[stage - 1];
+  document.querySelectorAll('.city-growth-path li').forEach((item, index) => {
+    item.classList.toggle('growth-current', index + 1 === stage);
+    item.classList.toggle('growth-complete', index + 1 < stage);
+  });
+  document.querySelectorAll('[data-unlock-profit]').forEach((district) => {
+    const unlocked = netProfit >= Number(district.dataset.unlockProfit);
+    district.classList.toggle('locked-district', !unlocked);
+    district.setAttribute('aria-disabled', String(!unlocked));
+  });
+  const factoryState = document.querySelector('#factory-state');
+  factoryState.innerHTML = netProfit >= 25 ? '<i></i> Production district unlocked' : '<i></i> Locked until $25 demo profit';
 }
 
 document.querySelector('#advance-demo-day').addEventListener('click', () => {
@@ -203,6 +221,10 @@ const officeData = {
   business: { district: 'Commerce & Operations', title: 'Commerce Operations Floor', description: 'Listings, order flow, capacity, and customer operations.', agents: [
     { name: 'Avery', role: 'Listing / SEO Specialist', task: 'Prepare one compliant marketplace listing', sprite: 'business-sprite', status: 'Optimizing' },
     { name: 'Nova', role: 'Operations Specialist', task: 'Monitor one active production queue', sprite: 'operations-sprite', status: 'Monitoring' }
+  ] },
+  factory: { district: 'Industrial District', title: 'MKN Production Works', description: 'Approved work orders move through creation, quality control, and delivery.', agents: [
+    { name: 'Forge', role: 'Production Manager', task: 'Move one approved work order through production', sprite: 'operations-sprite', status: 'Scheduling' },
+    { name: 'Quinn', role: 'Quality Inspector', task: 'Inspect one completed output against its brief', sprite: 'business-sprite', status: 'Inspecting' }
   ] },
   founder: { district: 'Downtown', title: 'Founder Tower', description: 'City oversight, approvals, budgets, and department coordination.', agents: [
     { name: 'Director', role: 'Chief Director', task: 'Review city performance and escalate decisions', sprite: 'director-sprite', status: 'Reviewing' }
@@ -262,7 +284,14 @@ function renderOffice(officeId) {
   officeDialog.showModal();
 }
 
-document.querySelectorAll('[data-office]').forEach((district) => district.addEventListener('click', () => renderOffice(district.dataset.office)));
+document.querySelectorAll('[data-office]').forEach((district) => district.addEventListener('click', () => {
+  const thresholds = { factory: 25, university: 100, government: 250 };
+  const threshold = thresholds[district.dataset.office];
+  const records = getDemoSeason().records;
+  const net = records.reduce((total, record) => total + record.revenue - record.expenses, 0);
+  if (threshold && net < threshold) return showToast(`This district unlocks at $${threshold} cumulative demo net.`);
+  renderOffice(district.dataset.office);
+}));
 document.querySelector('[data-enter-founder-office]').addEventListener('click', () => renderOffice('founder'));
 officeFloor.addEventListener('click', (event) => {
   const approvalsButton = event.target.closest('[data-owner-approvals]');

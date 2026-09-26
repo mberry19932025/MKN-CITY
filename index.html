@@ -121,12 +121,13 @@
           <button type="button" data-time-mode="night">Night</button>
         </div>
         <div class="night-lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <button class="district university" type="button" data-office="university"><i data-lucide="graduation-cap"></i><span>AI University</span></button>
+        <button class="district university locked-district" type="button" data-office="university" data-unlock-profit="100"><i data-lucide="graduation-cap"></i><span>AI University</span><b><i data-lucide="lock-keyhole"></i></b></button>
         <button class="district research" type="button" data-office="research"><i data-lucide="microscope"></i><span>Research</span></button>
         <button class="district founder" type="button" data-office="founder"><i data-lucide="landmark"></i><span>Founder Tower</span></button>
         <button class="district creative" type="button" data-office="creative"><i data-lucide="palette"></i><span>Creative</span></button>
         <button class="district business" type="button" data-office="business"><i data-lucide="briefcase-business"></i><span>Commerce &amp; Ops</span></button>
-        <button class="district government" type="button" data-office="government"><i data-lucide="landmark"></i><span>Contracting Center</span></button>
+        <button class="district government locked-district" type="button" data-office="government" data-unlock-profit="250"><i data-lucide="landmark"></i><span>Contracting Center</span><b><i data-lucide="lock-keyhole"></i></b></button>
+        <button class="district factory locked-district" type="button" data-office="factory" data-unlock-profit="25"><i data-lucide="factory"></i><span>Production Works</span><b><i data-lucide="lock-keyhole"></i></b></button>
         <div class="road road-horizontal"></div>
         <div class="road road-vertical"></div>
         <div class="traveling-agent" id="research-agent" aria-label="Research agent traveling downtown">
@@ -293,6 +294,25 @@
         </div>
         <footer><div><i data-lucide="key-round"></i><p><strong>No Fiverr password storage</strong><span>Use official OAuth only if Fiverr grants an approved seller integration. Until then, actions remain manual.</span></p></div><button type="button" data-connection="fiverr">Open Fiverr setup</button></footer>
       </section>
+      <section class="production-works" aria-labelledby="production-works-title">
+        <header><div><p class="eyebrow">Industrial District</p><h3 id="production-works-title">MKN Production Works</h3></div><span id="factory-state"><i></i> Locked until $25 demo profit</span></header>
+        <div class="production-floor">
+          <article><div class="production-stage"><i data-lucide="inbox"></i><b>2</b></div><small>Queue</small><strong>Approved work orders</strong></article>
+          <i data-lucide="arrow-right"></i>
+          <article><div class="production-stage active-line"><i data-lucide="image"></i><b>1</b></div><small>Creation</small><strong>Thumbnail package</strong></article>
+          <i data-lucide="arrow-right"></i>
+          <article><div class="production-stage"><i data-lucide="scan-search"></i><b>1</b></div><small>Quality control</small><strong>Brand and brief check</strong></article>
+          <i data-lucide="arrow-right"></i>
+          <article><div class="production-stage"><i data-lucide="package-check"></i><b>3</b></div><small>Completed</small><strong>Ready for delivery</strong></article>
+        </div>
+        <div class="production-ledger">
+          <div class="production-ledger-heading"><strong>Production profitability log</strong><span>Demo records</span></div>
+          <article><div><small>TH-0003</small><strong>Gaming thumbnail package</strong></div><span>Marcus · 3 assets</span><b>$8.40 cost</b><b>$35.00 sale</b><strong class="production-profit">+$26.60</strong></article>
+          <article><div><small>POD-0005</small><strong>Houston shirt test</strong></div><span>Design + listing test</span><b>$12.00 cost</b><b>$0.00 sale</b><strong class="production-loss">-$12.00</strong></article>
+        </div>
+        <footer><p>Factories unlock from demonstrated demand. Production cannot begin without an approved work order, budget, assigned agent, and measurable output.</p><button type="button" data-office="factory"><i data-lucide="factory"></i> Enter production floor</button></footer>
+      </section>
+      <section class="city-growth-path" aria-labelledby="city-growth-title"><header><div><p class="eyebrow">City Progression</p><h3 id="city-growth-title">Build the city through profit</h3></div><span id="growth-stage">Starter Block</span></header><ol><li class="growth-current"><b>1</b><div><strong>Starter Block</strong><span>Founder, Research, Creative</span></div><small>$0+</small></li><li><b>2</b><div><strong>Working District</strong><span>Commerce + Production Works</span></div><small>$25 net</small></li><li><b>3</b><div><strong>Business City</strong><span>University + specialized teams</span></div><small>$100 net</small></li><li><b>4</b><div><strong>Full MKN City</strong><span>All districts and expansion</span></div><small>$250 verified net</small></li></ol></section>
       <section class="government-center" aria-labelledby="government-center-title">
         <header><div><p class="eyebrow">Public Sector Division</p><h3 id="government-center-title">Government Contracting Center</h3></div><span><i data-lucide="shield-alert"></i> Readiness required</span></header>
         <div class="government-readiness">
