@@ -2,6 +2,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const { getPool, initializeDatabase, recordLedgerEvent, getEconomySummary } = require('./database');
 
 const port = Number(process.env.PORT || 4173);
 const root = __dirname;
@@ -59,6 +60,50 @@ function consumeRateLimit(request) {
   return record.count <= RATE_LIMIT;
 }
 
+function founderAuthorized(request) {
+  return Boolean(process.env.FOUNDER_ACCESS_CODE) && secureEqual(request.headers['x-mkn-access-code'], process.env.FOUNDER_ACCESS_CODE);
+}
+
+function cleanText(value, maxLength = 200) {
+  return String(value || '').trim().slice(0, maxLength);
+}
+
+async function handleEconomy(request, response) {
+  if (!founderAuthorized(request)) return sendJson(response, 401, { error: 'Founder access code required.' });
+  const summary = await getEconomySummary();
+  if (!summary) return sendJson(response, 200, { mode: 'demo', verified: false, message: 'Connect DATABASE_URL to enable the verified ledger.' });
+  return sendJson(response, 200, { mode: 'database', verified: true, ...summary });
+}
+
+async function handleLedgerWebhook(request, response) {
+  if (!process.env.LEDGER_WEBHOOK_SECRET) return sendJson(response, 503, { error: 'Ledger webhook is not configured.' });
+  if (!secureEqual(request.headers['x-mkn-webhook-secret'], process.env.LEDGER_WEBHOOK_SECRET)) {
+    return sendJson(response, 401, { error: 'Invalid webhook signature.' });
+  }
+  const payload = JSON.parse(await readBody(request));
+  const event = {
+    provider: cleanText(payload.provider, 40).toLowerCase(),
+    providerEventId: cleanText(payload.providerEventId, 160),
+    externalAccountId: cleanText(payload.externalAccountId, 160),
+    businessId: cleanText(payload.businessId, 100),
+    direction: cleanText(payload.direction, 20).toLowerCase(),
+    status: cleanText(payload.status, 20).toLowerCase(),
+    amountCents: Number(payload.amountCents),
+    currency: cleanText(payload.currency || 'USD', 3).toUpperCase(),
+    description: cleanText(payload.description, 300),
+    occurredAt: new Date(payload.occurredAt),
+    rawReference: { source: cleanText(payload.source, 100) }
+  };
+  const valid = event.provider && event.providerEventId && event.description
+    && ['revenue', 'expense'].includes(event.direction)
+    && ['pending', 'verified', 'reversed'].includes(event.status)
+    && Number.isSafeInteger(event.amountCents) && event.amountCents > 0
+    && /^[A-Z]{3}$/.test(event.currency) && !Number.isNaN(event.occurredAt.getTime());
+  if (!valid) return sendJson(response, 400, { error: 'Invalid ledger event.' });
+  const result = await recordLedgerEvent(event);
+  return sendJson(response, result.inserted ? 201 : 200, { accepted: true, duplicate: !result.inserted, ledgerId: result.id });
+}
+
 function demoReply(message) {
   const normalized = message.toLowerCase();
   if (normalized.includes('maya')) return 'Maya: I am reviewing trend evidence and will stop once confidence is sufficient. My next report will separate facts from assumptions.';
@@ -75,7 +120,7 @@ async function handleCommand(request, response) {
     if (!message) return sendJson(response, 400, { error: 'A command is required.' });
     if (!process.env.OPENAI_API_KEY) return sendJson(response, 200, { reply: demoReply(message), mode: 'demo' });
     if (!process.env.FOUNDER_ACCESS_CODE) return sendJson(response, 503, { error: 'Paid AI is locked until FOUNDER_ACCESS_CODE is configured.' });
-    if (!secureEqual(request.headers['x-mkn-access-code'], process.env.FOUNDER_ACCESS_CODE)) {
+    if (!founderAuthorized(request)) {
       return sendJson(response, 401, { error: 'Founder access code required.' });
     }
     if (activeAiRequests >= MAX_CONCURRENT_AI_REQUESTS) return sendJson(response, 429, { error: 'The Director is busy. Try again shortly.' });
@@ -134,10 +179,19 @@ async function handleCommand(request, response) {
 
 const server = http.createServer(async (request, response) => {
   if (request.method === 'POST' && request.url === '/api/command') return handleCommand(request, response);
+  if (request.method === 'GET' && request.url === '/api/economy') return handleEconomy(request, response).catch((error) => {
+    console.error('Economy API failed:', error);
+    return sendJson(response, 500, { error: 'Verified economy data is unavailable.' });
+  });
+  if (request.method === 'POST' && request.url === '/api/webhooks/ledger') return handleLedgerWebhook(request, response).catch((error) => {
+    console.error('Ledger webhook failed:', error);
+    return sendJson(response, 500, { error: 'Ledger event could not be recorded.' });
+  });
   if (request.method === 'GET' && request.url === '/api/health') return sendJson(response, 200, {
     status: 'ok',
     openai: Boolean(process.env.OPENAI_API_KEY),
-    paidAiReady: Boolean(process.env.OPENAI_API_KEY && process.env.FOUNDER_ACCESS_CODE)
+    paidAiReady: Boolean(process.env.OPENAI_API_KEY && process.env.FOUNDER_ACCESS_CODE),
+    verifiedLedgerReady: Boolean(getPool() && process.env.LEDGER_WEBHOOK_SECRET)
   });
   if (request.method !== 'GET' && request.method !== 'HEAD') return sendJson(response, 405, { error: 'Method not allowed.' });
 
@@ -152,4 +206,12 @@ const server = http.createServer(async (request, response) => {
   fs.createReadStream(filePath).pipe(response);
 });
 
-server.listen(port, '0.0.0.0', () => console.log(`MKN AI City running on port ${port}`));
+initializeDatabase()
+  .then((connected) => {
+    if (connected) console.log('Verified ledger database connected.');
+    server.listen(port, '0.0.0.0', () => console.log(`MKN AI City running on port ${port}`));
+  })
+  .catch((error) => {
+    console.error('Database initialization failed:', error.message);
+    process.exitCode = 1;
+  });

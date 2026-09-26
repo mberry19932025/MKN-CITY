@@ -620,6 +620,47 @@ document.querySelectorAll('[data-demo-wallet]').forEach((button) => button.addEv
 }));
 renderDemoWallet();
 
+const formatCents = (cents) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(cents || 0) / 100);
+
+async function refreshVerifiedEconomy() {
+  const status = document.querySelector('#ledger-state');
+  const message = document.querySelector('#verified-economy-message');
+  let accessCode = sessionStorage.getItem('mkn-founder-access');
+  if (!accessCode) {
+    accessCode = window.prompt('Enter the Founder access code to view verified finances:');
+    if (!accessCode) return;
+    sessionStorage.setItem('mkn-founder-access', accessCode);
+  }
+  status.textContent = 'Checking';
+  try {
+    const response = await fetch('/api/economy', { headers: { 'X-MKN-Access-Code': accessCode } });
+    const data = await response.json();
+    if (!response.ok) {
+      if (response.status === 401) sessionStorage.removeItem('mkn-founder-access');
+      throw new Error(data.error || 'Ledger unavailable.');
+    }
+    if (!data.verified) {
+      status.textContent = 'Demo only';
+      status.classList.remove('connected');
+      message.textContent = data.message;
+      return;
+    }
+    document.querySelector('#verified-revenue').textContent = formatCents(data.verifiedRevenueCents);
+    document.querySelector('#verified-expenses').textContent = formatCents(data.verifiedExpensesCents);
+    document.querySelector('#verified-profit').textContent = formatCents(data.verifiedProfitCents);
+    document.querySelector('#pending-net').textContent = formatCents(data.pendingRevenueCents - data.pendingExpensesCents);
+    status.textContent = 'Provider verified';
+    status.classList.add('connected');
+    message.textContent = `${data.recent.length} recent provider records loaded. Demo Credits remain separate.`;
+  } catch (error) {
+    status.textContent = 'Unavailable';
+    status.classList.remove('connected');
+    message.textContent = error.message;
+  }
+}
+
+document.querySelector('#refresh-economy').addEventListener('click', refreshVerifiedEconomy);
+
 document.querySelector('#save-safety').addEventListener('click', () => {
   const settings = {};
   safetyInputs.forEach((input) => {

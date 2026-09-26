@@ -480,6 +480,17 @@
           <div class="demo-wallet-history" id="demo-wallet-history"><span>No demo transactions yet.</span></div>
         </section>
 
+        <section class="settings-panel verified-economy-panel" aria-labelledby="verified-economy-title">
+          <header><i data-lucide="badge-dollar-sign"></i><div><h3 id="verified-economy-title">Verified Economy</h3><p>Provider-confirmed records from the production ledger.</p></div><span class="ledger-state" id="ledger-state">Not connected</span></header>
+          <div class="verified-money-grid">
+            <div><span>Verified revenue</span><strong id="verified-revenue">--</strong></div>
+            <div><span>Verified expenses</span><strong id="verified-expenses">--</strong></div>
+            <div><span>Verified profit</span><strong id="verified-profit">--</strong></div>
+            <div><span>Pending net</span><strong id="pending-net">--</strong></div>
+          </div>
+          <div class="verified-economy-footer"><p id="verified-economy-message">Demo credits are separate and never appear in verified totals.</p><button id="refresh-economy" type="button"><i data-lucide="refresh-cw"></i><span>Refresh</span></button></div>
+        </section>
+
         <section class="settings-panel" aria-labelledby="funding-title">
           <header><i data-lucide="wallet-cards"></i><div><h3 id="funding-title">Deposits &amp; withdrawals</h3><p>Open your own account to manage funds securely.</p></div></header>
           <div class="funding-row"><div class="platform-icon kalshi">K</div><div><strong>Kalshi</strong><span>Managed by Kalshi</span></div><a href="https://kalshi.com/" target="_blank" rel="noopener noreferrer">Open platform <i data-lucide="external-link"></i></a></div>

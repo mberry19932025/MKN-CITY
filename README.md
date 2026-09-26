@@ -23,6 +23,20 @@ The city works in demo mode without paid APIs. To enable generated agent respons
 
 Before enabling billing, create a dedicated OpenAI project for MKN City and configure its spend limits and alerts. The server limits each generated answer to 400 output tokens, allows at most two simultaneous AI calls, throttles repeated requests, and never sends the OpenAI key to the browser.
 
+## Verified economy ledger
+
+Real financial totals require a PostgreSQL database and authenticated provider events. Configure these Render secrets:
+
+- `DATABASE_URL`: the private PostgreSQL connection string.
+- `FOUNDER_ACCESS_CODE`: protects owner-only AI and finance APIs.
+- `LEDGER_WEBHOOK_SECRET`: protects normalized events sent by approved marketplace connectors.
+
+The ledger stores currency as integer cents, rejects duplicate provider event IDs, and separates `pending` from `verified` transactions. Demo Credits are browser-local, have no cash value, and never enter verified totals.
+
+`POST /api/webhooks/ledger` is an internal normalized ingestion endpoint, not a substitute for validating Etsy, Fiverr, payment-provider, or market webhook signatures. Each real connector must verify the provider's official signature before forwarding a normalized event. The app remains non-custodial: customer payments, deposits, and withdrawals stay with the approved external platform.
+
+Provider credentials must be added as Render secrets after creating and receiving approval for the relevant developer applications. Do not send credentials through the Founder command console.
+
 Free Render services may sleep while idle and take time to wake up. Local browser data is device-specific until a database and user accounts are added.
 
 ## Safety boundaries
