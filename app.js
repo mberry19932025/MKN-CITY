@@ -313,6 +313,7 @@ const agentDialog = document.querySelector('#agent-dialog');
 const agentForm = document.querySelector('#agent-form');
 const agentName = document.querySelector('#agent-name');
 const agentRole = document.querySelector('#agent-role');
+const agentTask = document.querySelector('#agent-task');
 const agentDepartment = document.querySelector('#agent-department');
 const agentCount = document.querySelector('#agent-count');
 
@@ -321,6 +322,10 @@ document.querySelectorAll('.template-card button').forEach((button) => {
     const template = button.closest('.template-card');
     agentName.value = '';
     agentRole.value = template.dataset.template;
+    agentTask.value = template.dataset.template === 'Trend Scout' ? 'Find and verify one product trend at a time'
+      : template.dataset.template === 'Thumbnail Designer' ? 'Create one approved thumbnail assignment at a time'
+      : template.dataset.template === 'Etsy Listing Specialist' ? 'Prepare one compliant Etsy listing at a time'
+      : '';
     agentDepartment.value = template.dataset.department;
     agentDialog.showModal();
     agentName.focus();
@@ -329,9 +334,19 @@ document.querySelectorAll('.template-card button').forEach((button) => {
 
 agentForm.addEventListener('submit', (event) => {
   if (event.submitter?.value === 'cancel') return;
+  const primaryTask = agentTask.value.trim();
+  if (primaryTask.length < 10) {
+    event.preventDefault();
+    agentTask.focus();
+    return showToast('Give this candidate one clear primary task.');
+  }
+  const createdAgents = JSON.parse(localStorage.getItem('mkn-agent-candidates') || '[]');
+  createdAgents.push({ name: agentName.value.trim(), role: agentRole.value.trim(), department: agentDepartment.value, primaryTask, status: 'probation' });
+  localStorage.setItem('mkn-agent-candidates', JSON.stringify(createdAgents));
   const current = Number(localStorage.getItem('mkn-created-agents') || '0') + 1;
   localStorage.setItem('mkn-created-agents', String(current));
   agentCount.textContent = `${6 + current} active`;
+  showToast(`${agentName.value.trim()} created with one focus-locked task.`);
 });
 
 const savedAgentCount = Number(localStorage.getItem('mkn-created-agents') || '0');

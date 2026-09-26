@@ -160,6 +160,7 @@
 
     <section class="view" id="agents" aria-labelledby="agents-title">
       <p class="eyebrow">Workforce</p><h2 id="agents-title">City Agents</h2>
+      <div class="focus-doctrine"><i data-lucide="crosshair"></i><div><strong>One Agent. One Primary Task.</strong><span>Agents study, practice, and improve inside their specialty. Unrelated work is handed to the correct department.</span></div><b>Focus lock active</b></div>
       <div class="agent-toolbar"><div><h3>Create from a template</h3><p>Start with a focused role, then customize its department and permissions.</p></div><span id="agent-count">6 active</span></div>
       <div class="template-grid">
         <article class="template-card" data-template="Trend Scout" data-department="Research"><div class="template-avatar research-avatar"><i data-lucide="telescope"></i></div><span>Research</span><h3>Trend Scout</h3><p>Finds early demand signals and prepares sourced opportunity reports.</p><button type="button">Use template</button></article>
@@ -604,6 +605,8 @@
       <p>This creates a probationary candidate. External accounts remain unavailable until separately approved.</p>
       <label for="agent-name">Agent name</label><input id="agent-name" required autocomplete="off" placeholder="Choose a name">
       <label for="agent-role">Role</label><input id="agent-role" required autocomplete="off">
+      <label for="agent-task">One primary task</label><input id="agent-task" required minlength="10" maxlength="140" autocomplete="off" placeholder="Example: Find verified product trends">
+      <p class="field-note">This becomes the agent's focus lock. New responsibilities require a new specialist or formal retraining.</p>
       <label for="agent-department">Department</label>
       <select id="agent-department"><option>Research</option><option>Creative</option><option>Business</option><option>Operations</option><option>Unassigned</option></select>
       <label class="permission-check"><input type="checkbox" id="agent-draft-only" checked><span><strong>Draft-only access</strong><small>Agent cannot publish, spend, message customers, or place orders.</small></span></label>

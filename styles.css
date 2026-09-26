@@ -373,6 +373,12 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
 .funding-request footer button { padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: transparent; cursor: pointer; font-size: .68rem; font-weight: 700; }
 
 .agent-toolbar { margin: 24px 0 14px; display: flex; align-items: end; justify-content: space-between; gap: 16px; }
+.focus-doctrine { margin-top: 22px; padding: 13px 15px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; border: 1px solid #3f5b4c; border-left: 3px solid var(--green); border-radius: 6px; background: #17231d; }
+.focus-doctrine > svg { width: 21px; color: var(--green); }
+.focus-doctrine strong, .focus-doctrine span { display: block; }
+.focus-doctrine strong { font-size: .77rem; }
+.focus-doctrine span { margin-top: 2px; color: var(--muted); font-size: .65rem; }
+.focus-doctrine > b { padding: 5px 7px; border-radius: 4px; background: #203b2d; color: #70d8a0; font-size: .56rem; text-transform: uppercase; white-space: nowrap; }
 .agent-toolbar h3 { font-size: 1rem; margin-bottom: 4px; }
 .agent-toolbar p { color: var(--muted); font-size: .78rem; }
 .agent-toolbar > span { color: var(--green); font-size: .72rem; font-weight: 700; }
@@ -781,6 +787,7 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
 .property-dialog label { display: block; margin-bottom: 6px; font-size: .76rem; font-weight: 700; }
 .property-dialog input { width: 100%; height: 42px; padding: 0 11px; border: 1px solid var(--line); border-radius: 6px; background: white; color: var(--ink); outline: none; }
 .property-dialog input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+.property-dialog .field-note { margin: -10px 0 14px; font-size: .62rem; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
 .dialog-actions button { padding: 9px 13px; border: 1px solid var(--line); border-radius: 6px; background: transparent; cursor: pointer; font-weight: 700; }
 .dialog-actions .primary-action { border-color: var(--green); background: var(--green); color: white; }
@@ -1111,6 +1118,8 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
   .versus { min-height: 24px; }
   .leverage-equation { flex-wrap: wrap; }
   .template-grid { grid-template-columns: 1fr 1fr; }
+  .focus-doctrine { grid-template-columns: auto 1fr; }
+  .focus-doctrine > b { grid-column: 2; justify-self: start; }
   .command-chain { grid-template-columns: 1fr; }
   .command-chain ol { grid-template-columns: 1fr; }
   .command-chain li:nth-child(even) > svg { transform: rotate(90deg); }
