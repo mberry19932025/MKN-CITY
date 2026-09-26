@@ -9,7 +9,5 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 24.11.1
-      - key: OPENAI_API_KEY
-        sync: false
       - key: OPENAI_MODEL
         value: gpt-5-mini

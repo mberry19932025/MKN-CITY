@@ -17,7 +17,7 @@ The city works in demo mode without paid APIs. To enable generated agent respons
 1. Push this folder to a GitHub repository.
 2. In Render, create a new Blueprint and select the repository.
 3. Render reads `render.yaml` and creates the web service.
-4. Leave `OPENAI_API_KEY` empty for free demo mode, or add it as a secret environment variable later.
+4. The first deployment runs in free demo mode without an API key. Add `OPENAI_API_KEY` as a secret environment variable later when you want generated responses.
 5. Open `/api/health` on the deployed URL to verify the server.
 
 Free Render services may sleep while idle and take time to wake up. Local browser data is device-specific until a database and user accounts are added.
