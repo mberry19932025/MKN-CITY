@@ -428,9 +428,27 @@ async function submitCommand(command) {
   const thinking = addConsoleMessage('Director', 'Reviewing your command...');
   thinking.classList.add('thinking');
   try {
-    const response = await fetch('/api/command', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: command }) });
+    const requestCommand = () => fetch('/api/command', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(sessionStorage.getItem('mkn-founder-access') ? { 'X-MKN-Access-Code': sessionStorage.getItem('mkn-founder-access') } : {})
+      },
+      body: JSON.stringify({ message: command })
+    });
+    let response = await requestCommand();
+    if (response.status === 401) {
+      const accessCode = window.prompt('Enter the Founder access code for paid AI:');
+      if (!accessCode) throw new Error('Founder access cancelled.');
+      sessionStorage.setItem('mkn-founder-access', accessCode);
+      response = await requestCommand();
+    }
     const data = await response.json();
     thinking.remove();
+    if (!response.ok) {
+      if (response.status === 401) sessionStorage.removeItem('mkn-founder-access');
+      return addConsoleMessage('Director', data.error || 'The city AI could not respond.');
+    }
     addConsoleMessage(data.mode === 'openai' ? 'Chief Director AI' : 'Director · Demo Mode', data.reply || data.error || 'No response received.');
   } catch {
     thinking.remove();
