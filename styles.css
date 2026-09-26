@@ -125,6 +125,9 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .mission-card header h3 { font-size: .95rem; }
 .mission-card header .eyebrow { color: #a9ddc4; }
 .mission-card header > span { font-size: .64rem; font-weight: 700; opacity: .75; }
+.mission-card header > button { min-height: 34px; padding: 0 10px; display: flex; align-items: center; gap: 6px; border: 1px solid #60746a; border-radius: 5px; background: #27352f; color: #dce9e2; cursor: pointer; font-size: .61rem; font-weight: 700; }
+.mission-card header > button:hover { border-color: #d2b65c; color: #edcb6a; }
+.mission-card header > button svg { width: 15px; }
 .mission-capital { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
 .mission-capital > div { position: relative; padding: 12px 18px; border-right: 1px solid var(--line); }
 .mission-capital > div:last-child { border: 0; }

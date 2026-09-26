@@ -150,6 +150,44 @@ function getDemoSeason() {
   catch { return { day: 0, records: [] }; }
 }
 
+const defaultGrowthPlan = { capital: 200, reserve: 100, activeCapital: 40, experimentCap: 20, revenueGoal: 300, reinvest: 25 };
+function getGrowthPlan() {
+  try { return { ...defaultGrowthPlan, ...JSON.parse(localStorage.getItem('mkn-growth-plan') || '{}') }; }
+  catch { return defaultGrowthPlan; }
+}
+
+function formatPlanMoney(value) {
+  return `$${Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+}
+
+function renderGrowthPlan(totals = { revenue: 0, expenses: 0 }) {
+  const plan = getGrowthPlan();
+  const net = totals.revenue - totals.expenses;
+  const progress = Math.max(0, Math.min(100, (totals.revenue / plan.revenueGoal) * 100));
+  document.querySelector('#founder-reserve').textContent = formatPlanMoney(plan.reserve);
+  document.querySelector('#command-city-cash').textContent = formatPlanMoney(plan.capital);
+  document.querySelector('#command-city-profit').textContent = `${net < 0 ? '-' : ''}$${Math.abs(net).toFixed(2)}`;
+  document.querySelector('#mission-starting-capital').textContent = formatPlanMoney(plan.capital);
+  document.querySelector('#mission-active-capital').textContent = formatPlanMoney(plan.activeCapital);
+  document.querySelector('#mission-protected-reserve').textContent = formatPlanMoney(plan.reserve);
+  document.querySelector('#mission-exposed-capital').textContent = formatPlanMoney(plan.activeCapital);
+  document.querySelector('#mission-revenue-target').textContent = `${formatPlanMoney(plan.revenueGoal)}+`;
+  document.querySelector('#mission-progress-fill').style.width = `${progress}%`;
+  document.querySelector('#mission-progress-copy').textContent = `${formatPlanMoney(totals.revenue)} of ${formatPlanMoney(plan.revenueGoal)} demo revenue · ${formatPlanMoney(Math.max(0, plan.revenueGoal - totals.revenue))} remaining`;
+  document.querySelector('#mission-status').textContent = progress >= 100 ? 'Target reached' : net > 0 ? 'Positive · validating' : 'Validating';
+  document.querySelector('#mission-net-goal').textContent = `Reach ${formatPlanMoney(plan.revenueGoal)} revenue with positive unit economics`;
+  document.querySelector('#mission-net-progress').textContent = `${formatPlanMoney(net)} demo net · ${progress.toFixed(1)}% of revenue target`;
+  document.querySelector('#treasury-city-cash').textContent = formatPlanMoney(plan.capital);
+  document.querySelector('#treasury-city-cash-copy').textContent = `${formatPlanMoney(plan.capital)} starting capital · ${formatPlanMoney(plan.reserve)} protected · demo results separate`;
+  document.querySelector('#growth-active-capital').textContent = formatPlanMoney(plan.activeCapital);
+  document.querySelector('#growth-revenue-target').textContent = `${formatPlanMoney(plan.revenueGoal)}+`;
+  document.querySelector('#growth-reinvest-rate').textContent = `${plan.reinvest}%`;
+  document.querySelector('#growth-target-percent').textContent = `${progress.toFixed(1)}% of revenue goal`;
+  document.querySelector('#growth-progress-fill').style.width = `${progress}%`;
+  document.querySelector('#growth-recorded').textContent = `${formatPlanMoney(totals.revenue)} demo revenue recorded`;
+  document.querySelector('#growth-remaining').textContent = `${formatPlanMoney(Math.max(0, plan.revenueGoal - totals.revenue))} remaining`;
+}
+
 function safeDemoText(value) {
   return String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character]);
 }
@@ -166,6 +204,7 @@ function renderDemoSeason() {
   document.querySelector('#season-net').textContent = `${net < 0 ? '-' : ''}$${Math.abs(net).toFixed(2)}`;
   document.querySelector('#season-health').textContent = health;
   document.querySelector('#season-health-fill').style.width = `${health}%`;
+  renderGrowthPlan(totals);
   updateCityGrowth(net);
   document.querySelector('#season-ledger').innerHTML = season.records.length ? season.records.slice().reverse().map((record) => `<article><b>Day ${record.day}</b><div><strong>${safeDemoText(record.work)}</strong><span>${safeDemoText(record.lesson)}</span></div><small>${record.tasks} tasks · $${record.revenue.toFixed(2)} revenue · $${record.expenses.toFixed(2)} cost</small></article>`).join('') : '<p>No simulated workdays recorded yet.</p>';
   document.querySelector('#advance-demo-day').disabled = season.day >= 7;
@@ -230,6 +269,46 @@ document.querySelector('#reset-demo-season').addEventListener('click', () => {
   renderDemoSeason();
   updateDemoAutonomyStatus();
   showToast('Seven-day demo season reset.');
+});
+
+const growthDialog = document.querySelector('#growth-dialog');
+const growthForm = document.querySelector('#growth-form');
+document.querySelector('#configure-growth-plan').addEventListener('click', () => {
+  const plan = getGrowthPlan();
+  document.querySelector('#plan-capital').value = plan.capital;
+  document.querySelector('#plan-reserve').value = plan.reserve;
+  document.querySelector('#plan-active-capital').value = plan.activeCapital;
+  document.querySelector('#plan-experiment-cap').value = plan.experimentCap;
+  document.querySelector('#plan-revenue-goal').value = plan.revenueGoal;
+  document.querySelector('#plan-reinvest').value = plan.reinvest;
+  growthDialog.showModal();
+});
+
+growthForm.addEventListener('submit', (event) => {
+  if (event.submitter?.value === 'cancel') return;
+  const plan = {
+    capital: Number(document.querySelector('#plan-capital').value),
+    reserve: Number(document.querySelector('#plan-reserve').value),
+    activeCapital: Number(document.querySelector('#plan-active-capital').value),
+    experimentCap: Number(document.querySelector('#plan-experiment-cap').value),
+    revenueGoal: Number(document.querySelector('#plan-revenue-goal').value),
+    reinvest: Number(document.querySelector('#plan-reinvest').value)
+  };
+  if (Object.values(plan).some((value) => !Number.isFinite(value) || value < 0)) {
+    event.preventDefault();
+    return showToast('Enter valid positive growth-plan amounts.');
+  }
+  if (plan.reserve + plan.activeCapital > plan.capital) {
+    event.preventDefault();
+    return showToast('Protected reserve plus active capital cannot exceed starting capital.');
+  }
+  if (plan.experimentCap > plan.activeCapital) {
+    event.preventDefault();
+    return showToast('The per-experiment cap cannot exceed active capital.');
+  }
+  localStorage.setItem('mkn-growth-plan', JSON.stringify(plan));
+  renderDemoSeason();
+  showToast('Founder growth plan saved. Revenue targets are goals, not spending caps or guarantees.');
 });
 
 renderDemoSeason();
@@ -1074,7 +1153,10 @@ function runLocalCommand(command) {
     return { handled: true, reply: 'Try: city status, government contracts, show agents, show approvals, show treasury, show account, talk to Maya, or ask the Director a business question.' };
   }
   if (normalized.includes('city status') || normalized === 'status') {
-    return { handled: true, reply: 'City cash is $168.20. Two businesses and eight agents are active. The Research Lab is learning from verified sources and exploring assigned markets.' };
+    const plan = getGrowthPlan();
+    const season = getDemoSeason();
+    const totals = season.records.reduce((sum, record) => ({ revenue: sum.revenue + record.revenue, expenses: sum.expenses + record.expenses }), { revenue: 0, expenses: 0 });
+    return { handled: true, reply: `Founder plan starts with ${formatPlanMoney(plan.capital)}, protects ${formatPlanMoney(plan.reserve)}, and exposes at most ${formatPlanMoney(plan.activeCapital)}. Demo net is ${formatPlanMoney(totals.revenue - totals.expenses)}. Two businesses and eight agents are active.` };
   }
   if (normalized.includes('talk to maya') || normalized === 'maya') {
     speakAsAgent('Maya', 'I am checking the strongest evidence now.');
@@ -1283,7 +1365,7 @@ eligibilityConsent.addEventListener('change', () => localStorage.setItem('mkn-el
 
 const demoWalletBalance = document.querySelector('#demo-wallet-balance');
 const demoWalletHistory = document.querySelector('#demo-wallet-history');
-let demoWallet = JSON.parse(localStorage.getItem('mkn-demo-wallet') || '{"balance":150,"transactions":[]}');
+let demoWallet = JSON.parse(localStorage.getItem('mkn-demo-wallet') || '{"balance":200,"transactions":[]}');
 
 function renderDemoWallet() {
   demoWalletBalance.textContent = `$${Number(demoWallet.balance).toFixed(2)}`;

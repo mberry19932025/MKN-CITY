@@ -35,18 +35,18 @@
       <section class="founder-command-card" aria-labelledby="founder-command-title">
         <div class="founder-seal"><i data-lucide="crown"></i></div>
         <div><p class="eyebrow"><span data-leader-title>Founder</span> / Final Authority</p><h3 id="founder-command-title" data-leader-name>MICHH</h3><p>Owns the city, appoints the Director, controls capital, and approves every high-risk external action.</p></div>
-        <div class="founder-authority"><span><b id="founder-approval-count">3</b> approvals waiting</span><span><b>5</b> direct reports</span><span><b>$100</b> protected reserve</span></div>
+        <div class="founder-authority"><span><b id="founder-approval-count">3</b> approvals waiting</span><span><b>5</b> direct reports</span><span><b id="founder-reserve">$100</b> protected reserve</span></div>
         <button type="button" data-enter-founder-office><i data-lucide="building-2"></i><span>Enter Founder Tower</span></button>
       </section>
 
       <div class="balance-panel">
         <div>
-          <span>City cash</span>
-          <strong>$168.20</strong>
+          <span>Demo starting capital</span>
+          <strong id="command-city-cash">$200.00</strong>
         </div>
         <div class="profit">
-          <span>City profit</span>
-          <strong>$18.20</strong>
+          <span>Demo net result</span>
+          <strong id="command-city-profit">$0.00</strong>
         </div>
       </div>
 
@@ -84,18 +84,18 @@
 
       <section class="milestone-card" aria-labelledby="milestone-title">
         <div class="milestone-number"><span>Milestone</span><strong>#1</strong></div>
-        <div class="milestone-copy"><p class="eyebrow">Self-sustaining city</p><h3 id="milestone-title">Earn more than the city costs to operate</h3><div class="milestone-progress"><div style="width:87.4%"></div></div><small>$43.71 of $50+ revenue recorded · $6.29 remaining</small></div>
-        <div class="milestone-targets"><div><span>Operating cost target</span><strong>$30</strong></div><div><span>Revenue target</span><strong>$50+</strong></div></div>
-        <span class="milestone-status">Almost unlocked</span>
+        <div class="milestone-copy"><p class="eyebrow">Self-sustaining city</p><h3 id="milestone-title">Recover operating costs, then scale evidence-backed winners</h3><div class="milestone-progress"><div id="mission-progress-fill" style="width:0%"></div></div><small id="mission-progress-copy">No demo revenue recorded yet.</small></div>
+        <div class="milestone-targets"><div><span>Capital exposed</span><strong id="mission-exposed-capital">$40</strong></div><div><span>Growth target</span><strong id="mission-revenue-target">$300+</strong></div></div>
+        <span class="milestone-status" id="mission-status">Validating</span>
       </section>
 
       <section class="mission-card" aria-labelledby="mission-title">
-        <header><div><p class="eyebrow">60-Day Mission</p><h3 id="mission-title">Prove the city before expansion</h3></div><span>Mission active</span></header>
-        <div class="mission-capital"><div><small>Initial capital</small><strong>$150</strong></div><div><small>Month 1 spend cap</small><strong>$50</strong></div><div class="protected-capital"><small>Protected reserve</small><strong>$100</strong><i data-lucide="lock-keyhole"></i></div></div>
+        <header><div><p class="eyebrow">Founder Growth Mission</p><h3 id="mission-title">Scale from evidence, not an arbitrary calendar cap</h3></div><button id="configure-growth-plan" type="button"><i data-lucide="sliders-horizontal"></i> Configure</button></header>
+        <div class="mission-capital"><div><small>Starting capital</small><strong id="mission-starting-capital">$200</strong></div><div><small>Active capital limit</small><strong id="mission-active-capital">$40</strong></div><div class="protected-capital"><small>Protected reserve</small><strong id="mission-protected-reserve">$100</strong><i data-lucide="lock-keyhole"></i></div></div>
         <ol class="mission-goals">
           <li class="complete-goal"><b><i data-lucide="check"></i></b><div><strong>Get the first paying customer</strong><span>Completed</span></div></li>
           <li class="complete-goal"><b><i data-lucide="check"></i></b><div><strong>Recover operating expenses</strong><span>Completed with $18.20 net profit</span></div></li>
-          <li class="in-progress"><b>3</b><div><strong>Generate $150+ cumulative net cash</strong><span>$18.20 recorded · 12.1% complete</span></div></li>
+          <li class="in-progress"><b>3</b><div><strong id="mission-net-goal">Reach the configured growth target</strong><span id="mission-net-progress">No verified profit recorded yet</span></div></li>
           <li><b>4</b><div><strong>Reinvest profits into new agents and businesses</strong><span>Locked until Goal 3</span></div></li>
         </ol>
       </section>
@@ -557,7 +557,7 @@
     </section>
     <section class="view" id="treasury" aria-labelledby="treasury-title">
       <p class="eyebrow">Finance</p><h2 id="treasury-title">Treasury</h2>
-      <div class="treasury-total"><div><span>City cash</span><strong>$168.20</strong><small>$150 initial capital + $18.20 realized profit</small></div><i data-lucide="landmark"></i></div>
+      <div class="treasury-total"><div><span>City cash</span><strong id="treasury-city-cash">$200.00</strong><small id="treasury-city-cash-copy">$200 starting capital · demo results remain separate</small></div><i data-lucide="landmark"></i></div>
       <section class="money-ecosystem" aria-labelledby="money-ecosystem-title">
         <div class="money-heading"><div><p class="eyebrow">Money Ecosystem</p><h3 id="money-ecosystem-title">From customer payment to protected profit</h3></div><span>Non-custodial · approval controlled</span></div>
         <div class="money-flow">
@@ -579,16 +579,16 @@
         <article class="fund-card profit-fund"><div class="fund-icon"><i data-lucide="vault"></i></div><div><span>Profit vault</span><strong>$0.00</strong><p>Realized profit kept outside operating budgets</p></div><button type="button" title="Fund settings" aria-label="Profit vault settings"><i data-lucide="settings"></i></button></article>
       </div>
       <section class="monthly-target" aria-labelledby="monthly-target-title">
-        <div class="monthly-target-heading"><div><p class="eyebrow">Month 1 target</p><h3 id="monthly-target-title">Reach positive operating leverage</h3></div><span>29.1% of revenue goal</span></div>
+        <div class="monthly-target-heading"><div><p class="eyebrow">Current Growth Cycle</p><h3 id="monthly-target-title">Reach positive operating leverage</h3></div><span id="growth-target-percent">0% of revenue goal</span></div>
         <div class="monthly-target-grid">
-          <div><span>AI &amp; hosting ceiling</span><strong>$40</strong></div>
-          <div><span>Tools &amp; subscriptions ceiling</span><strong>$20</strong></div>
-          <div><span>Hard spend ceiling</span><strong>$50</strong></div>
-          <div class="revenue-target"><span>Revenue target</span><strong>$150+</strong></div>
-          <div class="net-target"><span>Net target at $150</span><strong>$100+</strong></div>
+          <div><span>AI &amp; hosting guideline</span><strong>$20</strong></div>
+          <div><span>Tools guideline</span><strong>$10</strong></div>
+          <div><span>Active capital ceiling</span><strong id="growth-active-capital">$40</strong></div>
+          <div class="revenue-target"><span>Revenue target</span><strong id="growth-revenue-target">$300+</strong></div>
+          <div class="net-target"><span>Reinvest verified profit</span><strong id="growth-reinvest-rate">25%</strong></div>
         </div>
-        <div class="monthly-progress"><div style="width:29.1%"></div></div>
-        <div class="monthly-progress-labels"><span>$43.71 recorded</span><span>$106.29 remaining to $150</span></div>
+        <div class="monthly-progress"><div id="growth-progress-fill" style="width:0%"></div></div>
+        <div class="monthly-progress-labels"><span id="growth-recorded">$0 demo revenue recorded</span><span id="growth-remaining">$300 remaining</span></div>
       </section>
       <div class="treasury-policy"><i data-lucide="badge-dollar-sign"></i><div><strong>Treasury rule</strong><p>Agents cannot transfer money between funds. Budget changes and reserve withdrawals require Michh's approval.</p></div></div>
       <section class="spend-guardrail" aria-labelledby="guardrail-title">
@@ -662,7 +662,7 @@
         </section>
         <section class="settings-panel demo-wallet-panel" aria-labelledby="demo-wallet-title">
           <header><i data-lucide="coins"></i><div><h3 id="demo-wallet-title">MKN Demo Wallet</h3><p>Practice the city economy with simulated credits.</p></div><span class="demo-only">No cash value</span></header>
-          <div class="demo-wallet-balance"><span>Available demo balance</span><strong id="demo-wallet-balance">$150.00</strong><small>Demo Credits</small></div>
+          <div class="demo-wallet-balance"><span>Available demo balance</span><strong id="demo-wallet-balance">$200.00</strong><small>Demo Credits</small></div>
           <div class="demo-wallet-actions"><button type="button" data-demo-wallet="deposit"><i data-lucide="arrow-down-to-line"></i><span>Demo deposit</span></button><button type="button" data-demo-wallet="withdraw"><i data-lucide="arrow-up-from-line"></i><span>Demo withdrawal</span></button></div>
           <div class="demo-wallet-history" id="demo-wallet-history"><span>No demo transactions yet.</span></div>
         </section>
@@ -828,6 +828,23 @@
       </div>
       <p class="field-note">Use an alias or marketplace order ID. Do not store customer payment information or sensitive personal data.</p>
       <div class="dialog-actions"><button value="cancel" type="submit">Cancel</button><button class="primary-action" value="default" type="submit">Save order</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="property-dialog growth-dialog" id="growth-dialog">
+    <form method="dialog" id="growth-form">
+      <button class="dialog-close" value="cancel" title="Close" aria-label="Close growth plan"><i data-lucide="x"></i></button>
+      <p class="eyebrow">Founder Strategy</p><h2>Configure growth plan</h2>
+      <div class="order-form-grid">
+        <label>Starting capital<input id="plan-capital" type="number" min="50" max="100000" step="10" value="200"></label>
+        <label>Protected reserve<input id="plan-reserve" type="number" min="0" max="100000" step="10" value="100"></label>
+        <label>Active capital limit<input id="plan-active-capital" type="number" min="5" max="100000" step="5" value="40"></label>
+        <label>Maximum per experiment<input id="plan-experiment-cap" type="number" min="1" max="10000" step="1" value="20"></label>
+        <label>Growth-cycle revenue target<input id="plan-revenue-goal" type="number" min="50" max="1000000" step="50" value="300"></label>
+        <label>Verified-profit reinvestment<input id="plan-reinvest" type="number" min="0" max="100" step="5" value="25"></label>
+      </div>
+      <p class="field-note">Targets guide the simulation; they do not guarantee revenue. Reserve funds remain unavailable to autonomous experiments.</p>
+      <div class="dialog-actions"><button value="cancel" type="submit">Cancel</button><button class="primary-action" value="default" type="submit">Save growth plan</button></div>
     </form>
   </dialog>
 
