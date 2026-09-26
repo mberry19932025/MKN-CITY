@@ -35,6 +35,9 @@ const officeDistrict = document.querySelector('#office-district');
 const officeDescription = document.querySelector('#office-description');
 const officeFloor = document.querySelector('#office-floor');
 const officeShift = document.querySelector('#office-shift');
+const founderDeck = document.querySelector('.game-command-deck');
+const founderCard = document.querySelector('.founder-command-card');
+if (founderDeck && founderCard) founderCard.after(founderDeck);
 const officeData = {
   research: { district: 'Research District', title: 'Market Intelligence Lab', description: 'Evidence collection, source checks, and opportunity reports.', agents: [
     { name: 'Maya', role: 'Trend Researcher', task: 'Find and verify one product trend', sprite: 'research-sprite', status: 'Researching' }

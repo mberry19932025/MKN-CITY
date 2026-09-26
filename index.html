@@ -100,6 +100,17 @@
         </ol>
       </section>
 
+      <section class="game-command-deck" aria-label="MKN City founder operations deck">
+        <aside class="deck-panel crew-console" aria-label="Active agent crew">
+          <header><div><small>Active roster</small><strong>City Crew</strong></div><span>6 online</span></header>
+          <button type="button" data-agent-chat="Director"><span class="mini-agent director-sprite"></span><span><b>Director</b><small>City Command</small><i>Reviewing</i></span><em>LV 4</em></button>
+          <button type="button" data-agent-chat="Maya"><span class="mini-agent research-sprite"></span><span><b>Maya</b><small>Trend Research</small><i>Researching</i></span><em>LV 3</em></button>
+          <button type="button" data-agent-chat="Marcus"><span class="mini-agent creative-sprite"></span><span><b>Marcus</b><small>Creative Studio</small><i>Designing</i></span><em>LV 2</em></button>
+          <button type="button" data-agent-chat="Avery"><span class="mini-agent business-sprite"></span><span><b>Avery</b><small>Commerce</small><i>Optimizing</i></span><em>LV 2</em></button>
+          <button type="button" data-agent-chat="Nova"><span class="mini-agent operations-sprite"></span><span><b>Nova</b><small>Operations</small><i>Monitoring</i></span><em>LV 2</em></button>
+          <footer><button type="button" data-open-view="agents"><i data-lucide="user-plus"></i><span>Recruit agent</span></button></footer>
+        </aside>
+        <div class="game-stage">
       <div class="city-map" aria-label="MKN City district map">
         <div class="map-title"><span>Live MKN City</span><small>Tap districts or agents to interact</small></div>
         <div class="map-hud"><span><i></i> Live</span><b>Founder Level 1</b></div>
@@ -127,6 +138,22 @@
         <button class="map-agent nova-map-agent" type="button" data-agent-chat="Nova" aria-label="Talk to Nova"><span class="agent-sprite operations-sprite"><b>N</b></span><span class="agent-name">Nova</span><span class="speech-bubble">Production queue is moving.</span></button>
         <button class="map-agent director-map-agent" type="button" data-agent-chat="Director" aria-label="Talk to the Director"><span class="agent-sprite director-sprite"><b>D</b></span><span class="agent-name">Director</span><span class="speech-bubble">City systems are under review.</span></button>
       </div>
+          <nav class="stage-tool-dock" aria-label="City tools">
+            <button type="button" data-open-view="agents" title="Agents"><i data-lucide="users"></i><span>Crew</span></button>
+            <button type="button" data-open-view="businesses" title="Businesses"><i data-lucide="factory"></i><span>Build</span></button>
+            <button type="button" data-open-view="memory" title="Memory"><i data-lucide="brain-circuit"></i><span>Memory</span></button>
+            <button type="button" data-open-view="treasury" title="Treasury"><i data-lucide="landmark"></i><span>Funds</span></button>
+            <button type="button" data-open-view="approvals" title="Approvals"><i data-lucide="stamp"></i><span>Approve</span></button>
+          </nav>
+        </div>
+        <aside class="deck-panel intel-console" aria-label="Director intelligence feed">
+          <header><div><small>Director feed</small><strong>City Intelligence</strong></div><span class="live-chip"><i></i> Live</span></header>
+          <section><small>Current mission</small><h3>Reach self-sustaining operations</h3><div class="intel-progress"><i></i></div><p>$43.71 of $50 revenue milestone</p></section>
+          <section class="intel-alert"><small>Opportunity detected</small><h3>Government contracting readiness</h3><p>Build capability statement, verify SAM registration, then target one right-sized opportunity.</p><button type="button" data-office="government">Open contracting office</button></section>
+          <section><small>Agent memory</small><h3>Design #7 leads conversion</h3><p>2.4x above the current department average. Scale only after Treasury review.</p></section>
+          <footer><button type="button" data-command="city status"><i data-lucide="radio"></i><span>Ask Director</span></button></footer>
+        </aside>
+      </section>
 
       <section class="workflow-panel" aria-labelledby="workflow-title">
         <div class="workflow-heading">

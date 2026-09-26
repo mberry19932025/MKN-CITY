@@ -47,7 +47,7 @@ h2 { font-size: clamp(1.65rem, 4vw, 2.25rem); }
 .founder-level > div { height: 5px; margin-top: 4px; overflow: hidden; border-radius: 3px; background: #dfe5e0; }
 .founder-level > div i { display: block; width: 12.1%; height: 100%; background: var(--gold); }
 
-main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
+main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .view { display: none; animation: enter .24s ease; }
 .view.active { display: block; }
 @keyframes enter { from { opacity: 0; transform: translateY(6px); } }
@@ -138,6 +138,17 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
 .mission-goals strong, .mission-goals span { display: block; }
 .mission-goals strong { font-size: .7rem; }
 .mission-goals span { margin-top: 2px; color: var(--muted); font-size: .59rem; }
+.game-command-deck { margin: 22px 0; padding: 8px; display: grid; grid-template-columns: 210px minmax(0, 1fr) 230px; gap: 8px; border: 1px solid #5f5230; border-radius: 7px; background: #0a100d; box-shadow: 0 24px 70px rgba(0,0,0,.42), inset 0 0 0 1px rgba(233,185,79,.08); }
+.game-stage { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.deck-panel { min-width: 0; overflow: hidden; border: 1px solid #354b3f; border-radius: 5px; background: #111a16; color: #dce7e0; }
+.deck-panel > header { min-height: 50px; padding: 9px 10px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #354b3f; background: #17231d; }
+.deck-panel header small, .deck-panel header strong { display: block; }.deck-panel header small { color: #789184; font-size: .48rem; text-transform: uppercase; }.deck-panel header strong { margin-top: 2px; font-size: .72rem; }.deck-panel > header > span { color: #e4bf59; font-size: .51rem; font-weight: 700; text-transform: uppercase; }
+.crew-console > button { width: 100%; min-height: 64px; padding: 7px 8px; display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 7px; border: 0; border-bottom: 1px solid #293a31; background: transparent; color: #dce7e0; cursor: pointer; text-align: left; }.crew-console > button:hover { background: #1b2b23; }.crew-console > button > span:nth-child(2) { min-width: 0; }.crew-console b, .crew-console small, .crew-console i { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.crew-console b { font-size: .64rem; }.crew-console small { margin-top: 2px; color: #84978d; font-size: .49rem; }.crew-console i { margin-top: 3px; color: #58ce8f; font-size: .46rem; font-style: normal; }.crew-console em { color: #d9ba61; font-size: .48rem; font-style: normal; font-weight: 700; }
+.mini-agent { width: 34px; height: 48px; display: block; background-image: url("assets/mkn-agent-team-v1.png"); background-repeat: no-repeat; background-size: 500% 100%; background-position: 0 center; }
+.crew-console footer, .intel-console footer { padding: 8px; }.crew-console footer button, .intel-console footer button { width: 100%; min-height: 34px; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #6e5c2d; border-radius: 4px; background: #292617; color: #e7c666; cursor: pointer; font-size: .57rem; font-weight: 700; }.crew-console footer svg, .intel-console footer svg { width: 14px; }
+.intel-console .live-chip { display: flex; align-items: center; gap: 4px; color: #78d7a4; }.live-chip i { width: 6px; height: 6px; border-radius: 50%; background: #45cc87; box-shadow: 0 0 8px #45cc87; }
+.intel-console > section { padding: 12px 11px; border-bottom: 1px solid #293a31; }.intel-console section > small { color: #d9ba61; font-size: .47rem; font-weight: 700; text-transform: uppercase; }.intel-console h3 { margin-top: 5px; font-size: .68rem; line-height: 1.3; }.intel-console p { margin-top: 5px; color: #91a299; font-size: .53rem; line-height: 1.5; }.intel-console .intel-alert { background: #1b251d; }.intel-console section button { width: 100%; margin-top: 9px; min-height: 30px; border: 1px solid #526a5c; border-radius: 4px; background: #20352a; color: #a9e1c2; cursor: pointer; font-size: .52rem; font-weight: 700; }.intel-progress { height: 4px; margin-top: 9px; overflow: hidden; background: #2a3931; }.intel-progress i { display: block; width: 87%; height: 100%; background: #e5b94f; }
+.stage-tool-dock { min-height: 48px; display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid #354b3f; border-radius: 5px; background: #111a16; }.stage-tool-dock button { display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-right: 1px solid #293a31; background: transparent; color: #a9b8b0; cursor: pointer; font-size: .55rem; font-weight: 700; }.stage-tool-dock button:last-child { border: 0; }.stage-tool-dock button:hover { background: #1d2d25; color: #edcb6a; }.stage-tool-dock svg { width: 15px; }
 .mission-goals .in-progress { border-color: #9ec3b1; background: #f4faf7; opacity: 1; }
 .mission-goals .in-progress > b { background: var(--green-soft); color: var(--green); }
 .mission-goals .complete-goal { border-color: #9ec3b1; opacity: 1; }
@@ -1171,6 +1182,13 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
 #manual-entry-fields label { margin-top: 12px; }
 
 @media (max-width: 680px) {
+  .game-command-deck { grid-template-columns: 1fr; padding: 6px; }
+  .crew-console { display: grid; grid-template-columns: 1fr 1fr; }
+  .crew-console > header, .crew-console > footer { grid-column: 1 / -1; }
+  .crew-console > button { min-height: 58px; }
+  .intel-console { display: grid; grid-template-columns: 1fr 1fr; }
+  .intel-console > header, .intel-console > footer { grid-column: 1 / -1; }
+  .stage-tool-dock button { flex-direction: column; gap: 2px; }
   .topbar { height: 66px; padding: 0 4vw; }
   .status { font-size: 0; }
   main { width: min(94vw, 540px); padding-top: 26px; padding-bottom: 112px; }
