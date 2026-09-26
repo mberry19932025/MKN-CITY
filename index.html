@@ -376,6 +376,11 @@
         </div>
         <div class="care-output"><div><i data-lucide="clipboard-check"></i><span>QA Supervisor</span><small>Accuracy, tone, policy, and proposed remedy</small></div><i data-lucide="arrow-right"></i><div class="customer-message"><i data-lucide="send"></i><span>Customer Message</span><small>Owner-approved before sending</small></div></div>
       </section>
+      <section class="customer-ledger" aria-labelledby="customer-ledger-title">
+        <header><div><p class="eyebrow">Commerce Records</p><h3 id="customer-ledger-title">Customer &amp; Order Ledger</h3></div><button type="button" id="add-customer-order"><i data-lucide="plus"></i> Add order</button></header>
+        <div class="customer-ledger-summary"><div><small>Orders</small><strong id="customer-order-count">0</strong></div><div><small>Customer spend</small><strong id="customer-ledger-revenue">$0.00</strong></div><div><small>Total expenses</small><strong id="customer-ledger-expenses">$0.00</strong></div><div><small>Order profit</small><strong id="customer-ledger-profit">$0.00</strong></div></div>
+        <div class="customer-ledger-table"><table><thead><tr><th>Customer</th><th>Purchase</th><th>Status</th><th>Revenue</th><th>Expenses</th><th>Profit</th><th>Record</th><th></th></tr></thead><tbody id="customer-ledger-body"><tr><td colspan="8" class="ledger-empty">No customer orders recorded.</td></tr></tbody></table></div>
+      </section>
       <div class="property-heading">
         <div><h3>Available commercial property</h3><p>Choose a building when an approved business is ready to move in.</p></div>
         <span>2 vacant</span>
@@ -802,6 +807,27 @@
       <label for="agent-traits">Traits</label><input id="agent-traits" maxlength="80" autocomplete="off" placeholder="Curious, careful, persistent">
       <label class="permission-check"><input type="checkbox" id="agent-draft-only" checked><span><strong>Draft-only access</strong><small>Agent cannot publish, spend, message customers, or place orders.</small></span></label>
       <div class="dialog-actions"><button value="cancel" type="submit">Cancel</button><button class="primary-action" value="default" type="submit">Create candidate</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="property-dialog order-dialog" id="order-dialog">
+    <form method="dialog" id="order-form">
+      <button class="dialog-close" value="cancel" title="Close" aria-label="Close order form"><i data-lucide="x"></i></button>
+      <p class="eyebrow">Commerce Ledger</p><h2>Record customer order</h2>
+      <div class="order-form-grid">
+        <label>Customer reference<input id="order-customer" required maxlength="50" autocomplete="off" placeholder="Alias or order ID"></label>
+        <label>Business<select id="order-business"><option>MKN Thumbnails</option><option>MKN Merch</option><option>Etsy Division</option><option>Digital Products</option><option>Other</option></select></label>
+        <label class="wide-field">Product or service<input id="order-product" required maxlength="90" autocomplete="off" placeholder="What they purchased"></label>
+        <label>Amount paid<input id="order-revenue" required type="number" min="0" step="0.01" value="0.00"></label>
+        <label>Production cost<input id="order-production" type="number" min="0" step="0.01" value="0.00"></label>
+        <label>Platform fees<input id="order-fees" type="number" min="0" step="0.01" value="0.00"></label>
+        <label>Other expenses<input id="order-other-cost" type="number" min="0" step="0.01" value="0.00"></label>
+        <label>Refund amount<input id="order-refund" type="number" min="0" step="0.01" value="0.00"></label>
+        <label>Status<select id="order-status"><option>New</option><option>In production</option><option>Delivered</option><option>Refunded</option><option>Cancelled</option></select></label>
+        <label>Record type<select id="order-record-type"><option value="demo">Demo order</option><option value="pending">Real order · pending verification</option></select></label>
+      </div>
+      <p class="field-note">Use an alias or marketplace order ID. Do not store customer payment information or sensitive personal data.</p>
+      <div class="dialog-actions"><button value="cancel" type="submit">Cancel</button><button class="primary-action" value="default" type="submit">Save order</button></div>
     </form>
   </dialog>
 

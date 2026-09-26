@@ -701,6 +701,86 @@ renderMarketLedger();
 document.querySelector('#refresh-sports-research').addEventListener('click', refreshSportsResearch);
 refreshSportsResearch();
 
+const orderDialog = document.querySelector('#order-dialog');
+const orderForm = document.querySelector('#order-form');
+const customerLedgerBody = document.querySelector('#customer-ledger-body');
+
+function getCustomerOrders() {
+  try { return JSON.parse(localStorage.getItem('mkn-customer-orders') || '[]'); }
+  catch { return []; }
+}
+
+function money(value) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0));
+}
+
+function renderCustomerLedger() {
+  const orders = getCustomerOrders();
+  const totals = orders.reduce((summary, order) => {
+    summary.revenue += Number(order.revenue);
+    summary.expenses += Number(order.expenses);
+    summary.profit += Number(order.profit);
+    return summary;
+  }, { revenue: 0, expenses: 0, profit: 0 });
+  document.querySelector('#customer-order-count').textContent = String(orders.length);
+  document.querySelector('#customer-ledger-revenue').textContent = money(totals.revenue);
+  document.querySelector('#customer-ledger-expenses').textContent = money(totals.expenses);
+  const profitNode = document.querySelector('#customer-ledger-profit');
+  profitNode.textContent = money(totals.profit);
+  profitNode.className = totals.profit < 0 ? 'profit-negative' : 'profit-positive';
+  if (!orders.length) {
+    customerLedgerBody.innerHTML = '<tr><td colspan="8" class="ledger-empty">No customer orders recorded.</td></tr>';
+  } else {
+    customerLedgerBody.innerHTML = orders.map((order) => `
+      <tr><td><strong>${escapeHtml(String(order.customer))}</strong><br><small>${escapeHtml(String(order.business))}</small></td><td>${escapeHtml(String(order.product))}</td><td>${escapeHtml(String(order.status))}</td><td>${money(order.revenue)}</td><td>${money(order.expenses)}</td><td class="${order.profit < 0 ? 'profit-negative' : 'profit-positive'}">${money(order.profit)}</td><td><span class="record-chip ${order.recordType}">${order.recordType === 'demo' ? 'Demo' : 'Pending verification'}</span></td><td><button class="delete-order" type="button" data-delete-order="${escapeHtml(String(order.id))}" title="Delete order" aria-label="Delete order"><i data-lucide="trash-2"></i></button></td></tr>
+    `).join('');
+  }
+  refreshIcons();
+}
+
+document.querySelector('#add-customer-order').addEventListener('click', () => {
+  orderForm.reset();
+  ['order-revenue', 'order-production', 'order-fees', 'order-other-cost', 'order-refund'].forEach((id) => { document.querySelector(`#${id}`).value = '0.00'; });
+  orderDialog.showModal();
+  document.querySelector('#order-customer').focus();
+});
+
+orderForm.addEventListener('submit', (event) => {
+  if (event.submitter?.value === 'cancel') return;
+  const customer = document.querySelector('#order-customer').value.trim();
+  const product = document.querySelector('#order-product').value.trim();
+  const revenue = Number(document.querySelector('#order-revenue').value || 0);
+  const production = Number(document.querySelector('#order-production').value || 0);
+  const fees = Number(document.querySelector('#order-fees').value || 0);
+  const other = Number(document.querySelector('#order-other-cost').value || 0);
+  const refund = Number(document.querySelector('#order-refund').value || 0);
+  if (!customer || !product || [revenue, production, fees, other, refund].some((value) => !Number.isFinite(value) || value < 0)) {
+    event.preventDefault();
+    return showToast('Complete the customer, purchase, and valid money fields.');
+  }
+  if (refund > revenue) {
+    event.preventDefault();
+    return showToast('A refund cannot exceed the amount paid.');
+  }
+  const expenses = production + fees + other + refund;
+  const orders = getCustomerOrders();
+  orders.unshift({ id: `ORD-${Date.now()}`, customer, business: document.querySelector('#order-business').value, product, revenue, production, fees, other, refund, expenses, profit: revenue - expenses, status: document.querySelector('#order-status').value, recordType: document.querySelector('#order-record-type').value, createdAt: new Date().toISOString() });
+  localStorage.setItem('mkn-customer-orders', JSON.stringify(orders));
+  renderCustomerLedger();
+  showToast('Customer order saved to the commerce ledger.');
+});
+
+customerLedgerBody.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-delete-order]');
+  if (!button || !window.confirm('Delete this customer order record?')) return;
+  const orders = getCustomerOrders().filter((order) => String(order.id) !== button.dataset.deleteOrder);
+  localStorage.setItem('mkn-customer-orders', JSON.stringify(orders));
+  renderCustomerLedger();
+  showToast('Customer order deleted.');
+});
+
+renderCustomerLedger();
+
 const agentDialog = document.querySelector('#agent-dialog');
 const agentForm = document.querySelector('#agent-form');
 const agentName = document.querySelector('#agent-name');

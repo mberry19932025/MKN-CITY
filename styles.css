@@ -753,6 +753,33 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .care-output small { color: var(--muted); font-size: .56rem; }
 .care-output .customer-message { border-color: #d5c079; background: #fff9e8; }
 .care-output .customer-message > svg { color: #805613; }
+.customer-ledger { margin-top: 16px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.customer-ledger > header { padding: 15px 17px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); }
+.customer-ledger > header h3 { font-size: .96rem; }
+.customer-ledger > header button { padding: 8px 10px; display: flex; align-items: center; gap: 6px; border: 1px solid var(--green); border-radius: 5px; background: var(--green); color: white; cursor: pointer; font-size: .65rem; font-weight: 700; }
+.customer-ledger > header button svg { width: 14px; }
+.customer-ledger-summary { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); background: #f4f6f3; }
+.customer-ledger-summary > div { padding: 11px 15px; border-right: 1px solid var(--line); }
+.customer-ledger-summary > div:last-child { border: 0; }
+.customer-ledger-summary small, .customer-ledger-summary strong { display: block; }
+.customer-ledger-summary small { color: var(--muted); font-size: .57rem; text-transform: uppercase; }
+.customer-ledger-summary strong { margin-top: 3px; font: 700 .91rem "Space Grotesk", sans-serif; }
+.customer-ledger-table { overflow-x: auto; }
+.customer-ledger table { width: 100%; border-collapse: collapse; font-size: .65rem; }
+.customer-ledger th { padding: 9px 11px; color: var(--muted); background: #fafaf7; text-align: left; text-transform: uppercase; font-size: .52rem; }
+.customer-ledger td { padding: 10px 11px; border-top: 1px solid var(--line); white-space: nowrap; }
+.customer-ledger td:nth-child(2) { min-width: 170px; white-space: normal; }
+.customer-ledger .profit-positive { color: var(--green); font-weight: 800; }
+.customer-ledger .profit-negative { color: #b94735; font-weight: 800; }
+.customer-ledger .record-chip { padding: 3px 5px; border-radius: 3px; background: #ecefe9; color: var(--muted); font-size: .52rem; font-weight: 700; }
+.customer-ledger .record-chip.pending { background: #fff0cc; color: #755313; }
+.customer-ledger .delete-order { width: 27px; height: 27px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 4px; background: transparent; color: var(--muted); cursor: pointer; }
+.customer-ledger .delete-order svg { width: 13px; }
+.ledger-empty { padding: 24px !important; color: var(--muted); text-align: center; }
+.order-form-grid { margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.order-form-grid label { margin: 0; }
+.order-form-grid .wide-field { grid-column: 1 / -1; }
+.order-form-grid select { width: 100%; height: 42px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; background: white; color: var(--ink); }
 .property-heading h3 { margin-bottom: 4px; font-size: 1rem; }
 .government-center { margin: 16px 0; padding: 18px; border: 1px solid #506a5c; border-radius: 8px; background: #17211c; color: #edf4ef; }
 .government-center > header, .government-center > footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
@@ -1173,6 +1200,10 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .founder-night .opportunity-problem,
 .founder-night .handoff-current,
 .founder-night .care-output .customer-message { background: #302a1c; color: #eed887; }
+.founder-night .customer-ledger-summary, .founder-night .customer-ledger th { background: #121713; }
+.founder-night .customer-ledger .record-chip { background: #252c28; }
+.founder-night .customer-ledger .record-chip.pending { background: #302a1c; color: #eed887; }
+.founder-night .order-form-grid select { border-color: #4a514d; background: #151916; color: #e1e7e3; }
 .founder-night .blocked-strategy { background: #35211f; color: #f0a295; }
 .founder-night .handoff-decision,
 .founder-night .monthly-target-grid .net-target { background: #282331; }
@@ -1336,6 +1367,10 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
   .milestone-status { text-align: center; }
   .mission-goals { grid-template-columns: 1fr; }
   .property-grid { grid-template-columns: 1fr; }
+  .customer-ledger-summary { grid-template-columns: 1fr 1fr; }
+  .customer-ledger-summary > div:nth-child(even) { border-right: 0; }
+  .order-form-grid { grid-template-columns: 1fr; }
+  .order-form-grid .wide-field { grid-column: auto; }
   .division-body { grid-template-columns: 1fr; }
   .division-body > div { border-right: 0; border-bottom: 1px solid var(--line); }
   .division-body > div:last-child { border-bottom: 0; }
