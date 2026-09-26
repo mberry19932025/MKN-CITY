@@ -81,7 +81,7 @@ const cityPhase = document.querySelector('#city-phase');
 const cityClockIcon = document.querySelector('.city-clock > i');
 const timeModeButtons = document.querySelectorAll('[data-time-mode]');
 const schedulePhases = document.querySelectorAll('#schedule-timeline article');
-let cityTimeMode = localStorage.getItem('mkn-city-time-mode') || 'auto';
+let cityTimeMode = localStorage.getItem('mkn-city-time-mode') || 'night';
 
 function getCityPeriod(hour) {
   if (hour >= 6 && hour < 10) return { className: 'time-morning', phase: 'Morning research + planning', schedule: 0, icon: 'sunrise' };
