@@ -768,6 +768,14 @@ document.querySelectorAll('[data-command]').forEach((button) => button.addEventL
   setConsole(true);
   submitCommand(button.dataset.command);
 }));
+document.querySelectorAll('[data-memory-brief]').forEach((button) => button.addEventListener('click', () => {
+  const business = button.dataset.memoryBrief;
+  localStorage.setItem('mkn-last-memory-brief', JSON.stringify({ business, reviewedAt: new Date().toISOString() }));
+  button.innerHTML = '<i data-lucide="check"></i> Brief attached';
+  button.disabled = true;
+  refreshIcons();
+  showToast(`${business} lessons attached to the next matching task.`);
+}));
 document.querySelectorAll('[data-agent-chat]').forEach((agent) => agent.addEventListener('click', () => {
   setConsole(true);
   submitCommand(`talk to ${agent.dataset.agentChat}`);

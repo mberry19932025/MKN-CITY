@@ -35,8 +35,48 @@ async function initializeDatabase() {
       UNIQUE (provider, provider_event_id)
     );
     CREATE INDEX IF NOT EXISTS ledger_events_status_idx ON ledger_events (status, occurred_at DESC);
+    CREATE TABLE IF NOT EXISTS business_memories (
+      id BIGSERIAL PRIMARY KEY,
+      business_type TEXT NOT NULL CHECK (business_type IN ('etsy', 'pod', 'fiverr_thumbnails')),
+      title TEXT NOT NULL,
+      lesson TEXT NOT NULL,
+      outcome TEXT NOT NULL CHECK (outcome IN ('win', 'loss', 'mixed')),
+      evidence_count INTEGER NOT NULL DEFAULT 1 CHECK (evidence_count > 0),
+      confidence NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (confidence >= 0 AND confidence <= 100),
+      status TEXT NOT NULL DEFAULT 'candidate' CHECK (status IN ('candidate', 'validated', 'retired')),
+      source_task_id TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS business_memories_lookup_idx ON business_memories (business_type, status, confidence DESC);
   `);
   return true;
+}
+
+async function getBusinessMemories(businessType) {
+  const database = getPool();
+  if (!database) return null;
+  const allowed = ['etsy', 'pod', 'fiverr_thumbnails'];
+  if (!allowed.includes(businessType)) throw new Error('Unsupported business memory type.');
+  const result = await database.query(`
+    SELECT id, business_type, title, lesson, outcome, evidence_count, confidence, status, source_task_id, updated_at
+    FROM business_memories
+    WHERE business_type = $1 AND status != 'retired'
+    ORDER BY status = 'validated' DESC, confidence DESC, updated_at DESC
+    LIMIT 25
+  `, [businessType]);
+  return result.rows;
+}
+
+async function recordBusinessMemory(memory) {
+  const database = getPool();
+  if (!database) throw new Error('Database is not configured.');
+  const result = await database.query(`
+    INSERT INTO business_memories (business_type, title, lesson, outcome, evidence_count, confidence, status, source_task_id)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+    RETURNING id
+  `, [memory.businessType, memory.title, memory.lesson, memory.outcome, memory.evidenceCount, memory.confidence, memory.status, memory.sourceTaskId || null]);
+  return result.rows[0];
 }
 
 async function recordLedgerEvent(event) {
@@ -93,4 +133,4 @@ async function getEconomySummary() {
   };
 }
 
-module.exports = { getPool, initializeDatabase, recordLedgerEvent, getEconomySummary };
+module.exports = { getPool, initializeDatabase, recordLedgerEvent, getEconomySummary, getBusinessMemories, recordBusinessMemory };

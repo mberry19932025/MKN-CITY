@@ -2,7 +2,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { getPool, initializeDatabase, recordLedgerEvent, getEconomySummary } = require('./database');
+const { getPool, initializeDatabase, recordLedgerEvent, getEconomySummary, getBusinessMemories, recordBusinessMemory } = require('./database');
 
 const port = Number(process.env.PORT || 4173);
 const root = __dirname;
@@ -105,6 +105,33 @@ async function handleLedgerWebhook(request, response) {
   return sendJson(response, result.inserted ? 201 : 200, { accepted: true, duplicate: !result.inserted, ledgerId: result.id });
 }
 
+async function handleMemories(request, response, pathname) {
+  if (!founderAuthorized(request)) return sendJson(response, 401, { error: 'Founder access code required.' });
+  if (!getPool()) return sendJson(response, 200, { mode: 'demo', memories: [] });
+  if (request.method === 'GET') {
+    const businessType = pathname.split('/').pop();
+    return sendJson(response, 200, { mode: 'database', memories: await getBusinessMemories(businessType) });
+  }
+  const payload = JSON.parse(await readBody(request));
+  const memory = {
+    businessType: cleanText(payload.businessType, 40),
+    title: cleanText(payload.title, 140),
+    lesson: cleanText(payload.lesson, 1000),
+    outcome: cleanText(payload.outcome, 10),
+    evidenceCount: Number(payload.evidenceCount),
+    confidence: Number(payload.confidence),
+    status: cleanText(payload.status || 'candidate', 20),
+    sourceTaskId: cleanText(payload.sourceTaskId, 100)
+  };
+  const valid = ['etsy', 'pod', 'fiverr_thumbnails'].includes(memory.businessType)
+    && memory.title && memory.lesson && ['win', 'loss', 'mixed'].includes(memory.outcome)
+    && Number.isInteger(memory.evidenceCount) && memory.evidenceCount > 0
+    && Number.isFinite(memory.confidence) && memory.confidence >= 0 && memory.confidence <= 100
+    && ['candidate', 'validated', 'retired'].includes(memory.status);
+  if (!valid) return sendJson(response, 400, { error: 'Invalid business memory.' });
+  return sendJson(response, 201, { recorded: true, ...(await recordBusinessMemory(memory)) });
+}
+
 function demoReply(message) {
   const normalized = message.toLowerCase();
   if (normalized.includes('maya')) return 'Maya: I am reviewing trend evidence and will stop once confidence is sufficient. My next report will separate facts from assumptions.';
@@ -141,7 +168,7 @@ async function handleCommand(request, response) {
           max_output_tokens: 400,
           store: false,
           input: [
-            { role: 'developer', content: 'You are the Chief Director of MKN AI City. Respond concisely as an in-world business operations agent. Enforce one agent, one primary task: each worker studies and improves only within its assigned specialty, and unrelated work must be handed to the correct specialist or manager. Never claim an external action occurred unless the user confirms it. Never request or expose passwords, API keys, card data, or banking credentials. Spending, publishing, outreach, wagering, refunds, deposits, withdrawals, and account changes require Founder Michh approval. For government contracting, never fabricate eligibility, certifications, past performance, pricing evidence, registrations, or solicitation requirements. Agents may research and draft, but Michh must verify facts, approve bids, sign certifications, and submit through the official portal.' },
+            { role: 'developer', content: 'You are the Chief Director of MKN AI City. Respond concisely as an in-world business operations agent. Enforce one agent, one primary task: each worker studies and improves only within its assigned specialty, and unrelated work must be handed to the correct specialist or manager. Before Etsy, print-on-demand, or Fiverr thumbnail work, retrieve the matching business memories and distinguish candidate lessons from validated playbooks. After a measured outcome, preserve both wins and failures with evidence, cost, date, and confidence; never turn an unverified claim into company memory. Never claim an external action occurred unless the user confirms it. Never request or expose passwords, API keys, card data, or banking credentials. Spending, publishing, outreach, wagering, refunds, deposits, withdrawals, and account changes require Founder Michh approval. For government contracting, never fabricate eligibility, certifications, past performance, pricing evidence, registrations, or solicitation requirements. Agents may research and draft, but Michh must verify facts, approve bids, sign certifications, and submit through the official portal.' },
             { role: 'user', content: message }
           ]
         })
@@ -189,6 +216,12 @@ const server = http.createServer(async (request, response) => {
     console.error('Ledger webhook failed:', error);
     return sendJson(response, 500, { error: 'Ledger event could not be recorded.' });
   });
+  if ((request.method === 'GET' && pathname.startsWith('/api/memories/')) || (request.method === 'POST' && pathname === '/api/memories')) {
+    return handleMemories(request, response, pathname).catch((error) => {
+      console.error('Memory API failed:', error);
+      return sendJson(response, 500, { error: 'Business memory could not be processed.' });
+    });
+  }
   if (request.method === 'GET' && pathname === '/api/health') return sendJson(response, 200, {
     status: 'ok',
     build: buildId,
