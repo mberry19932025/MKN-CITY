@@ -1273,6 +1273,26 @@ function addConsoleMessage(speaker, text, user = false) {
   return message;
 }
 
+function addConsoleSources(sources) {
+  if (!Array.isArray(sources) || !sources.length) return;
+  const message = document.createElement('div');
+  message.className = 'console-message agent-message source-message';
+  const label = document.createElement('span');
+  label.textContent = 'Research sources';
+  const list = document.createElement('div');
+  sources.forEach((source) => {
+    const link = document.createElement('a');
+    link.href = source.url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = source.title || source.url;
+    list.append(link);
+  });
+  message.append(label, list);
+  consoleMessages.append(message);
+  consoleMessages.scrollTop = consoleMessages.scrollHeight;
+}
+
 function speakAsAgent(agent, text) {
   const mapAgent = document.querySelector(`[data-agent-chat="${agent}"]`);
   if (!mapAgent) return;
@@ -1374,7 +1394,8 @@ async function submitCommand(command) {
       if (response.status === 401) sessionStorage.removeItem('mkn-founder-access');
       return addConsoleMessage('Director', data.error || 'The city AI could not respond.');
     }
-    addConsoleMessage(data.mode === 'openai' ? 'Chief Director AI' : 'Director · Demo Mode', data.reply || data.error || 'No response received.');
+    addConsoleMessage(String(data.mode).startsWith('openai') ? 'Chief Director AI' : 'Director · Demo Mode', data.reply || data.error || 'No response received.');
+    addConsoleSources(data.sources);
   } catch {
     thinking.remove();
     addConsoleMessage('Director · Offline', 'The server is unavailable. Navigation commands still work locally.');

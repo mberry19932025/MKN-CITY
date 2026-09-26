@@ -1118,6 +1118,9 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .user-message { align-self: flex-end; background: #176b4a; }
 .user-message span { color: #cfeddf; }
 .console-message.thinking { color: #aeb8b2; }
+.source-message > div { display: grid; gap: 5px; }
+.source-message a { overflow: hidden; color: #78d7a4; font-size: .61rem; line-height: 1.35; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+.source-message a:hover { color: #edcb6a; text-decoration: underline; }
 .quick-commands { padding: 9px 12px; display: flex; flex-wrap: wrap; gap: 5px; border-top: 1px solid #34413a; }
 .quick-commands button { padding: 5px 7px; display: flex; align-items: center; gap: 4px; border: 1px solid #45534c; border-radius: 5px; background: transparent; color: #ced7d2; cursor: pointer; font-size: .58rem; }
 .quick-commands button:hover { background: #303c36; }

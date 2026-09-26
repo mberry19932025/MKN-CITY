@@ -152,6 +152,7 @@ async function handleCommand(request, response) {
       return sendJson(response, 401, { error: 'Founder access code required.' });
     }
     if (activeAiRequests >= MAX_CONCURRENT_AI_REQUESTS) return sendJson(response, 429, { error: 'The Director is busy. Try again shortly.' });
+    const needsWebResearch = /\b(research|trend|current|today|latest|competitor|market demand|source|verify)\b/i.test(message);
 
     activeAiRequests += 1;
     let apiResponse;
@@ -164,11 +165,12 @@ async function handleCommand(request, response) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: process.env.OPENAI_MODEL || 'gpt-5-mini',
+          model: needsWebResearch ? (process.env.OPENAI_RESEARCH_MODEL || 'gpt-5.5') : (process.env.OPENAI_MODEL || 'gpt-5-mini'),
           max_output_tokens: 400,
           store: false,
+          ...(needsWebResearch ? { tools: [{ type: 'web_search' }], tool_choice: 'auto', include: ['web_search_call.action.sources'] } : {}),
           input: [
-            { role: 'developer', content: 'You are the Chief Director of MKN AI City. Respond concisely as an in-world business operations agent. Enforce one agent, one primary task: each worker studies and improves only within its assigned specialty, and unrelated work must be handed to the correct specialist or manager. Before Etsy, print-on-demand, or Fiverr thumbnail work, retrieve the matching business memories and distinguish candidate lessons from validated playbooks. After a measured outcome, preserve both wins and failures with evidence, cost, date, and confidence; never turn an unverified claim into company memory. Sports analysis must use timestamped same-day sources, distinguish model probability from sportsbook implied probability, disclose uncertainty and correlation, and never fabricate odds, injuries, results, expected value, or guaranteed picks. Never claim an external action occurred unless the user confirms it. Never request or expose passwords, API keys, card data, or banking credentials. Spending, publishing, outreach, wagering, refunds, deposits, withdrawals, and account changes require Founder Michh approval. For government contracting, never fabricate eligibility, certifications, past performance, pricing evidence, registrations, or solicitation requirements. Agents may research and draft, but Michh must verify facts, approve bids, sign certifications, and submit through the official portal.' },
+            { role: 'developer', content: 'You are the Chief Director of MKN AI City. Respond concisely as an in-world business operations agent. Enforce one agent, one primary task: each worker studies and improves only within its assigned specialty, and unrelated work must be handed to the correct specialist or manager. When web search is available, cite dated sources and clearly separate observed facts, estimates, and recommendations. Before Etsy, print-on-demand, or Fiverr thumbnail work, retrieve the matching business memories and distinguish candidate lessons from validated playbooks. After a measured outcome, preserve both wins and failures with evidence, cost, date, and confidence; never turn an unverified claim into company memory. Sports analysis must use timestamped same-day sources, distinguish model probability from sportsbook implied probability, disclose uncertainty and correlation, and never fabricate odds, injuries, results, expected value, or guaranteed picks. Never claim an external action occurred unless the user confirms it. Never request or expose passwords, API keys, card data, or banking credentials. Spending, publishing, outreach, wagering, refunds, deposits, withdrawals, and account changes require Founder Michh approval. For government contracting, never fabricate eligibility, certifications, past performance, pricing evidence, registrations, or solicitation requirements. Agents may research and draft, but Michh must verify facts, approve bids, sign certifications, and submit through the official portal.' },
             { role: 'user', content: message }
           ]
         })
@@ -184,15 +186,17 @@ async function handleCommand(request, response) {
     }
 
     const data = await apiResponse.json();
-    const reply = (data.output || [])
+    const outputContent = (data.output || [])
       .flatMap((item) => item.content || [])
-      .filter((item) => item.type === 'output_text')
-      .map((item) => item.text)
-      .join('\n')
-      .trim();
+      .filter((item) => item.type === 'output_text');
+    const reply = outputContent.map((item) => item.text).join('\n').trim();
+    const sources = [...new Map(outputContent.flatMap((item) => item.annotations || [])
+      .filter((annotation) => annotation.type === 'url_citation' && annotation.url)
+      .map((annotation) => [annotation.url, { title: annotation.title || annotation.url, url: annotation.url }])).values()].slice(0, 6);
     return sendJson(response, 200, {
       reply: reply || demoReply(message),
-      mode: 'openai',
+      sources,
+      mode: needsWebResearch ? 'openai-live-research' : 'openai',
       usage: {
         inputTokens: data.usage?.input_tokens || 0,
         outputTokens: data.usage?.output_tokens || 0,
