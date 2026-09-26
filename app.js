@@ -131,6 +131,9 @@ const roamingLines = {
 };
 
 function moveAgent(agent, index) {
+  if (agent.dataset.meeting === 'true') return;
+  const moveId = Number(agent.dataset.moveId || 0) + 1;
+  agent.dataset.moveId = String(moveId);
   const currentLeft = Number.parseFloat(agent.style.left || getComputedStyle(agent).left) || 0;
   const point = agentWaypoints[(Math.floor(Math.random() * agentWaypoints.length) + index) % agentWaypoints.length];
   const duration = cityMap.classList.contains('time-night') ? 7 + Math.random() * 4 : 4 + Math.random() * 4;
@@ -144,7 +147,9 @@ function moveAgent(agent, index) {
     agent.style.top = `${point[1]}%`;
   });
   setTimeout(() => {
+    if (Number(agent.dataset.moveId) !== moveId) return;
     agent.classList.remove('walking');
+    if (agent.dataset.meeting === 'true') return;
     if (Math.random() > .56) {
       const lines = roamingLines[agent.dataset.agentChat] || ['On my way, Founder.'];
       agent.querySelector('.speech-bubble').textContent = lines[Math.floor(Math.random() * lines.length)];
@@ -156,6 +161,58 @@ function moveAgent(agent, index) {
 }
 
 roamingAgents.forEach((agent, index) => setTimeout(() => moveAgent(agent, index), 900 + index * 650));
+
+const agentConversations = [
+  { agents: ['Maya', 'Marcus'], first: 'Demand evidence is ready.', second: 'I will turn it into one test concept.' },
+  { agents: ['Marcus', 'Avery'], first: 'The new design variant is ready.', second: 'I will prepare the listing and keywords.' },
+  { agents: ['Avery', 'Nova'], first: 'Orders increased this afternoon.', second: 'I am checking production capacity now.' },
+  { agents: ['Maya', 'Director'], first: 'Confidence reached the submit threshold.', second: 'Good. Send the report for Founder review.' },
+  { agents: ['Nova', 'Director'], first: 'The queue is within safe capacity.', second: 'Keep spending inside the approved limit.' }
+];
+let conversationIndex = 0;
+
+function showAgentExchange() {
+  if (!cityMap.classList.contains('time-night') && document.visibilityState === 'hidden') return;
+  const exchange = agentConversations[conversationIndex % agentConversations.length];
+  conversationIndex += 1;
+  const first = roamingAgents.find((agent) => agent.dataset.agentChat === exchange.agents[0]);
+  const second = roamingAgents.find((agent) => agent.dataset.agentChat === exchange.agents[1]);
+  if (!first || !second) return;
+  [first, second].forEach((agent) => {
+    agent.dataset.moveId = String(Number(agent.dataset.moveId || 0) + 1);
+    agent.dataset.meeting = 'true';
+    agent.classList.add('walking', 'agent-meeting');
+    agent.style.transitionDuration = '2.4s';
+  });
+  first.style.setProperty('--face', 1);
+  second.style.setProperty('--face', -1);
+  first.style.left = '44%';
+  first.style.top = '54%';
+  second.style.left = '50%';
+  second.style.top = '54%';
+  setTimeout(() => {
+    first.classList.remove('walking');
+    second.classList.remove('walking');
+    first.querySelector('.speech-bubble').textContent = exchange.first;
+    first.classList.add('speaking');
+  }, 2600);
+  setTimeout(() => {
+    first.classList.remove('speaking');
+    second.querySelector('.speech-bubble').textContent = exchange.second;
+    second.classList.add('speaking');
+  }, 5600);
+  setTimeout(() => {
+    second.classList.remove('speaking');
+    [first, second].forEach((agent, index) => {
+      agent.classList.remove('agent-meeting');
+      agent.dataset.meeting = 'false';
+      moveAgent(agent, index);
+    });
+  }, 9000);
+}
+
+setTimeout(showAgentExchange, 4500);
+setInterval(showAgentExchange, 19000);
 
 const propertyDialog = document.querySelector('#property-dialog');
 const dialogPropertyName = document.querySelector('#dialog-property-name');
