@@ -190,25 +190,56 @@ function updateCityGrowth(netProfit) {
   factoryState.innerHTML = netProfit >= 25 ? '<i></i> Production district unlocked' : '<i></i> Locked until $25 demo profit';
 }
 
-document.querySelector('#advance-demo-day').addEventListener('click', () => {
+const demoAutonomy = document.querySelector('#demo-autonomy');
+const demoAutonomyStatus = document.querySelector('#demo-autonomy-status');
+demoAutonomy.checked = localStorage.getItem('mkn-demo-autonomy') !== 'paused';
+
+function updateDemoAutonomyStatus() {
   const season = getDemoSeason();
-  if (season.day >= 7) return;
+  demoAutonomyStatus.textContent = season.day >= 7 ? 'Proof week complete · Director review ready'
+    : demoAutonomy.checked ? 'Autopilot active · next shift runs automatically'
+    : 'Autopilot paused by Founder';
+}
+
+function runDemoDay(source = 'manual') {
+  const season = getDemoSeason();
+  if (season.day >= 7) return false;
   const plan = demoDayPlans[season.day];
   season.day += 1;
-  season.records.push({ day: season.day, recordedAt: new Date().toISOString(), ...plan });
+  season.records.push({ day: season.day, recordedAt: new Date().toISOString(), source, ...plan });
   localStorage.setItem('mkn-demo-season', JSON.stringify(season));
+  localStorage.setItem('mkn-demo-last-run', new Date().toISOString());
   renderDemoSeason();
-  showToast(`Demo Day ${season.day} recorded. City health recalculated.`);
+  updateDemoAutonomyStatus();
+  showToast(`${source === 'autonomous' ? 'Autonomous shift' : 'Demo Day'} ${season.day} recorded. City health recalculated.`);
+  return true;
+}
+
+document.querySelector('#advance-demo-day').addEventListener('click', () => runDemoDay('manual'));
+
+demoAutonomy.addEventListener('change', () => {
+  localStorage.setItem('mkn-demo-autonomy', demoAutonomy.checked ? 'active' : 'paused');
+  updateDemoAutonomyStatus();
+  showToast(demoAutonomy.checked ? 'Autonomous demo shifts enabled.' : 'Autonomous demo shifts paused.');
 });
 
 document.querySelector('#reset-demo-season').addEventListener('click', () => {
   if (!window.confirm('Reset all seven-day demo records on this device?')) return;
   localStorage.removeItem('mkn-demo-season');
+  localStorage.removeItem('mkn-demo-last-run');
   renderDemoSeason();
+  updateDemoAutonomyStatus();
   showToast('Seven-day demo season reset.');
 });
 
 renderDemoSeason();
+updateDemoAutonomyStatus();
+setTimeout(() => {
+  if (demoAutonomy.checked) runDemoDay('autonomous');
+}, 12000);
+setInterval(() => {
+  if (demoAutonomy.checked && document.visibilityState === 'visible') runDemoDay('autonomous');
+}, 90000);
 const officeData = {
   research: { district: 'Research District', title: 'Market Intelligence Lab', description: 'Evidence collection, source checks, and opportunity reports.', agents: [
     { name: 'Maya', role: 'Trend Researcher', task: 'Find and verify one product trend', sprite: 'research-sprite', status: 'Researching' },
@@ -1008,6 +1039,16 @@ function speakAsAgent(agent, text) {
 
 function runLocalCommand(command) {
   const normalized = command.toLowerCase().trim();
+  if (normalized.includes('start demo autopilot') || normalized.includes('resume demo city')) {
+    demoAutonomy.checked = true;
+    demoAutonomy.dispatchEvent(new Event('change'));
+    return { handled: true, reply: 'Autonomous demo shifts resumed. External actions and real spending remain approval-gated.' };
+  }
+  if (normalized.includes('pause demo autopilot') || normalized.includes('pause demo city')) {
+    demoAutonomy.checked = false;
+    demoAutonomy.dispatchEvent(new Event('change'));
+    return { handled: true, reply: 'Autonomous demo shifts paused by Founder command.' };
+  }
   const routes = [
     { terms: ['show agents', 'view agents', 'go to agents'], view: 'agents', reply: 'Opening the Employment Center and agent roster.' },
     { terms: ['show businesses', 'view businesses', 'go to business'], view: 'businesses', reply: 'Opening the Business District.' },
