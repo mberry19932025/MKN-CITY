@@ -838,6 +838,23 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
 .settings-panel > header > svg { width: 21px; color: var(--green); }
 .settings-panel h3 { font-size: .92rem; }
 .settings-panel header p, .settings-panel .fine-print { margin-top: 3px; color: var(--muted); font-size: .66rem; line-height: 1.45; }
+.demo-wallet-panel { grid-column: 1 / -1; }
+.demo-wallet-panel > header .demo-only { margin-left: auto; padding: 5px 7px; border: 1px solid #725f2f; border-radius: 5px; background: #352d1c; color: #f0d278; font-size: .57rem; font-weight: 700; text-transform: uppercase; }
+.demo-wallet-balance { min-height: 112px; padding: 17px; display: grid; place-items: center; align-content: center; border: 1px solid #3d624f; border-radius: 7px; background: #122b20; text-align: center; }
+.demo-wallet-balance span, .demo-wallet-balance small { color: #9db4a8; font-size: .63rem; }
+.demo-wallet-balance strong { margin: 4px 0; color: #6ee0a7; font: 700 2rem "Space Grotesk", sans-serif; }
+.demo-wallet-actions { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.demo-wallet-actions button { min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--line); border-radius: 6px; background: #202c26; color: var(--ink); cursor: pointer; font-size: .68rem; font-weight: 700; }
+.demo-wallet-actions button:hover { border-color: var(--green); }
+.demo-wallet-actions svg { width: 16px; }
+.demo-wallet-history { margin-top: 10px; max-height: 125px; overflow-y: auto; border-top: 1px solid var(--line); }
+.demo-wallet-history > span { display: block; padding-top: 10px; color: var(--muted); font-size: .62rem; }
+.demo-wallet-history article { padding: 8px 2px; display: grid; grid-template-columns: 1fr auto; gap: 8px; border-bottom: 1px solid var(--line); }
+.demo-wallet-history article strong, .demo-wallet-history article small { display: block; }
+.demo-wallet-history article strong { font-size: .66rem; }
+.demo-wallet-history article small { margin-top: 2px; color: var(--muted); font-size: .56rem; }
+.demo-wallet-history article b { color: var(--green); font-size: .68rem; }
+.demo-wallet-history article.withdrawal b { color: #f0c266; }
 .funding-row { min-height: 64px; padding: 9px 0; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; border-top: 1px solid var(--line); }
 .funding-row > div:nth-child(2) strong, .funding-row > div:nth-child(2) span { display: block; }
 .funding-row > div:nth-child(2) strong { font-size: .76rem; }

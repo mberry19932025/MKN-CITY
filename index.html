@@ -473,6 +473,13 @@
       <div class="account-notice"><i data-lucide="landmark"></i><div><strong>MKN City does not hold wagering funds</strong><p>Deposits, withdrawals, identity checks, and entries happen directly on the licensed platform. MKN provides research, manual tracking, limits, and approval controls.</p></div></div>
 
       <div class="account-grid">
+        <section class="settings-panel demo-wallet-panel" aria-labelledby="demo-wallet-title">
+          <header><i data-lucide="coins"></i><div><h3 id="demo-wallet-title">MKN Demo Wallet</h3><p>Practice the city economy with simulated credits.</p></div><span class="demo-only">No cash value</span></header>
+          <div class="demo-wallet-balance"><span>Available demo balance</span><strong id="demo-wallet-balance">$150.00</strong><small>Demo Credits</small></div>
+          <div class="demo-wallet-actions"><button type="button" data-demo-wallet="deposit"><i data-lucide="arrow-down-to-line"></i><span>Demo deposit</span></button><button type="button" data-demo-wallet="withdraw"><i data-lucide="arrow-up-from-line"></i><span>Demo withdrawal</span></button></div>
+          <div class="demo-wallet-history" id="demo-wallet-history"><span>No demo transactions yet.</span></div>
+        </section>
+
         <section class="settings-panel" aria-labelledby="funding-title">
           <header><i data-lucide="wallet-cards"></i><div><h3 id="funding-title">Deposits &amp; withdrawals</h3><p>Open your own account to manage funds securely.</p></div></header>
           <div class="funding-row"><div class="platform-icon kalshi">K</div><div><strong>Kalshi</strong><span>Managed by Kalshi</span></div><a href="https://kalshi.com/" target="_blank" rel="noopener noreferrer">Open platform <i data-lucide="external-link"></i></a></div>
@@ -502,6 +509,7 @@
           <details><summary>Privacy notice <i data-lucide="chevron-down"></i></summary><p>This prototype stores preferences and manual market records in this browser. Do not enter sensitive financial credentials. A production launch needs a reviewed privacy policy, encrypted accounts, retention rules, and a deletion process.</p></details>
           <details><summary>Responsible use agreement <i data-lucide="chevron-down"></i></summary><p>MKN provides research and organization, not guaranteed income, investment advice, or automatic wagering. The owner remains responsible for platform eligibility, location rules, decisions, and losses.</p></details>
           <label class="agreement-check"><input id="privacy-consent" type="checkbox"><span>I acknowledge the prototype privacy notice and responsible-use terms.</span></label>
+          <label class="agreement-check"><input id="eligibility-consent" type="checkbox"><span>I understand real-money features require legal age, identity, location, and platform eligibility checks.</span></label>
         </section>
 
         <section class="settings-panel" aria-labelledby="data-title">

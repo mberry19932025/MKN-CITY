@@ -572,6 +572,54 @@ privacyConsent.addEventListener('change', () => {
   showToast(privacyConsent.checked ? 'Agreement acknowledgement saved on this device.' : 'Agreement acknowledgement removed.');
 });
 
+const eligibilityConsent = document.querySelector('#eligibility-consent');
+eligibilityConsent.checked = localStorage.getItem('mkn-eligibility-consent') === 'true';
+eligibilityConsent.addEventListener('change', () => localStorage.setItem('mkn-eligibility-consent', String(eligibilityConsent.checked)));
+
+const demoWalletBalance = document.querySelector('#demo-wallet-balance');
+const demoWalletHistory = document.querySelector('#demo-wallet-history');
+let demoWallet = JSON.parse(localStorage.getItem('mkn-demo-wallet') || '{"balance":150,"transactions":[]}');
+
+function renderDemoWallet() {
+  demoWalletBalance.textContent = `$${Number(demoWallet.balance).toFixed(2)}`;
+  if (!demoWallet.transactions.length) {
+    demoWalletHistory.innerHTML = '<span>No demo transactions yet.</span>';
+    return;
+  }
+  demoWalletHistory.innerHTML = demoWallet.transactions.slice(0, 8).map((transaction) => `
+    <article class="${transaction.type}"><div><strong>Demo ${transaction.type}</strong><small>${escapeHtml(transaction.date)} · simulated only</small></div><b>${transaction.type === 'deposit' ? '+' : '-'}$${transaction.amount.toFixed(2)}</b></article>
+  `).join('');
+}
+
+document.querySelectorAll('[data-demo-wallet]').forEach((button) => button.addEventListener('click', () => {
+  const type = button.dataset.demoWallet;
+  if (type === 'deposit') {
+    const settings = JSON.parse(localStorage.getItem('mkn-safety-settings') || '{}');
+    if (settings.coolOff) return showToast('Cool-off mode blocks new demo deposits. Demo withdrawals remain available.');
+    if (!privacyConsent.checked || !eligibilityConsent.checked) return showToast('Acknowledge both agreements before practicing deposits.');
+  }
+  const entered = window.prompt(`Enter demo ${type} amount:`, '10');
+  if (entered === null) return;
+  const amount = Number(entered);
+  if (!Number.isFinite(amount) || amount <= 0 || amount > 100) return showToast('Enter a demo amount from $0.01 to $100.');
+  if (type === 'withdraw' && amount > demoWallet.balance) return showToast('Demo withdrawal cannot exceed the available balance.');
+  if (type === 'deposit') {
+    const settings = JSON.parse(localStorage.getItem('mkn-safety-settings') || '{}');
+    const depositLimit = Number(settings.depositLimit || 25);
+    const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    const weeklyDeposits = demoWallet.transactions
+      .filter((transaction) => transaction.type === 'deposit' && Number(transaction.createdAt || 0) >= weekAgo)
+      .reduce((total, transaction) => total + Number(transaction.amount), 0);
+    if (weeklyDeposits + amount > depositLimit) return showToast(`This would exceed your $${depositLimit.toFixed(2)} weekly demo-deposit limit.`);
+  }
+  demoWallet.balance = Number(demoWallet.balance) + (type === 'deposit' ? amount : -amount);
+  demoWallet.transactions.unshift({ type, amount, date: new Date().toLocaleString(), createdAt: Date.now() });
+  localStorage.setItem('mkn-demo-wallet', JSON.stringify(demoWallet));
+  renderDemoWallet();
+  showToast(`Demo ${type} recorded. No real money moved.`);
+}));
+renderDemoWallet();
+
 document.querySelector('#save-safety').addEventListener('click', () => {
   const settings = {};
   safetyInputs.forEach((input) => {
