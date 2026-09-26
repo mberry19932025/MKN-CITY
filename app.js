@@ -56,6 +56,29 @@ function updateApprovalCount() {
   document.querySelector('.notification-dot').hidden = waiting === 0;
 }
 
+const autopilotMode = document.querySelector('#autopilot-mode');
+const savedAutopilotMode = localStorage.getItem('mkn-autopilot-mode') || 'guarded';
+autopilotMode.value = savedAutopilotMode;
+autopilotMode.addEventListener('change', () => {
+  localStorage.setItem('mkn-autopilot-mode', autopilotMode.value);
+  showToast(`Big Boss autopilot set to ${autopilotMode.options[autopilotMode.selectedIndex].text}.`);
+});
+
+document.querySelector('#run-policy-review').addEventListener('click', () => {
+  const result = document.querySelector('#policy-result');
+  if (autopilotMode.value === 'manual') {
+    result.textContent = 'Manual mode · no automatic decisions';
+    return showToast('Manual mode leaves every decision with Michh.');
+  }
+  if (autopilotMode.value === 'observe') {
+    result.textContent = 'Observed · 1 deny recommendation, 2 escalations';
+    return showToast('Review complete. No decisions changed in Observe mode.');
+  }
+  if (!localStorage.getItem('mkn-opportunity-0142-decision')) resolveOpportunity0142('declined');
+  result.textContent = '1 internal task approved · 1 weak test denied · 2 escalated';
+  showToast('Guarded review complete. Spending and hiring remain with Michh.');
+});
+
 function showToast(message) {
   clearTimeout(toastTimer);
   gameToast.textContent = message;
@@ -652,6 +675,8 @@ function runLocalCommand(command) {
     { terms: ['show businesses', 'view businesses', 'go to business'], view: 'businesses', reply: 'Opening the Business District.' },
     { terms: ['government contract', 'contracting center', 'show government', 'sam.gov', 'sam gov'], view: 'businesses', office: 'government', reply: 'Opening the Government Contracting Center. Readiness must be verified before any bid is submitted.' },
     { terms: ['show approvals', 'view approvals', 'go to approvals'], view: 'approvals', reply: 'Opening your approval queue.' },
+    { terms: ['autopilot off', 'manual approvals'], view: 'approvals', reply: 'Opening Approvals. Set Big Boss Autopilot to Manual to keep every decision with you.' },
+    { terms: ['autopilot on', 'guarded autopilot', 'run policy review'], view: 'approvals', reply: 'Opening Big Boss Guarded Autopilot. Internal zero-spend tasks may be automated; external actions remain yours.' },
     { terms: ['show memory', 'view memory', 'go to memory'], view: 'memory', reply: 'Opening the Memory Archive.' },
     { terms: ['show treasury', 'view treasury', 'go to treasury'], view: 'treasury', reply: 'Opening Treasury. The emergency reserve remains locked.' },
     { terms: ['show money ecosystem', 'money ecosystem', 'show money flow'], view: 'treasury', reply: 'Opening the Money Ecosystem. Demo, pending, and verified funds remain separate.' },

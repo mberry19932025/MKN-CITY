@@ -430,6 +430,15 @@
     </section>
     <section class="view" id="approvals" aria-labelledby="approvals-title">
       <div class="approval-page-heading"><div><p class="eyebrow">Mayor's Desk</p><h2 id="approvals-title">Approvals</h2></div><div><span id="approval-summary">3 decisions waiting</span><button type="button" id="reset-demo-decisions"><i data-lucide="rotate-ccw"></i> Reset demo decisions</button></div></div>
+      <section class="big-boss-policy" aria-labelledby="big-boss-policy-title">
+        <header><div><p class="eyebrow">Decision Engine</p><h3 id="big-boss-policy-title">Big Boss Guarded Autopilot</h3></div><label><span>Mode</span><select id="autopilot-mode"><option value="guarded">Guarded</option><option value="manual">Manual</option><option value="observe">Observe only</option></select></label></header>
+        <div class="policy-lanes">
+          <article><i data-lucide="check-check"></i><div><strong>Auto-approve</strong><p>Internal research, source checks, memory cleanup, and zero-spend reversible tasks.</p></div></article>
+          <article><i data-lucide="shield-alert"></i><div><strong>Send to Michh</strong><p>Any spending, outreach, publishing, hiring, account access, contracts, or legal certification.</p></div></article>
+          <article><i data-lucide="ban"></i><div><strong>Auto-deny</strong><p>Missing evidence, negative expected ROI, policy violations, or spending beyond a hard limit.</p></div></article>
+        </div>
+        <footer><div><small>Last policy review</small><strong id="policy-result">Not run</strong></div><button type="button" id="run-policy-review"><i data-lucide="scan-search"></i> Run guarded review</button></footer>
+      </section>
       <aside class="memory-alert" id="memory-alert">
         <div class="memory-alert-icon"><i data-lucide="triangle-alert"></i></div>
         <div class="memory-alert-copy"><p class="eyebrow">City Memory Alert</p><h3>Similar opportunity previously tested</h3><span>Experiment #00241 · Loss: <b>-$18.42</b></span></div>
