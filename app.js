@@ -358,6 +358,7 @@ function runLocalCommand(command) {
     { terms: ['show memory', 'view memory', 'go to memory'], view: 'memory', reply: 'Opening the Memory Archive.' },
     { terms: ['show treasury', 'view treasury', 'go to treasury'], view: 'treasury', reply: 'Opening Treasury. The emergency reserve remains locked.' },
     { terms: ['show markets', 'view markets', 'go to markets'], view: 'markets', reply: 'Opening the personal Markets Desk.' },
+    { terms: ['show account', 'view account', 'privacy', 'payment methods', 'responsible gaming', 'responsible play', 'deposit', 'withdrawal'], view: 'account', reply: 'Opening Account & Safety. MKN does not hold wagering funds; deposits and withdrawals stay on the licensed platform.' },
     { terms: ['show city', 'view city', 'go home'], view: 'city', reply: 'Returning to the City Command Center.' }
   ];
   const route = routes.find((item) => item.terms.some((term) => normalized.includes(term)));
@@ -366,7 +367,7 @@ function runLocalCommand(command) {
     return { handled: true, reply: route.reply };
   }
   if (normalized === 'help' || normalized.includes('what can i do')) {
-    return { handled: true, reply: 'Try: city status, show agents, show approvals, show treasury, talk to Maya, or ask the Director a business question.' };
+    return { handled: true, reply: 'Try: city status, show agents, show approvals, show treasury, show account, talk to Maya, or ask the Director a business question.' };
   }
   if (normalized.includes('city status') || normalized === 'status') {
     return { handled: true, reply: 'City cash is $168.20. Two businesses and six agents are active. The 60-day mission has completed Goals 1 and 2.' };
@@ -493,6 +494,52 @@ document.querySelector('.agent-profile header button').addEventListener('click',
   openView('agents');
   setConsole(true);
   addConsoleMessage('Maya', 'My profile is active. You can assign research through this command console.');
+});
+
+const safetyInputs = document.querySelectorAll('[data-safety-setting]');
+const savedSafety = JSON.parse(localStorage.getItem('mkn-safety-settings') || '{}');
+safetyInputs.forEach((input) => {
+  const savedValue = savedSafety[input.dataset.safetySetting];
+  if (savedValue === undefined) return;
+  if (input.type === 'checkbox') input.checked = savedValue;
+  else input.value = savedValue;
+});
+
+const privacyConsent = document.querySelector('#privacy-consent');
+privacyConsent.checked = localStorage.getItem('mkn-privacy-consent') === 'true';
+privacyConsent.addEventListener('change', () => {
+  localStorage.setItem('mkn-privacy-consent', String(privacyConsent.checked));
+  showToast(privacyConsent.checked ? 'Agreement acknowledgement saved on this device.' : 'Agreement acknowledgement removed.');
+});
+
+document.querySelector('#save-safety').addEventListener('click', () => {
+  const settings = {};
+  safetyInputs.forEach((input) => {
+    settings[input.dataset.safetySetting] = input.type === 'checkbox' ? input.checked : Number(input.value);
+  });
+  localStorage.setItem('mkn-safety-settings', JSON.stringify(settings));
+  showToast('Responsible-play limits saved on this device.');
+});
+
+document.querySelector('#export-data').addEventListener('click', () => {
+  const exportData = {};
+  Object.keys(localStorage).filter((key) => key.startsWith('mkn-')).forEach((key) => {
+    try { exportData[key] = JSON.parse(localStorage.getItem(key)); }
+    catch { exportData[key] = localStorage.getItem(key); }
+  });
+  const file = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(file);
+  link.download = `mkn-city-data-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+  showToast('Your browser-local MKN data was exported.');
+});
+
+document.querySelector('#clear-local-data').addEventListener('click', () => {
+  if (!window.confirm('Clear all MKN City data stored in this browser? This cannot be undone.')) return;
+  Object.keys(localStorage).filter((key) => key.startsWith('mkn-')).forEach((key) => localStorage.removeItem(key));
+  window.location.reload();
 });
 
 lucide.createIcons();

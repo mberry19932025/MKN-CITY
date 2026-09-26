@@ -457,6 +457,53 @@
         <div class="ledger-empty" id="ledger-content"><i data-lucide="notebook-tabs"></i><p>No entries recorded yet.</p></div>
       </section>
     </section>
+    <section class="view" id="account" aria-labelledby="account-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">Founder Account</p><h2 id="account-title">Account &amp; Safety</h2></div>
+        <span class="prototype-badge"><i data-lucide="shield-check"></i> Prototype protected</span>
+      </div>
+
+      <div class="account-notice"><i data-lucide="landmark"></i><div><strong>MKN City does not hold wagering funds</strong><p>Deposits, withdrawals, identity checks, and entries happen directly on the licensed platform. MKN provides research, manual tracking, limits, and approval controls.</p></div></div>
+
+      <div class="account-grid">
+        <section class="settings-panel" aria-labelledby="funding-title">
+          <header><i data-lucide="wallet-cards"></i><div><h3 id="funding-title">Deposits &amp; withdrawals</h3><p>Open your own account to manage funds securely.</p></div></header>
+          <div class="funding-row"><div class="platform-icon kalshi">K</div><div><strong>Kalshi</strong><span>Managed by Kalshi</span></div><a href="https://kalshi.com/" target="_blank" rel="noopener noreferrer">Open platform <i data-lucide="external-link"></i></a></div>
+          <div class="funding-row"><div class="platform-icon prize">P</div><div><strong>PrizePicks</strong><span>Managed by PrizePicks</span></div><a href="https://www.prizepicks.com/" target="_blank" rel="noopener noreferrer">Open platform <i data-lucide="external-link"></i></a></div>
+          <p class="fine-print">Never enter bank, card, or platform passwords into an MKN agent command.</p>
+        </section>
+
+        <section class="settings-panel" aria-labelledby="payments-title">
+          <header><i data-lucide="credit-card"></i><div><h3 id="payments-title">MKN payment methods</h3><p>For future software subscriptions only.</p></div></header>
+          <div class="empty-payment"><i data-lucide="lock-keyhole"></i><strong>No payment method stored</strong><span>Billing stays disabled until MKN has an approved processor and production privacy controls.</span></div>
+          <button class="disabled-action" type="button" disabled><i data-lucide="plus"></i> Add payment method</button>
+        </section>
+
+        <section class="settings-panel responsible-panel" aria-labelledby="responsible-title">
+          <header><i data-lucide="shield-alert"></i><div><h3 id="responsible-title">Responsible play controls</h3><p>Personal guardrails for the Markets Desk.</p></div></header>
+          <div class="limit-grid">
+            <label>Weekly deposit limit <span>$<input data-safety-setting="depositLimit" type="number" min="0" step="1" value="25"></span></label>
+            <label>Weekly loss limit <span>$<input data-safety-setting="lossLimit" type="number" min="0" step="1" value="20"></span></label>
+            <label>Session reminder <span><input data-safety-setting="sessionMinutes" type="number" min="15" step="15" value="60"> min</span></label>
+          </div>
+          <label class="setting-toggle"><input data-safety-setting="coolOff" type="checkbox"><span><strong>Cool-off mode</strong><small>Hide market actions until manually restored after the selected break.</small></span></label>
+          <div class="safety-actions"><button id="save-safety" class="primary-action" type="button">Save limits</button><a href="https://www.ncpgambling.org/help-treatment/about-the-national-problem-gambling-helpline/" target="_blank" rel="noopener noreferrer">Get confidential help <i data-lucide="external-link"></i></a></div>
+        </section>
+
+        <section class="settings-panel" aria-labelledby="agreements-title">
+          <header><i data-lucide="file-check-2"></i><div><h3 id="agreements-title">Agreements &amp; privacy</h3><p>Consent records for this prototype.</p></div></header>
+          <details><summary>Privacy notice <i data-lucide="chevron-down"></i></summary><p>This prototype stores preferences and manual market records in this browser. Do not enter sensitive financial credentials. A production launch needs a reviewed privacy policy, encrypted accounts, retention rules, and a deletion process.</p></details>
+          <details><summary>Responsible use agreement <i data-lucide="chevron-down"></i></summary><p>MKN provides research and organization, not guaranteed income, investment advice, or automatic wagering. The owner remains responsible for platform eligibility, location rules, decisions, and losses.</p></details>
+          <label class="agreement-check"><input id="privacy-consent" type="checkbox"><span>I acknowledge the prototype privacy notice and responsible-use terms.</span></label>
+        </section>
+
+        <section class="settings-panel" aria-labelledby="data-title">
+          <header><i data-lucide="database"></i><div><h3 id="data-title">Your data</h3><p>Browser-local prototype controls.</p></div></header>
+          <div class="data-actions"><button id="export-data" type="button"><i data-lucide="download"></i><span>Export my data</span></button><button id="clear-local-data" class="danger-action" type="button"><i data-lucide="trash-2"></i><span>Clear local data</span></button></div>
+          <p class="fine-print">Production accounts will require server-side export, deletion, access logs, and identity verification.</p>
+        </section>
+      </div>
+    </section>
   </main>
 
   <button class="command-launcher" id="command-launcher" type="button" aria-controls="command-console" aria-expanded="false"><i data-lucide="message-circle"></i><span>Command</span></button>
@@ -475,7 +522,6 @@
     <div class="tutorial-progress" id="tutorial-progress"><i class="active"></i><i></i><i></i><i></i></div>
     <div class="tutorial-controls"><button id="tutorial-skip" type="button">Skip</button><button id="tutorial-next" class="primary-action" type="button">Next</button></div>
   </dialog>
-y miss
   <nav class="bottom-nav" aria-label="City navigation">
     <button class="nav-item active" data-view="city" type="button"><i data-lucide="map"></i><span>City</span></button>
     <button class="nav-item" data-view="agents" type="button"><i data-lucide="bot"></i><span>Agents</span></button>
@@ -484,6 +530,7 @@ y miss
     <button class="nav-item" data-view="memory" type="button"><i data-lucide="brain"></i><span>Memory</span></button>
     <button class="nav-item" data-view="treasury" type="button"><i data-lucide="landmark"></i><span>Treasury</span></button>
     <button class="nav-item" data-view="markets" type="button"><i data-lucide="chart-candlestick"></i><span>Markets</span></button>
+    <button class="nav-item" data-view="account" type="button"><i data-lucide="circle-user-round"></i><span>Account</span></button>
   </nav>
 
   <dialog class="property-dialog" id="property-dialog">
