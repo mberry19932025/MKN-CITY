@@ -118,6 +118,8 @@ const officeShift = document.querySelector('#office-shift');
 const founderDeck = document.querySelector('.game-command-deck');
 const founderCard = document.querySelector('.founder-command-card');
 if (founderDeck && founderCard) founderCard.after(founderDeck);
+const demoSeasonPanel = document.querySelector('#demo-season');
+if (founderDeck && demoSeasonPanel) founderDeck.after(demoSeasonPanel);
 const enterCityFocus = document.querySelector('#enter-city-focus');
 const exitCityFocus = document.querySelector('#exit-city-focus');
 
@@ -132,6 +134,63 @@ exitCityFocus.addEventListener('click', () => setCityFocus(false));
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && document.body.classList.contains('city-focus-mode')) setCityFocus(false);
 });
+
+const demoDayPlans = [
+  { work: 'Research team mapped thumbnail demand and verified five sources.', tasks: 3, revenue: 0, expenses: 1.85, lesson: 'Buyer pain points repeat around weak branding and slow delivery.' },
+  { work: 'Creative team produced three original thumbnail concepts from the research brief.', tasks: 4, revenue: 0, expenses: 3.2, lesson: 'A consistent visual system tested stronger than unrelated samples.' },
+  { work: 'Commerce prepared a Fiverr gig draft and Etsy listing test for Founder review.', tasks: 3, revenue: 0, expenses: 2.1, lesson: 'Complete pricing and fees before publishing any offer.' },
+  { work: 'Demo thumbnail order completed after QA and owner approval.', tasks: 5, revenue: 35, expenses: 8.4, lesson: 'Fast delivery and a focused brief reduced simulated revision time.' },
+  { work: 'POD test spent its cap but produced no demo sale.', tasks: 3, revenue: 0, expenses: 12, lesson: 'Preserve the design engagement data; do not scale the supplier setup.' },
+  { work: 'Thumbnail package generated a second simulated client outcome.', tasks: 5, revenue: 65, expenses: 14.75, lesson: 'Package pricing outperformed a single-image offer in this simulation.' },
+  { work: 'Director consolidated the week and promoted repeated evidence to playbooks.', tasks: 4, revenue: 90, expenses: 19.5, lesson: 'Scale the thumbnail service cautiously; revise POD before another test.' }
+];
+
+function getDemoSeason() {
+  try { return JSON.parse(localStorage.getItem('mkn-demo-season') || '{"day":0,"records":[]}'); }
+  catch { return { day: 0, records: [] }; }
+}
+
+function safeDemoText(value) {
+  return String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character]);
+}
+
+function renderDemoSeason() {
+  const season = getDemoSeason();
+  const totals = season.records.reduce((sum, record) => ({ tasks: sum.tasks + record.tasks, revenue: sum.revenue + record.revenue, expenses: sum.expenses + record.expenses }), { tasks: 0, revenue: 0, expenses: 0 });
+  const net = totals.revenue - totals.expenses;
+  const health = Math.max(0, Math.min(100, Math.round(50 + (net / 4) + (totals.tasks * .35))));
+  document.querySelector('#season-day').textContent = `${season.day} / 7`;
+  document.querySelector('#season-tasks').textContent = totals.tasks;
+  document.querySelector('#season-revenue').textContent = `$${totals.revenue.toFixed(2)}`;
+  document.querySelector('#season-expenses').textContent = `$${totals.expenses.toFixed(2)}`;
+  document.querySelector('#season-net').textContent = `${net < 0 ? '-' : ''}$${Math.abs(net).toFixed(2)}`;
+  document.querySelector('#season-health').textContent = health;
+  document.querySelector('#season-health-fill').style.width = `${health}%`;
+  document.querySelector('#season-ledger').innerHTML = season.records.length ? season.records.slice().reverse().map((record) => `<article><b>Day ${record.day}</b><div><strong>${safeDemoText(record.work)}</strong><span>${safeDemoText(record.lesson)}</span></div><small>${record.tasks} tasks · $${record.revenue.toFixed(2)} revenue · $${record.expenses.toFixed(2)} cost</small></article>`).join('') : '<p>No simulated workdays recorded yet.</p>';
+  document.querySelector('#advance-demo-day').disabled = season.day >= 7;
+  document.querySelector('#advance-demo-day').innerHTML = season.day >= 7 ? '<i data-lucide="check"></i> Week complete' : '<i data-lucide="play"></i> Run next demo day';
+  refreshIcons();
+}
+
+document.querySelector('#advance-demo-day').addEventListener('click', () => {
+  const season = getDemoSeason();
+  if (season.day >= 7) return;
+  const plan = demoDayPlans[season.day];
+  season.day += 1;
+  season.records.push({ day: season.day, recordedAt: new Date().toISOString(), ...plan });
+  localStorage.setItem('mkn-demo-season', JSON.stringify(season));
+  renderDemoSeason();
+  showToast(`Demo Day ${season.day} recorded. City health recalculated.`);
+});
+
+document.querySelector('#reset-demo-season').addEventListener('click', () => {
+  if (!window.confirm('Reset all seven-day demo records on this device?')) return;
+  localStorage.removeItem('mkn-demo-season');
+  renderDemoSeason();
+  showToast('Seven-day demo season reset.');
+});
+
+renderDemoSeason();
 const officeData = {
   research: { district: 'Research District', title: 'Market Intelligence Lab', description: 'Evidence collection, source checks, and opportunity reports.', agents: [
     { name: 'Maya', role: 'Trend Researcher', task: 'Find and verify one product trend', sprite: 'research-sprite', status: 'Researching' },
@@ -170,6 +229,7 @@ function renderOffice(officeId) {
   officeTitle.textContent = office.title;
   officeDescription.textContent = office.description;
   officeShift.innerHTML = `<i></i>${isNightCycle ? 'Low-cost night cycle' : period.phase}`;
+  officeDialog.dataset.office = officeId;
   const desks = office.agents.map((agent) => {
     const liveStatus = isNightCycle && agent.name !== 'Director' ? 'Consolidating memory'
       : period.schedule === 4 ? 'Knowledge exchange'
