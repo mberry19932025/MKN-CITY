@@ -30,6 +30,8 @@
         </button>
       </div>
 
+      <div class="reality-banner"><i data-lucide="shield-check"></i><span>MKN City helps operate real business experiments. Revenue is measured, never guaranteed, and external actions require Founder approval.</span></div>
+
       <div class="balance-panel">
         <div>
           <span>City cash</span>
@@ -92,7 +94,8 @@
       </section>
 
       <div class="city-map" aria-label="MKN City district map">
-        <div class="map-title"><span>City map</span><small>Tap a district to visit</small></div>
+        <div class="map-title"><span>Live MKN City</span><small>Tap districts or agents to interact</small></div>
+        <div class="map-hud"><span><i></i> Live</span><b>Founder Level 1</b></div>
         <div class="district university"><i data-lucide="graduation-cap"></i><span>AI University</span></div>
         <div class="district research"><i data-lucide="microscope"></i><span>Research</span></div>
         <div class="district founder"><i data-lucide="landmark"></i><span>Founder Tower</span></div>
@@ -457,6 +460,7 @@
   </main>
 
   <button class="command-launcher" id="command-launcher" type="button" aria-controls="command-console" aria-expanded="false"><i data-lucide="message-circle"></i><span>Command</span></button>
+  <div class="game-toast" id="game-toast" role="status" aria-live="polite"></div>
   <aside class="command-console" id="command-console" aria-label="Founder command console" aria-hidden="true">
     <header><div><span class="console-pulse"></span><div><small>MKN City AI</small><strong>Founder Command</strong></div></div><button id="close-console" type="button" title="Close command console" aria-label="Close command console"><i data-lucide="x"></i></button></header>
     <div class="console-messages" id="console-messages" aria-live="polite">
@@ -471,7 +475,7 @@
     <div class="tutorial-progress" id="tutorial-progress"><i class="active"></i><i></i><i></i><i></i></div>
     <div class="tutorial-controls"><button id="tutorial-skip" type="button">Skip</button><button id="tutorial-next" class="primary-action" type="button">Next</button></div>
   </dialog>
-
+y miss
   <nav class="bottom-nav" aria-label="City navigation">
     <button class="nav-item active" data-view="city" type="button"><i data-lucide="map"></i><span>City</span></button>
     <button class="nav-item" data-view="agents" type="button"><i data-lucide="bot"></i><span>Agents</span></button>
@@ -483,7 +487,7 @@
   </nav>
 
   <dialog class="property-dialog" id="property-dialog">
-    <form method="dialog" id="market-form">
+    <form method="dialog" id="property-form">
       <button class="dialog-close" value="cancel" title="Close" aria-label="Close property details"><i data-lucide="x"></i></button>
       <p class="eyebrow">Commercial property</p>
       <h2 id="dialog-property-name">Building 001</h2>
@@ -499,7 +503,7 @@
   </dialog>
 
   <dialog class="property-dialog" id="market-dialog">
-    <form method="dialog">
+    <form method="dialog" id="market-form">
       <button class="dialog-close" value="cancel" title="Close" aria-label="Close market dialog"><i data-lucide="x"></i></button>
       <p class="eyebrow" id="market-dialog-label">Personal tracker</p>
       <h2 id="market-dialog-title">Add manual entry</h2>

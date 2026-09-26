@@ -19,8 +19,23 @@ document.querySelectorAll('[data-open-view]').forEach((button) => {
   button.addEventListener('click', () => openView(button.dataset.openView));
 });
 
+const gameToast = document.querySelector('#game-toast');
+let toastTimer;
+
+function showToast(message) {
+  clearTimeout(toastTimer);
+  gameToast.textContent = message;
+  gameToast.classList.add('show');
+  toastTimer = setTimeout(() => gameToast.classList.remove('show'), 3200);
+}
+
 document.querySelectorAll('.district').forEach((district) => {
-  district.addEventListener('click', () => openView('city'));
+  district.addEventListener('click', () => {
+    const name = district.textContent.trim();
+    showToast(`${name} selected. Building detail mode will unlock as the city levels up.`);
+    setConsole(true);
+    addConsoleMessage('City Guide', `${name} is active. Ask what this district is working on or give it a command.`);
+  });
 });
 
 const workflowSteps = document.querySelectorAll('.workflow-steps li');
@@ -71,7 +86,7 @@ document.querySelectorAll('[data-property]').forEach((button) => {
     propertyDialog.querySelector('p:not(.eyebrow)').textContent = 'A building can be reserved only for an approved business proposal. Reserving property does not publish or launch the business.';
     propertyDialog.querySelector('label').hidden = false;
     propertyDialog.querySelector('input').hidden = false;
-    propertyDialog.querySelector('#reserve-property').textContent = 'Request reservation';
+propertyDialog.querySelector('#reserve-property').textContent = 'Request reservation';
     propertyDialog.showModal();
   });
 });
@@ -455,5 +470,29 @@ if (!localStorage.getItem('mkn-tutorial-complete')) {
     showTutorialStep();
   }, 500);
 }
+
+const propertyForm = document.querySelector('#property-form');
+propertyForm.addEventListener('submit', (event) => {
+  if (event.submitter?.value === 'cancel') return;
+  const businessName = document.querySelector('#business-name').value.trim();
+  if (!businessName || document.querySelector('#business-name').hidden) return;
+  localStorage.setItem('mkn-property-request', JSON.stringify({ building: dialogPropertyName.textContent, business: businessName }));
+  showToast(`${dialogPropertyName.textContent} reservation sent to Approvals for ${businessName}.`);
+});
+
+document.querySelector('.icon-button').addEventListener('click', () => {
+  openView('approvals');
+  showToast('Approval desk opened. Two decisions need Founder review.');
+});
+
+document.querySelectorAll('.fund-card > button').forEach((button) => button.addEventListener('click', () => {
+  showToast('Fund settings are owner-controlled. Editing unlocks with persistent accounts in the next city upgrade.');
+}));
+
+document.querySelector('.agent-profile header button').addEventListener('click', () => {
+  openView('agents');
+  setConsole(true);
+  addConsoleMessage('Maya', 'My profile is active. You can assign research through this command console.');
+});
 
 lucide.createIcons();
