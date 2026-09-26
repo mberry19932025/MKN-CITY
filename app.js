@@ -75,6 +75,48 @@ function runResearchHandoff() {
 replayWorkflow.addEventListener('click', runResearchHandoff);
 runResearchHandoff();
 
+const cityMap = document.querySelector('.city-map');
+const cityTime = document.querySelector('#city-time');
+const cityPhase = document.querySelector('#city-phase');
+const cityClockIcon = document.querySelector('.city-clock > i');
+const timeModeButtons = document.querySelectorAll('[data-time-mode]');
+const schedulePhases = document.querySelectorAll('#schedule-timeline article');
+let cityTimeMode = localStorage.getItem('mkn-city-time-mode') || 'auto';
+
+function getCityPeriod(hour) {
+  if (hour >= 6 && hour < 10) return { className: 'time-morning', phase: 'Morning research + planning', schedule: 0, icon: 'sunrise' };
+  if (hour >= 10 && hour < 15) return { className: 'time-day', phase: 'Production + operations', schedule: 1, icon: 'sun' };
+  if (hour >= 15 && hour < 18) return { className: 'time-day', phase: 'Reviews + collaboration', schedule: 2, icon: 'users-round' };
+  if (hour >= 18 && hour < 21) return { className: 'time-evening', phase: 'Reports + learning', schedule: 3, icon: 'sunset' };
+  if (hour >= 21 && hour < 23) return { className: 'time-evening', phase: 'Recreation + maintenance', schedule: 4, icon: 'gamepad-2' };
+  return { className: 'time-night', phase: 'Memory + low-cost mode', schedule: 5, icon: 'moon-star' };
+}
+
+function updateCityTime() {
+  const now = new Date();
+  const displayHour = cityTimeMode === 'day' ? 12 : cityTimeMode === 'night' ? 23 : now.getHours();
+  const period = getCityPeriod(displayHour);
+  cityMap.classList.remove('time-morning', 'time-day', 'time-evening', 'time-night');
+  cityMap.classList.add(period.className);
+  cityTime.textContent = cityTimeMode === 'auto'
+    ? now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+    : cityTimeMode === 'day' ? '12:00 PM' : '11:00 PM';
+  cityPhase.textContent = period.phase;
+  cityClockIcon.setAttribute('data-lucide', period.icon);
+  schedulePhases.forEach((phase, index) => phase.classList.toggle('active-phase', index === period.schedule));
+  timeModeButtons.forEach((button) => button.classList.toggle('active', button.dataset.timeMode === cityTimeMode));
+  lucide.createIcons();
+}
+
+timeModeButtons.forEach((button) => button.addEventListener('click', () => {
+  cityTimeMode = button.dataset.timeMode;
+  localStorage.setItem('mkn-city-time-mode', cityTimeMode);
+  updateCityTime();
+  showToast(cityTimeMode === 'auto' ? 'City lighting now follows local time.' : `${cityTimeMode === 'day' ? 'Day' : 'Night'} preview enabled.`);
+}));
+updateCityTime();
+setInterval(updateCityTime, 60000);
+
 const propertyDialog = document.querySelector('#property-dialog');
 const dialogPropertyName = document.querySelector('#dialog-property-name');
 

@@ -96,6 +96,13 @@
       <div class="city-map" aria-label="MKN City district map">
         <div class="map-title"><span>Live MKN City</span><small>Tap districts or agents to interact</small></div>
         <div class="map-hud"><span><i></i> Live</span><b>Founder Level 1</b></div>
+        <div class="city-clock" aria-live="polite"><i data-lucide="sun"></i><div><strong id="city-time">--:--</strong><span id="city-phase">Loading city time</span></div></div>
+        <div class="time-controls" role="group" aria-label="City time display">
+          <button class="active" type="button" data-time-mode="auto">Auto</button>
+          <button type="button" data-time-mode="day">Day</button>
+          <button type="button" data-time-mode="night">Night</button>
+        </div>
+        <div class="night-lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <div class="district university"><i data-lucide="graduation-cap"></i><span>AI University</span></div>
         <div class="district research"><i data-lucide="microscope"></i><span>Research</span></div>
         <div class="district founder"><i data-lucide="landmark"></i><span>Founder Tower</span></div>
@@ -138,7 +145,7 @@
       </section>
       <section class="daily-schedule" aria-labelledby="schedule-title">
         <div class="schedule-heading"><div><p class="eyebrow">City rhythm</p><h3 id="schedule-title">Daily Schedule</h3></div><span>Local city time</span></div>
-        <div class="schedule-timeline">
+        <div class="schedule-timeline" id="schedule-timeline">
           <article class="schedule-morning"><i data-lucide="sunrise"></i><div><small>Morning</small><strong>Research + planning</strong></div></article>
           <article class="schedule-work"><i data-lucide="briefcase-business"></i><div><small>Workday</small><strong>Production + operations</strong></div></article>
           <article class="schedule-afternoon"><i data-lucide="users-round"></i><div><small>Afternoon</small><strong>Reviews + collaboration</strong></div></article>

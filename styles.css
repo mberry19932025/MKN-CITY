@@ -134,6 +134,7 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
 .mission-goals .complete-goal > b svg { width: 14px; }
 
 .city-map { position: relative; width: 100%; aspect-ratio: 16 / 9; min-height: 390px; overflow: hidden; background: #dfe8dc url("assets/mkn-city-isometric.png") center / cover no-repeat; border: 1px solid #aebdb4; border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.5), var(--shadow); }
+.city-map::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: rgba(10,25,43,0); transition: background 1.2s ease; }
 .city-map::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; box-shadow: inset 0 0 48px rgba(20,42,31,.2); }
 .map-title { position: absolute; z-index: 3; left: 18px; top: 16px; display: flex; flex-direction: column; }
 .map-title { padding: 8px 10px; border: 1px solid rgba(255,255,255,.7); border-radius: 6px; background: rgba(255,254,249,.91); box-shadow: 0 5px 14px rgba(23,33,29,.16); }
@@ -143,6 +144,23 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
 .map-hud span { display: flex; align-items: center; gap: 5px; color: #a9ddc4; font-size: .59rem; font-weight: 700; text-transform: uppercase; }
 .map-hud span i { width: 7px; height: 7px; border-radius: 50%; background: #45c988; }
 .map-hud b { padding-left: 9px; border-left: 1px solid rgba(255,255,255,.25); font-size: .61rem; }
+.city-clock { position: absolute; z-index: 4; left: 18px; bottom: 16px; min-width: 142px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,.55); border-radius: 6px; background: rgba(23,33,29,.9); color: white; box-shadow: 0 5px 14px rgba(23,33,29,.22); }
+.city-clock > svg { width: 19px; color: #f3c45f; }
+.city-clock strong, .city-clock span { display: block; }
+.city-clock strong { font: 700 .75rem "Space Grotesk", sans-serif; }
+.city-clock span { color: #b9c7c0; font-size: .56rem; }
+.time-controls { position: absolute; z-index: 4; right: 16px; bottom: 16px; padding: 4px; display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid rgba(255,255,255,.4); border-radius: 6px; background: rgba(23,33,29,.9); }
+.time-controls button { min-width: 46px; height: 28px; border: 0; border-radius: 4px; background: transparent; color: #bdc8c2; cursor: pointer; font-size: .59rem; font-weight: 700; }
+.time-controls button.active { background: #f7f4e9; color: var(--ink); }
+.night-lights { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 1.2s ease; }
+.night-lights i { position: absolute; width: 7px; height: 5px; background: #ffd66b; box-shadow: 0 0 10px 3px rgba(255,205,87,.6); }
+.night-lights i:nth-child(1) { left: 30%; top: 27%; }.night-lights i:nth-child(2) { left: 47%; top: 32%; }.night-lights i:nth-child(3) { right: 24%; top: 29%; }.night-lights i:nth-child(4) { left: 21%; bottom: 32%; }.night-lights i:nth-child(5) { right: 33%; bottom: 27%; }.night-lights i:nth-child(6) { right: 16%; bottom: 39%; }
+.city-map.time-evening::before { background: rgba(63,42,67,.25); }
+.city-map.time-night::before { background: rgba(7,20,40,.58); }
+.city-map.time-night .night-lights, .city-map.time-evening .night-lights { opacity: 1; }
+.city-map.time-night .map-agent { filter: brightness(.72); }
+.schedule-timeline article.active-phase { position: relative; background: #eef8f2; box-shadow: inset 0 -4px 0 var(--green); }
+.schedule-timeline article.active-phase::after { content: "Now"; position: absolute; right: 7px; top: 7px; padding: 2px 4px; border-radius: 3px; background: var(--green); color: white; font-size: .48rem; font-weight: 700; text-transform: uppercase; }
 .road { position: absolute; z-index: 0; background: #9aa49d; border: 5px solid #cad1cc; }
 .road { display: none; }
 .district { position: absolute; z-index: 3; width: auto; min-height: 0; padding: 7px 9px; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px; border: 1px solid rgba(255,255,255,.75); border-radius: 6px; box-shadow: 0 5px 12px rgba(23,33,29,.22); color: var(--ink); background: rgba(255,254,249,.9); font-size: .64rem; font-weight: 700; text-align: center; cursor: pointer; transition: transform .15s ease, background .15s ease; }
