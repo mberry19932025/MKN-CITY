@@ -66,6 +66,35 @@ document.querySelectorAll('[data-open-view]').forEach((button) => {
   button.addEventListener('click', () => openView(button.dataset.openView));
 });
 
+function getCampaignState() {
+  try { return JSON.parse(localStorage.getItem('mkn-revenue-campaign') || '{"engine":"service","step":0}'); }
+  catch { return { engine: 'service', step: 0 }; }
+}
+
+function renderCampaignState() {
+  const state = getCampaignState();
+  const engines = ['service', 'product', 'contracts'];
+  document.querySelectorAll('[data-campaign]').forEach((button, index) => button.closest('.revenue-engine').classList.toggle('active-engine', engines[index] === state.engine));
+  document.querySelectorAll('.campaign-missions li').forEach((mission, index) => {
+    mission.classList.toggle('current', index === state.step);
+    mission.classList.toggle('complete-goal', index < state.step);
+  });
+  document.querySelector('#campaign-rank').textContent = state.step >= 5 ? 'Rank 3 · Growth Operator' : state.step >= 2 ? 'Rank 2 · Market Tester' : 'Rank 1 · Offer Builder';
+}
+
+document.querySelectorAll('[data-campaign]').forEach((button) => button.addEventListener('click', () => {
+  const state = getCampaignState();
+  state.engine = button.dataset.campaign;
+  state.step = Math.max(state.step, button.dataset.campaign === 'service' ? 1 : state.step);
+  localStorage.setItem('mkn-revenue-campaign', JSON.stringify(state));
+  renderCampaignState();
+  openView('businesses');
+  showToast(button.dataset.campaign === 'service' ? 'Service sprint activated. Build the offer and samples before publishing.'
+    : button.dataset.campaign === 'product' ? 'Digital Product Lab opened for a controlled product test.'
+    : 'Government readiness mission opened. Eligibility and submissions remain human-verified.');
+}));
+renderCampaignState();
+
 const gameToast = document.querySelector('#game-toast');
 let toastTimer;
 
