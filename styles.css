@@ -173,14 +173,27 @@ main { width: min(1060px, 92vw); margin: 0 auto; padding: 38px 0 130px; }
 .business { right: 18%; top: 23%; }
 .traveling-agent { position: absolute; z-index: 5; right: 18%; top: 42%; width: 34px; height: 34px; display: grid; place-items: center; color: white; background: var(--green); border: 3px solid var(--surface); border-radius: 50%; box-shadow: 0 5px 12px rgba(23,33,29,.3); opacity: 0; }
 .traveling-agent svg { width: 17px; height: 17px; }
-.map-agent { position: absolute; z-index: 6; width: 34px; height: 34px; padding: 0; border: 3px solid var(--surface); border-radius: 50%; background: transparent; box-shadow: 0 5px 12px rgba(23,33,29,.25); cursor: pointer; }
-.agent-sprite { width: 100%; height: 100%; display: grid; place-items: center; border-radius: 50%; background: #243b32; color: white; font-size: .7rem; font-weight: 700; }
+.map-agent { --face: 1; position: absolute; z-index: 6; width: 38px; height: 52px; padding: 0; border: 0; background: transparent; cursor: pointer; transition-property: left, top; transition-timing-function: linear; filter: drop-shadow(0 6px 4px rgba(5,13,9,.38)); }
+.agent-sprite { position: relative; width: 30px; height: 38px; margin: 0 auto; display: block; transform: scaleX(var(--face)); transform-origin: center bottom; }
+.agent-sprite::before { content: ""; position: absolute; left: 7px; top: 0; width: 16px; height: 15px; border: 2px solid #e8b991; border-radius: 4px 4px 3px 3px; background: #b87954; box-shadow: inset 0 -5px 0 #d89c75; }
+.agent-sprite::after { content: ""; position: absolute; left: 4px; bottom: 2px; width: 22px; height: 21px; border: 2px solid #111a16; border-radius: 4px 4px 2px 2px; background: #2e7b5a; box-shadow: -4px 14px 0 -2px #17211d, 4px 14px 0 -2px #17211d; }
+.agent-sprite b { position: absolute; z-index: 2; left: 10px; top: 17px; color: white; font-size: .52rem; line-height: 16px; }
+.creative-sprite::after { background: #a24e68; }.business-sprite::after { background: #477ea3; }.operations-sprite::after { background: #b17b32; }.director-sprite::after { background: #66518e; }
+.agent-name { position: absolute; left: 50%; bottom: -2px; padding: 1px 4px; transform: translateX(-50%); border-radius: 3px; background: rgba(12,20,16,.88); color: white; font-size: .46rem; font-weight: 700; white-space: nowrap; }
+.map-agent.walking .agent-sprite { animation: rpg-walk .34s steps(2, end) infinite; }
+@keyframes rpg-walk { 0% { margin-top: 0; } 50% { margin-top: -3px; } 100% { margin-top: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .map-agent { transition-duration: 0s !important; }
+  .map-agent.walking .agent-sprite { animation: none; }
+}
 .speech-bubble { position: absolute; left: 50%; bottom: calc(100% + 10px); width: max-content; max-width: 160px; padding: 7px 9px; transform: translateX(-50%); border: 1px solid #b9c4bd; border-radius: 6px; background: var(--surface); color: var(--ink); box-shadow: 0 5px 14px rgba(23,33,29,.13); font-size: .61rem; font-weight: 600; pointer-events: none; opacity: 0; transition: opacity .16s ease, transform .16s ease; }
 .speech-bubble::after { content: ""; position: absolute; left: 50%; top: 100%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: var(--surface); }
 .map-agent:hover .speech-bubble, .map-agent.speaking .speech-bubble { opacity: 1; transform: translate(-50%, -2px); }
-.maya-map-agent { right: 22%; top: 30%; }
-.marcus-map-agent { left: 18%; bottom: 18%; }
-.avery-map-agent { right: 20%; bottom: 15%; }
+.maya-map-agent { left: 69%; top: 30%; }
+.marcus-map-agent { left: 18%; top: 70%; }
+.avery-map-agent { left: 76%; top: 72%; }
+.nova-map-agent { left: 56%; top: 63%; }
+.director-map-agent { left: 47%; top: 39%; }
 .traveling-agent.moving { animation: research-route 5s ease-in-out forwards; }
 @keyframes research-route {
   0% { right: 18%; top: 42%; opacity: 0; }

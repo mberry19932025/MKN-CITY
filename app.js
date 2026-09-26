@@ -117,6 +117,46 @@ timeModeButtons.forEach((button) => button.addEventListener('click', () => {
 updateCityTime();
 setInterval(updateCityTime, 60000);
 
+const roamingAgents = [...document.querySelectorAll('.map-agent')];
+const agentWaypoints = [
+  [16, 24], [27, 35], [42, 40], [53, 51], [68, 35], [77, 25],
+  [72, 61], [57, 69], [41, 66], [25, 70], [33, 52], [60, 43]
+];
+const roamingLines = {
+  Maya: ['Checking a new signal.', 'Taking research downtown.', 'Evidence first, Founder.'],
+  Marcus: ['Heading to the studio.', 'New concept in progress.', 'Reviewing Design #7.'],
+  Avery: ['Updating the listings.', 'Checking conversion data.', 'SEO report is moving.'],
+  Nova: ['Production queue checked.', 'Capacity looks stable.', 'Moving to operations.'],
+  Director: ['Reviewing city performance.', 'Approval queue checked.', 'Watching the departments.']
+};
+
+function moveAgent(agent, index) {
+  const currentLeft = Number.parseFloat(agent.style.left || getComputedStyle(agent).left) || 0;
+  const point = agentWaypoints[(Math.floor(Math.random() * agentWaypoints.length) + index) % agentWaypoints.length];
+  const duration = cityMap.classList.contains('time-night') ? 7 + Math.random() * 4 : 4 + Math.random() * 4;
+  const mapWidth = cityMap.clientWidth || 1;
+  const targetPixels = mapWidth * point[0] / 100;
+  agent.style.setProperty('--face', targetPixels < currentLeft ? -1 : 1);
+  agent.style.transitionDuration = `${duration}s`;
+  agent.classList.add('walking');
+  requestAnimationFrame(() => {
+    agent.style.left = `${point[0]}%`;
+    agent.style.top = `${point[1]}%`;
+  });
+  setTimeout(() => {
+    agent.classList.remove('walking');
+    if (Math.random() > .56) {
+      const lines = roamingLines[agent.dataset.agentChat] || ['On my way, Founder.'];
+      agent.querySelector('.speech-bubble').textContent = lines[Math.floor(Math.random() * lines.length)];
+      agent.classList.add('speaking');
+      setTimeout(() => agent.classList.remove('speaking'), 2600);
+    }
+    setTimeout(() => moveAgent(agent, index), 1400 + Math.random() * 3000);
+  }, duration * 1000);
+}
+
+roamingAgents.forEach((agent, index) => setTimeout(() => moveAgent(agent, index), 900 + index * 650));
+
 const propertyDialog = document.querySelector('#property-dialog');
 const dialogPropertyName = document.querySelector('#dialog-property-name');
 
@@ -417,6 +457,22 @@ function runLocalCommand(command) {
   if (normalized.includes('talk to maya') || normalized === 'maya') {
     speakAsAgent('Maya', 'I am checking the strongest evidence now.');
     return { handled: true, reply: 'Maya: I am researching active opportunities. My manager rule is to submit once confidence is sufficient.' };
+  }
+  if (normalized.includes('talk to marcus') || normalized === 'marcus') {
+    speakAsAgent('Marcus', 'I am preparing the next design test.');
+    return { handled: true, reply: 'Marcus: Design #7 remains the creative benchmark. I am preparing one controlled variation for review.' };
+  }
+  if (normalized.includes('talk to avery') || normalized === 'avery') {
+    speakAsAgent('Avery', 'I am checking listing performance.');
+    return { handled: true, reply: 'Avery: Listings are organized. I will flag keyword or conversion changes before recommending a budget increase.' };
+  }
+  if (normalized.includes('talk to nova') || normalized === 'nova') {
+    speakAsAgent('Nova', 'I am checking production capacity.');
+    return { handled: true, reply: 'Nova: The production queue is stable. I will request temporary workers if demand exceeds safe capacity.' };
+  }
+  if (normalized.includes('talk to director')) {
+    speakAsAgent('Director', 'I am reviewing the whole city.');
+    return { handled: true, reply: 'Director: I am monitoring departments, budgets, approvals, and agent performance. No external action proceeds without your approval.' };
   }
   return { handled: false };
 }
