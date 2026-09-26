@@ -49,7 +49,15 @@ const officeData = {
   founder: { district: 'Downtown', title: 'Founder Tower', description: 'City oversight, approvals, budgets, and department coordination.', agents: [
     { name: 'Director', role: 'Chief Director', task: 'Review city performance and escalate decisions', sprite: 'director-sprite', status: 'Reviewing' }
   ] },
-  university: { district: 'North MKN City', title: 'AI University', description: 'Training, work samples, certification, and formal retraining.', agents: [] }
+  university: { district: 'North MKN City', title: 'AI University', description: 'Training, work samples, certification, and formal retraining.', agents: [] },
+  government: { district: 'Government Contracting District', title: 'Capture & Proposal Center', description: 'Opportunity qualification, compliant proposal development, and human-controlled submissions.', agents: [
+    { name: 'Grant', role: 'Opportunity Scout', task: 'Find one solicitation that matches verified capabilities', sprite: 'research-sprite', status: 'Scanning' },
+    { name: 'Carmen', role: 'Capture Analyst', task: 'Produce one evidence-based bid or no-bid brief', sprite: 'operations-sprite', status: 'Qualifying' },
+    { name: 'Clara', role: 'Compliance Specialist', task: 'Build one solicitation compliance matrix', sprite: 'business-sprite', status: 'Checking' },
+    { name: 'Perry', role: 'Pricing Analyst', task: 'Build one documented cost and price model', sprite: 'director-sprite', status: 'Modeling' },
+    { name: 'Wren', role: 'Proposal Writer', task: 'Draft one proposal section from verified facts', sprite: 'creative-sprite', status: 'Drafting' },
+    { name: 'Redd', role: 'Red Team Reviewer', task: 'Review one proposal package against its requirements', sprite: 'director-sprite', status: 'Reviewing' }
+  ] }
 };
 
 function renderOffice(officeId) {
@@ -580,6 +588,7 @@ function runLocalCommand(command) {
   const routes = [
     { terms: ['show agents', 'view agents', 'go to agents'], view: 'agents', reply: 'Opening the Employment Center and agent roster.' },
     { terms: ['show businesses', 'view businesses', 'go to business'], view: 'businesses', reply: 'Opening the Business District.' },
+    { terms: ['government contract', 'contracting center', 'show government', 'sam.gov', 'sam gov'], view: 'businesses', office: 'government', reply: 'Opening the Government Contracting Center. Readiness must be verified before any bid is submitted.' },
     { terms: ['show approvals', 'view approvals', 'go to approvals'], view: 'approvals', reply: 'Opening your approval queue.' },
     { terms: ['show memory', 'view memory', 'go to memory'], view: 'memory', reply: 'Opening the Memory Archive.' },
     { terms: ['show treasury', 'view treasury', 'go to treasury'], view: 'treasury', reply: 'Opening Treasury. The emergency reserve remains locked.' },
@@ -596,7 +605,7 @@ function runLocalCommand(command) {
     return { handled: true, reply: route.reply };
   }
   if (normalized === 'help' || normalized.includes('what can i do')) {
-    return { handled: true, reply: 'Try: city status, show agents, show approvals, show treasury, show account, talk to Maya, or ask the Director a business question.' };
+    return { handled: true, reply: 'Try: city status, government contracts, show agents, show approvals, show treasury, show account, talk to Maya, or ask the Director a business question.' };
   }
   if (normalized.includes('city status') || normalized === 'status') {
     return { handled: true, reply: 'City cash is $168.20. Two businesses and six agents are active. The 60-day mission has completed Goals 1 and 2.' };
