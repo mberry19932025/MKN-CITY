@@ -301,6 +301,7 @@ function renderOffice(officeId) {
 }
 
 document.querySelectorAll('[data-office]').forEach((district) => district.addEventListener('click', () => {
+  if (document.querySelector('.city-map')?.classList.contains('build-mode')) return;
   const thresholds = { factory: 25, university: 100, government: 250 };
   const threshold = thresholds[district.dataset.office];
   const records = getDemoSeason().records;
@@ -360,12 +361,98 @@ replayWorkflow.addEventListener('click', runResearchHandoff);
 runResearchHandoff();
 
 const cityMap = document.querySelector('.city-map');
+const cityDistricts = [...cityMap.querySelectorAll('.district')];
+const blueprintControls = document.querySelector('#blueprint-controls');
+const blueprintSelect = document.querySelector('#city-blueprint');
+const roadStyleSelect = document.querySelector('#road-style');
 const cityTime = document.querySelector('#city-time');
 const cityPhase = document.querySelector('#city-phase');
 const cityClockIcon = document.querySelector('.city-clock > i');
 const timeModeButtons = document.querySelectorAll('[data-time-mode]');
 const schedulePhases = document.querySelectorAll('#schedule-timeline article');
 let cityTimeMode = localStorage.getItem('mkn-city-time-mode') || 'night';
+const cityBlueprints = {
+  founder: { university: [13, 15], research: [20, 38], founder: [44, 46], creative: [12, 67], business: [70, 23], government: [82, 48], factory: [60, 70] },
+  grid: { university: [12, 18], research: [34, 18], founder: [56, 18], creative: [12, 58], business: [34, 58], government: [56, 58], factory: [76, 58] },
+  campus: { university: [39, 14], research: [18, 31], founder: [43, 43], creative: [17, 66], business: [67, 31], government: [68, 62], factory: [43, 73] }
+};
+
+function districtKey(district) {
+  return [...district.classList].find((name) => cityBlueprints.founder[name]);
+}
+
+function applyBlueprintLayout(layout) {
+  cityDistricts.forEach((district) => {
+    const position = layout[districtKey(district)];
+    if (!position) return;
+    district.style.left = `${position[0]}%`;
+    district.style.top = `${position[1]}%`;
+    district.style.right = 'auto';
+    district.style.bottom = 'auto';
+  });
+}
+
+function readCurrentLayout() {
+  return Object.fromEntries(cityDistricts.map((district) => [districtKey(district), [Number.parseFloat(district.style.left), Number.parseFloat(district.style.top)]]));
+}
+
+function setBuildMode(active) {
+  cityMap.classList.toggle('build-mode', active);
+  blueprintControls.hidden = !active;
+  document.querySelector('#toggle-build-mode').classList.toggle('active', active);
+  showToast(active ? 'Build mode active. Drag district markers to redesign MKN City.' : 'City blueprint editor closed.');
+}
+
+let savedBlueprint = null;
+try { savedBlueprint = JSON.parse(localStorage.getItem('mkn-city-blueprint') || 'null'); }
+catch { localStorage.removeItem('mkn-city-blueprint'); }
+if (savedBlueprint?.layout) {
+  applyBlueprintLayout(savedBlueprint.layout);
+  blueprintSelect.value = savedBlueprint.template || 'founder';
+  roadStyleSelect.value = savedBlueprint.roads || 'boulevard';
+}
+cityMap.dataset.roads = roadStyleSelect.value;
+
+document.querySelector('#toggle-build-mode').addEventListener('click', () => setBuildMode(!cityMap.classList.contains('build-mode')));
+document.querySelector('#close-build-mode').addEventListener('click', () => setBuildMode(false));
+blueprintSelect.addEventListener('change', () => {
+  applyBlueprintLayout(cityBlueprints[blueprintSelect.value]);
+  showToast(`${blueprintSelect.options[blueprintSelect.selectedIndex].text} applied. Save to keep it.`);
+});
+roadStyleSelect.addEventListener('change', () => { cityMap.dataset.roads = roadStyleSelect.value; });
+document.querySelector('#save-blueprint').addEventListener('click', () => {
+  localStorage.setItem('mkn-city-blueprint', JSON.stringify({ template: blueprintSelect.value, roads: roadStyleSelect.value, layout: readCurrentLayout(), savedAt: new Date().toISOString() }));
+  showToast('City blueprint saved on this device.');
+});
+document.querySelector('#reset-blueprint').addEventListener('click', () => {
+  blueprintSelect.value = 'founder';
+  roadStyleSelect.value = 'boulevard';
+  cityMap.dataset.roads = 'boulevard';
+  applyBlueprintLayout(cityBlueprints.founder);
+  localStorage.removeItem('mkn-city-blueprint');
+  showToast('Founder City blueprint restored.');
+});
+
+cityDistricts.forEach((district) => {
+  district.addEventListener('pointerdown', (event) => {
+    if (!cityMap.classList.contains('build-mode')) return;
+    event.preventDefault();
+    district.setPointerCapture(event.pointerId);
+    district.classList.add('district-dragging');
+  });
+  district.addEventListener('pointermove', (event) => {
+    if (!district.classList.contains('district-dragging')) return;
+    const bounds = cityMap.getBoundingClientRect();
+    const left = Math.max(3, Math.min(88, ((event.clientX - bounds.left) / bounds.width) * 100));
+    const top = Math.max(8, Math.min(82, ((event.clientY - bounds.top) / bounds.height) * 100));
+    district.style.left = `${left.toFixed(1)}%`;
+    district.style.top = `${top.toFixed(1)}%`;
+    district.style.right = 'auto';
+    district.style.bottom = 'auto';
+  });
+  district.addEventListener('pointerup', () => district.classList.remove('district-dragging'));
+  district.addEventListener('pointercancel', () => district.classList.remove('district-dragging'));
+});
 
 function getCityPeriod(hour) {
   if (hour >= 6 && hour < 10) return { className: 'time-morning', phase: 'Morning research + planning', schedule: 0, icon: 'sunrise' };
@@ -542,7 +629,11 @@ document.querySelectorAll('[data-business]').forEach((button) => {
   });
 });
 
-document.querySelector('.expand-action').addEventListener('click', () => openView('businesses'));
+document.querySelector('.expand-action').addEventListener('click', () => {
+  openView('city');
+  setBuildMode(true);
+  cityMap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
 
 const marketDialog = document.querySelector('#market-dialog');
 const marketDialogTitle = document.querySelector('#market-dialog-title');

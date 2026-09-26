@@ -120,6 +120,13 @@
           <button type="button" data-time-mode="day">Day</button>
           <button type="button" data-time-mode="night">Night</button>
         </div>
+        <div class="blueprint-controls" id="blueprint-controls" aria-label="City blueprint tools">
+          <label><span>Blueprint</span><select id="city-blueprint"><option value="founder">Founder City</option><option value="grid">Business Grid</option><option value="campus">Open Campus</option></select></label>
+          <label><span>Roads</span><select id="road-style"><option value="boulevard">Boulevard</option><option value="grid">City Grid</option><option value="loop">Loop Road</option></select></label>
+          <button type="button" id="save-blueprint" title="Save city blueprint"><i data-lucide="save"></i><span>Save</span></button>
+          <button type="button" id="reset-blueprint" title="Reset Founder blueprint"><i data-lucide="rotate-ccw"></i><span>Reset</span></button>
+          <button type="button" id="close-build-mode" title="Finish building"><i data-lucide="check"></i><span>Done</span></button>
+        </div>
         <div class="night-lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <button class="district university locked-district" type="button" data-office="university" data-unlock-profit="100"><i data-lucide="graduation-cap"></i><span>AI University</span><b><i data-lucide="lock-keyhole"></i></b></button>
         <button class="district research" type="button" data-office="research"><i data-lucide="microscope"></i><span>Research</span></button>
@@ -142,7 +149,7 @@
           <nav class="stage-tool-dock" aria-label="City tools">
             <button type="button" id="enter-city-focus" title="Large city view"><i data-lucide="maximize-2"></i><span>City View</span></button>
             <button type="button" data-open-view="agents" title="Agents"><i data-lucide="users"></i><span>Crew</span></button>
-            <button type="button" data-open-view="businesses" title="Businesses"><i data-lucide="factory"></i><span>Build</span></button>
+            <button type="button" id="toggle-build-mode" title="Edit city blueprint"><i data-lucide="construction"></i><span>Build</span></button>
             <button type="button" data-open-view="memory" title="Memory"><i data-lucide="brain-circuit"></i><span>Memory</span></button>
             <button type="button" data-open-view="treasury" title="Treasury"><i data-lucide="landmark"></i><span>Funds</span></button>
             <button type="button" data-open-view="approvals" title="Approvals"><i data-lucide="stamp"></i><span>Approve</span></button>

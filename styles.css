@@ -184,6 +184,19 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .time-controls { position: absolute; z-index: 4; right: 16px; bottom: 16px; padding: 4px; display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid rgba(255,255,255,.4); border-radius: 6px; background: rgba(23,33,29,.9); }
 .time-controls button { min-width: 46px; height: 28px; border: 0; border-radius: 4px; background: transparent; color: #bdc8c2; cursor: pointer; font-size: .59rem; font-weight: 700; }
 .time-controls button.active { background: #f7f4e9; color: var(--ink); }
+.blueprint-controls { position: absolute; z-index: 12; left: 50%; bottom: 15px; width: min(540px, calc(100% - 32px)); padding: 7px; transform: translateX(-50%); display: grid; grid-template-columns: 1.2fr 1fr auto auto auto; align-items: end; gap: 6px; border: 1px solid #7c6a35; border-radius: 6px; background: rgba(8,11,9,.96); color: #e7dfc8; box-shadow: 0 12px 34px rgba(0,0,0,.5); }
+.blueprint-controls[hidden] { display: none; }
+.blueprint-controls label span { display: block; margin: 0 0 3px 2px; color: #9da9a2; font-size: .47rem; font-weight: 700; text-transform: uppercase; }
+.blueprint-controls select, .blueprint-controls button { height: 32px; border: 1px solid #405047; border-radius: 4px; background: #17211d; color: #e6eee9; font-size: .55rem; font-weight: 700; }
+.blueprint-controls select { width: 100%; padding: 0 7px; }
+.blueprint-controls button { min-width: 54px; padding: 0 7px; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
+.blueprint-controls button:hover { border-color: #d7b85c; color: #edcb6a; }
+.blueprint-controls svg { width: 13px; }
+.build-mode { outline: 2px solid #d7b85c; outline-offset: 2px; }
+.build-mode .district { touch-action: none; cursor: grab; animation: build-marker-pulse 1.6s ease-in-out infinite; }
+.build-mode .district-dragging { z-index: 15; cursor: grabbing; animation: none; transform: scale(1.06); }
+.build-mode .map-agent { pointer-events: none; opacity: .45; }
+@keyframes build-marker-pulse { 50% { box-shadow: 0 0 0 4px rgba(225,168,59,.18), 0 6px 14px rgba(0,0,0,.28); } }
 .night-lights { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 1.2s ease; }
 .night-lights i { position: absolute; width: 7px; height: 5px; background: #ffd66b; box-shadow: 0 0 10px 3px rgba(255,205,87,.6); }
 .night-lights i:nth-child(1) { left: 30%; top: 27%; }.night-lights i:nth-child(2) { left: 47%; top: 32%; }.night-lights i:nth-child(3) { right: 24%; top: 29%; }.night-lights i:nth-child(4) { left: 21%; bottom: 32%; }.night-lights i:nth-child(5) { right: 33%; bottom: 27%; }.night-lights i:nth-child(6) { right: 16%; bottom: 39%; }
@@ -194,7 +207,14 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .schedule-timeline article.active-phase { position: relative; background: #eef8f2; box-shadow: inset 0 -4px 0 var(--green); }
 .schedule-timeline article.active-phase::after { content: "Now"; position: absolute; right: 7px; top: 7px; padding: 2px 4px; border-radius: 3px; background: var(--green); color: white; font-size: .48rem; font-weight: 700; text-transform: uppercase; }
 .road { position: absolute; z-index: 0; background: #9aa49d; border: 5px solid #cad1cc; }
-.road { display: none; }
+.road { display: none; pointer-events: none; opacity: .52; }
+.city-map[data-roads="boulevard"] .road { display: block; }
+.city-map[data-roads="boulevard"] .road-horizontal { left: 8%; right: 8%; top: 52%; height: 10px; border-width: 2px 0; }
+.city-map[data-roads="boulevard"] .road-vertical { top: 12%; bottom: 12%; left: 50%; width: 10px; border-width: 0 2px; }
+.city-map[data-roads="grid"] .road { display: block; background: repeating-linear-gradient(90deg, #87928b 0 22px, #aeb7b1 22px 25px); }
+.city-map[data-roads="grid"] .road-horizontal { left: 5%; right: 5%; top: 47%; height: 15px; border-width: 3px 0; }
+.city-map[data-roads="grid"] .road-vertical { top: 8%; bottom: 8%; left: 38%; width: 15px; border-width: 0 3px; }
+.city-map[data-roads="loop"] .road-horizontal { display: block; left: 17%; right: 17%; top: 24%; bottom: 20%; height: auto; border: 8px solid #9aa49d; border-radius: 38%; background: transparent; }
 .district { position: absolute; z-index: 3; width: auto; min-height: 0; padding: 7px 9px; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px; border: 1px solid rgba(255,255,255,.75); border-radius: 6px; box-shadow: 0 5px 12px rgba(23,33,29,.22); color: var(--ink); background: rgba(255,254,249,.9); font-size: .64rem; font-weight: 700; text-align: center; cursor: pointer; transition: transform .15s ease, background .15s ease; }
 .district:hover { transform: translateY(-3px) scale(1.03); background: white; }
 .district svg { width: 16px; }
@@ -1403,6 +1423,9 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
   .validation-decision { align-items: stretch; flex-direction: column; }
   .decision-buttons button { flex: 1; justify-content: center; }
   .city-map { aspect-ratio: 4 / 5; min-height: 520px; background-position: 48% center; }
+  .blueprint-controls { bottom: 76px; grid-template-columns: 1fr 1fr; }
+  .blueprint-controls button { min-width: 0; }
+  .blueprint-controls button span { display: none; }
   .district { padding: 6px; font-size: 0; }
   .district svg { width: 18px; }
   .university { left: 10%; top: 17%; }
