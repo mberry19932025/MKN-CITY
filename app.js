@@ -538,13 +538,6 @@ document.querySelectorAll('.validation-request').forEach((request) => {
     updateApprovalCount();
   };
   approve.addEventListener('click', () => {
-    if (localStorage.getItem('mkn-memory-00241-reviewed') !== 'true') {
-      localStorage.setItem('mkn-memory-00241-reviewed', 'true');
-      markMemoryReviewed();
-      showToast('Prior experiment reviewed. Click Approve $10 to confirm funding.');
-      approve.focus();
-      return;
-    }
     resolve('approved');
     showToast('Approved by Michh. The decision was saved.');
   });
@@ -555,17 +548,11 @@ document.querySelectorAll('.validation-request').forEach((request) => {
 
 const reviewMemory = document.querySelector('#review-memory');
 const memoryAlert = document.querySelector('#memory-alert');
-const validationApprove = document.querySelector('.validation-request .approve-button');
 
 function markMemoryReviewed() {
   reviewMemory.innerHTML = '<i data-lucide="check"></i><span>Prior experiment reviewed</span>';
   memoryAlert.classList.add('reviewed');
   memoryAlert.classList.remove('needs-attention');
-  if (!localStorage.getItem('mkn-validation-decision')) {
-    validationApprove.disabled = false;
-    validationApprove.title = '';
-    validationApprove.innerHTML = '<i data-lucide="check"></i><span>Approve $10</span>';
-  }
   refreshIcons();
 }
 
