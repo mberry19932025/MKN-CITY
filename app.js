@@ -24,6 +24,29 @@ async function checkSystemHealth() {
 
 checkSystemHealth();
 
+async function refreshSportsResearch() {
+  const status = document.querySelector('#sports-feed-status');
+  const proposal = document.querySelector('#parlay-proposal');
+  status.innerHTML = '<i></i> Checking data feed';
+  try {
+    const response = await fetch('/api/health', { cache: 'no-store' });
+    const health = await response.json();
+    if (!health.sportsDataReady) {
+      status.innerHTML = '<i></i> Demo · no live feed';
+      proposal.className = 'parlay-proposal-empty';
+      proposal.innerHTML = '<i data-lucide="circle-alert"></i><div><strong>No verified same-day proposal</strong><p>SPORTS_DATA_API_KEY is not configured. No current games, injuries, prices, or EV claims were generated.</p></div>';
+      refreshIcons();
+      return showToast('Sports research is in demo mode. No live proposal was created.');
+    }
+    status.innerHTML = '<i></i> Feed connected';
+    proposal.innerHTML = '<i data-lucide="scan-search"></i><div><strong>Feed ready for an approved research job</strong><p>A production worker is still required to collect, timestamp, compare, and review same-day data.</p></div>';
+    refreshIcons();
+  } catch {
+    status.innerHTML = '<i></i> Feed unavailable';
+    showToast('The sports data feed could not be reached.');
+  }
+}
+
 function openView(viewId) {
   if (viewId !== 'city' && document.body.classList.contains('city-focus-mode')) setCityFocus(false);
   views.forEach((view) => view.classList.toggle('active', view.id === viewId));
@@ -464,6 +487,8 @@ marketForm.addEventListener('submit', (event) => {
 });
 
 renderMarketLedger();
+document.querySelector('#refresh-sports-research').addEventListener('click', refreshSportsResearch);
+refreshSportsResearch();
 
 const agentDialog = document.querySelector('#agent-dialog');
 const agentForm = document.querySelector('#agent-form');

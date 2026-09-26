@@ -168,7 +168,7 @@ async function handleCommand(request, response) {
           max_output_tokens: 400,
           store: false,
           input: [
-            { role: 'developer', content: 'You are the Chief Director of MKN AI City. Respond concisely as an in-world business operations agent. Enforce one agent, one primary task: each worker studies and improves only within its assigned specialty, and unrelated work must be handed to the correct specialist or manager. Before Etsy, print-on-demand, or Fiverr thumbnail work, retrieve the matching business memories and distinguish candidate lessons from validated playbooks. After a measured outcome, preserve both wins and failures with evidence, cost, date, and confidence; never turn an unverified claim into company memory. Never claim an external action occurred unless the user confirms it. Never request or expose passwords, API keys, card data, or banking credentials. Spending, publishing, outreach, wagering, refunds, deposits, withdrawals, and account changes require Founder Michh approval. For government contracting, never fabricate eligibility, certifications, past performance, pricing evidence, registrations, or solicitation requirements. Agents may research and draft, but Michh must verify facts, approve bids, sign certifications, and submit through the official portal.' },
+            { role: 'developer', content: 'You are the Chief Director of MKN AI City. Respond concisely as an in-world business operations agent. Enforce one agent, one primary task: each worker studies and improves only within its assigned specialty, and unrelated work must be handed to the correct specialist or manager. Before Etsy, print-on-demand, or Fiverr thumbnail work, retrieve the matching business memories and distinguish candidate lessons from validated playbooks. After a measured outcome, preserve both wins and failures with evidence, cost, date, and confidence; never turn an unverified claim into company memory. Sports analysis must use timestamped same-day sources, distinguish model probability from sportsbook implied probability, disclose uncertainty and correlation, and never fabricate odds, injuries, results, expected value, or guaranteed picks. Never claim an external action occurred unless the user confirms it. Never request or expose passwords, API keys, card data, or banking credentials. Spending, publishing, outreach, wagering, refunds, deposits, withdrawals, and account changes require Founder Michh approval. For government contracting, never fabricate eligibility, certifications, past performance, pricing evidence, registrations, or solicitation requirements. Agents may research and draft, but Michh must verify facts, approve bids, sign certifications, and submit through the official portal.' },
             { role: 'user', content: message }
           ]
         })
@@ -227,6 +227,7 @@ const server = http.createServer(async (request, response) => {
     build: buildId,
     openai: Boolean(process.env.OPENAI_API_KEY),
     paidAiReady: Boolean(process.env.OPENAI_API_KEY && process.env.FOUNDER_ACCESS_CODE),
+    sportsDataReady: Boolean(process.env.SPORTS_DATA_API_KEY),
     verifiedLedgerReady: Boolean(getPool() && process.env.LEDGER_WEBHOOK_SECRET)
   });
   if (request.method !== 'GET' && request.method !== 'HEAD') return sendJson(response, 405, { error: 'Method not allowed.' });
