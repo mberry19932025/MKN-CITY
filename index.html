@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MKN AI City</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Founder Console</p>
+      <h1>MKN AI City</h1>
+    </div>
+    <div class="topbar-tools"><div class="founder-level"><span>Founder Level 1</span><div><i></i></div><small>18 / 150 XP</small></div><div class="status"><span></span> City online</div></div>
+  </header>
+
+  <main>
+    <section class="view active" id="city" aria-labelledby="city-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Command Center</p>
+          <h2 id="city-title">Good evening, Michh</h2>
+        </div>
+        <button class="icon-button" type="button" title="City notifications" aria-label="City notifications">
+          <i data-lucide="bell"></i><span class="notification-dot"></span>
+        </button>
+      </div>
+
+      <div class="balance-panel">
+        <div>
+          <span>City cash</span>
+          <strong>$168.20</strong>
+        </div>
+        <div class="profit">
+          <span>City profit</span>
+          <strong>$18.20</strong>
+        </div>
+      </div>
+
+      <div class="daily-finance" aria-label="Today's finances">
+        <div><span>Today's revenue</span><strong>$43.71</strong></div>
+        <div><span>Today's expenses</span><strong>$25.51</strong></div>
+      </div>
+
+      <div class="metrics" aria-label="City overview">
+        <article><i data-lucide="bot"></i><strong>6</strong><span>Active agents</span></article>
+        <article><i data-lucide="list-checks"></i><strong>3</strong><span>Tasks running</span></article>
+        <article><i data-lucide="flask-conical"></i><strong>1</strong><span>Experiment</span></article>
+        <article><i data-lucide="building-2"></i><strong>2</strong><span>Businesses</span></article>
+      </div>
+
+      <div class="command-actions" aria-label="Command Center actions">
+        <button type="button" data-open-view="agents"><i data-lucide="users"></i><span>View agents</span></button>
+        <button type="button" data-open-view="businesses"><i data-lucide="building-2"></i><span>View businesses</span></button>
+        <button type="button" data-open-view="approvals"><i data-lucide="badge-check"></i><span>Approvals</span></button>
+        <button type="button" data-open-view="memory"><i data-lucide="brain"></i><span>Memory</span></button>
+        <button type="button" data-open-view="treasury"><i data-lucide="landmark"></i><span>Treasury</span></button>
+        <button class="expand-action" type="button"><i data-lucide="construction"></i><span>Expand city</span></button>
+      </div>
+
+      <section class="city-pipeline" aria-labelledby="pipeline-title">
+        <div><p class="eyebrow">City operating system</p><h3 id="pipeline-title">Evidence before expansion</h3></div>
+        <ol>
+          <li class="done"><i data-lucide="search"></i><span>Research</span></li>
+          <li class="done"><i data-lucide="badge-check"></i><span>Validate</span></li>
+          <li class="current"><i data-lucide="flask-conical"></i><span>Small test</span></li>
+          <li><i data-lucide="chart-no-axes-combined"></i><span>Measure</span></li>
+          <li><i data-lucide="trending-up"></i><span>Scale</span></li>
+        </ol>
+      </section>
+
+      <section class="milestone-card" aria-labelledby="milestone-title">
+        <div class="milestone-number"><span>Milestone</span><strong>#1</strong></div>
+        <div class="milestone-copy"><p class="eyebrow">Self-sustaining city</p><h3 id="milestone-title">Earn more than the city costs to operate</h3><div class="milestone-progress"><div style="width:87.4%"></div></div><small>$43.71 of $50+ revenue recorded · $6.29 remaining</small></div>
+        <div class="milestone-targets"><div><span>Operating cost target</span><strong>$30</strong></div><div><span>Revenue target</span><strong>$50+</strong></div></div>
+        <span class="milestone-status">Almost unlocked</span>
+      </section>
+
+      <section class="mission-card" aria-labelledby="mission-title">
+        <header><div><p class="eyebrow">60-Day Mission</p><h3 id="mission-title">Prove the city before expansion</h3></div><span>Mission active</span></header>
+        <div class="mission-capital"><div><small>Initial capital</small><strong>$150</strong></div><div><small>Month 1 spend cap</small><strong>$50</strong></div><div class="protected-capital"><small>Protected reserve</small><strong>$100</strong><i data-lucide="lock-keyhole"></i></div></div>
+        <ol class="mission-goals">
+          <li class="complete-goal"><b><i data-lucide="check"></i></b><div><strong>Get the first paying customer</strong><span>Completed</span></div></li>
+          <li class="complete-goal"><b><i data-lucide="check"></i></b><div><strong>Recover operating expenses</strong><span>Completed with $18.20 net profit</span></div></li>
+          <li class="in-progress"><b>3</b><div><strong>Generate $150+ cumulative net cash</strong><span>$18.20 recorded · 12.1% complete</span></div></li>
+          <li><b>4</b><div><strong>Reinvest profits into new agents and businesses</strong><span>Locked until Goal 3</span></div></li>
+        </ol>
+      </section>
+
+      <div class="city-map" aria-label="MKN City district map">
+        <div class="map-title"><span>City map</span><small>Tap a district to visit</small></div>
+        <div class="district university"><i data-lucide="graduation-cap"></i><span>AI University</span></div>
+        <div class="district research"><i data-lucide="microscope"></i><span>Research</span></div>
+        <div class="district founder"><i data-lucide="landmark"></i><span>Founder Tower</span></div>
+        <div class="district creative"><i data-lucide="palette"></i><span>Creative</span></div>
+        <div class="district business"><i data-lucide="briefcase-business"></i><span>Business</span></div>
+        <div class="road road-horizontal"></div>
+        <div class="road road-vertical"></div>
+        <div class="traveling-agent" id="research-agent" aria-label="Research agent traveling downtown">
+          <i data-lucide="user-round"></i>
+        </div>
+        <button class="map-agent maya-map-agent" type="button" data-agent-chat="Maya" aria-label="Talk to Maya"><span class="agent-sprite">M</span><span class="speech-bubble">Research is ready, Founder.</span></button>
+        <button class="map-agent marcus-map-agent" type="button" data-agent-chat="Marcus" aria-label="Talk to Marcus"><span class="agent-sprite">M</span><span class="speech-bubble">Design #7 is still leading.</span></button>
+        <button class="map-agent avery-map-agent" type="button" data-agent-chat="Avery" aria-label="Talk to Avery"><span class="agent-sprite">A</span><span class="speech-bubble">Listings are optimized.</span></button>
+      </div>
+
+      <section class="workflow-panel" aria-labelledby="workflow-title">
+        <div class="workflow-heading">
+          <div><p class="eyebrow">Live workflow</p><h3 id="workflow-title">Research report handoff</h3></div>
+          <span class="workflow-status" id="workflow-status">In progress</span>
+        </div>
+        <ol class="workflow-steps">
+          <li class="complete"><i data-lucide="check"></i><span>Research complete</span></li>
+          <li class="active"><i data-lucide="footprints"></i><span>Agent leaves office</span></li>
+          <li><i data-lucide="building"></i><span>Travels downtown</span></li>
+          <li><i data-lucide="file-check-2"></i><span>Report submitted</span></li>
+          <li><i data-lucide="scan-search"></i><span>Director evaluates report</span></li>
+        </ol>
+        <button class="replay-workflow" id="replay-workflow" type="button"><i data-lucide="rotate-ccw"></i><span>Replay route</span></button>
+      </section>
+      <section class="night-cycle" aria-labelledby="night-cycle-title">
+        <div class="night-cycle-heading"><div><p class="eyebrow">End of shift</p><h3 id="night-cycle-title">Nightly Agent Cycle</h3></div><span><i data-lucide="moon"></i> Scheduled</span></div>
+        <ol>
+          <li><b>1</b><div><strong>Finish work queue</strong><span>Reach a safe stopping point</span></div></li>
+          <li><b>2</b><div><strong>Summarize today</strong><span>Compress task logs</span></div></li>
+          <li><b>3</b><div><strong>Save memories</strong><span>Preserve important lessons</span></div></li>
+          <li><b>4</b><div><strong>Update performance</strong><span>Record quality, speed, and cost</span></div></li>
+          <li><b>5</b><div><strong>Reduce usage</strong><span>Enter low-cost AI/API mode</span></div></li>
+          <li><b>6</b><div><strong>Wait for schedule</strong><span>Resume next approved work period</span></div></li>
+        </ol>
+      </section>
+      <section class="daily-schedule" aria-labelledby="schedule-title">
+        <div class="schedule-heading"><div><p class="eyebrow">City rhythm</p><h3 id="schedule-title">Daily Schedule</h3></div><span>Local city time</span></div>
+        <div class="schedule-timeline">
+          <article class="schedule-morning"><i data-lucide="sunrise"></i><div><small>Morning</small><strong>Research + planning</strong></div></article>
+          <article class="schedule-work"><i data-lucide="briefcase-business"></i><div><small>Workday</small><strong>Production + operations</strong></div></article>
+          <article class="schedule-afternoon"><i data-lucide="users-round"></i><div><small>Afternoon</small><strong>Reviews + collaboration</strong></div></article>
+          <article class="schedule-evening"><i data-lucide="book-open-check"></i><div><small>Evening</small><strong>Reports + learning</strong></div></article>
+          <article class="schedule-recreation"><i data-lucide="gamepad-2"></i><div><small>Recreation</small><strong>Idle + knowledge sharing</strong></div></article>
+          <article class="schedule-sleep"><i data-lucide="moon-star"></i><div><small>Sleep</small><strong>Memory + low-cost mode</strong></div></article>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" id="agents" aria-labelledby="agents-title">
+      <p class="eyebrow">Workforce</p><h2 id="agents-title">City Agents</h2>
+      <div class="agent-toolbar"><div><h3>Create from a template</h3><p>Start with a focused role, then customize its department and permissions.</p></div><span id="agent-count">6 active</span></div>
+      <div class="template-grid">
+        <article class="template-card" data-template="Trend Scout" data-department="Research"><div class="template-avatar research-avatar"><i data-lucide="telescope"></i></div><span>Research</span><h3>Trend Scout</h3><p>Finds early demand signals and prepares sourced opportunity reports.</p><button type="button">Use template</button></article>
+        <article class="template-card" data-template="Thumbnail Designer" data-department="Creative"><div class="template-avatar creative-avatar"><i data-lucide="image"></i></div><span>Creative</span><h3>Thumbnail Designer</h3><p>Creates concepts, variants, and production-ready thumbnail packages.</p><button type="button">Use template</button></article>
+        <article class="template-card" data-template="Etsy Listing Specialist" data-department="Business"><div class="template-avatar business-avatar"><i data-lucide="shopping-bag"></i></div><span>Business</span><h3>Etsy Listing Specialist</h3><p>Prepares compliant listing drafts, keywords, and product information.</p><button type="button">Use template</button></article>
+        <article class="template-card" data-template="Custom Agent" data-department="Unassigned"><div class="template-avatar custom-avatar"><i data-lucide="settings-2"></i></div><span>Custom</span><h3>Build your own</h3><p>Define a narrow role, success criteria, department, and tool access.</p><button type="button">Configure</button></article>
+      </div>
+      <section class="command-chain" aria-labelledby="command-chain-title">
+        <div><p class="eyebrow">Authority</p><h3 id="command-chain-title">City Escalation Chain</h3></div>
+        <ol><li><i data-lucide="bot"></i><span>Worker Agent</span><small>Performs assigned task</small></li><li><i data-lucide="arrow-right"></i></li><li><i data-lucide="users"></i><span>Department Manager</span><small>Reviews team decisions</small></li><li><i data-lucide="arrow-right"></i></li><li><i data-lucide="briefcase-business"></i><span>Overseer</span><small>Coordinates city operations</small></li><li><i data-lucide="arrow-right"></i></li><li class="owner-authority"><i data-lucide="crown"></i><span>Michh / Owner</span><small>Final authority</small></li></ol>
+      </section>
+      <article class="agent-profile">
+        <header><div class="agent-portrait">M</div><div><p class="eyebrow">Research Department</p><h3>Maya</h3><span>Trend Researcher · Active</span></div><button type="button" title="Agent options" aria-label="Maya agent options"><i data-lucide="ellipsis"></i></button></header>
+        <div class="agent-profile-body">
+          <div><h4>Traits</h4><div class="trait-list"><span>Curious</span><span>Skeptical</span><span>Persistent</span><span>Analytical</span><span>Low-risk</span></div></div>
+          <div><h4>Strengths</h4><ul><li><i data-lucide="check"></i>Trend detection</li><li><i data-lucide="check"></i>Source verification</li><li><i data-lucide="check"></i>Competitor research</li></ul></div>
+          <div><h4>Known weakness</h4><p class="weakness-note"><i data-lucide="timer-reset"></i>Can over-research</p></div>
+        </div>
+        <footer><i data-lucide="message-square-quote"></i><div><small>Manager instruction</small><p>Stop research when confidence is high enough. Submit findings instead of chasing perfection.</p></div><span>Active rule</span></footer>
+      </article>
+      <section class="capacity-workflow" aria-labelledby="capacity-workflow-title">
+        <div class="capacity-workflow-heading"><div><p class="eyebrow">Employment Center</p><h3 id="capacity-workflow-title">Production Capacity Expansion</h3></div><span>2 positions</span></div>
+        <ol>
+          <li class="flow-complete"><i data-lucide="trending-up"></i><strong>Demand rises</strong><small>Orders +41%</small></li>
+          <li><i data-lucide="chevron-right"></i></li>
+          <li class="flow-complete"><i data-lucide="gauge"></i><strong>Bottleneck detected</strong><small>6-job daily gap</small></li>
+          <li><i data-lucide="chevron-right"></i></li>
+          <li class="flow-current"><i data-lucide="briefcase-business"></i><strong>Open positions</strong><small>2 temporary helpers</small></li>
+          <li><i data-lucide="chevron-right"></i></li>
+          <li><i data-lucide="messages-square"></i><strong>Interview</strong><small>Structured questions</small></li>
+          <li><i data-lucide="chevron-right"></i></li>
+          <li><i data-lucide="clipboard-check"></i><strong>Work samples</strong><small>Identical production test</small></li>
+          <li><i data-lucide="chevron-right"></i></li>
+          <li><i data-lucide="user-check"></i><strong>Hire workers</strong><small>Best performers</small></li>
+          <li><i data-lucide="chevron-right"></i></li>
+          <li><i data-lucide="factory"></i><strong>Capacity grows</strong><small>12 → 18 jobs/day</small></li>
+        </ol>
+      </section>
+      <section class="connections-panel">
+        <div class="connections-heading"><div><h3>Connected accounts</h3><p>Connections belong to the owner and are granted to agents by permission.</p></div><i data-lucide="key-round"></i></div>
+        <div class="connection-list">
+          <article><div class="service-mark openai">AI</div><div><h3>OpenAI API</h3><p>Server-side project key for approved agents.</p></div><span class="not-connected">Not configured</span><button type="button" data-connection="openai">Setup</button></article>
+          <article><div class="service-mark etsy">E</div><div><h3>Etsy</h3><p>OAuth connection with listing and shop scopes.</p></div><span class="not-connected">Not connected</span><button type="button" data-connection="etsy">Connect</button></article>
+          <article><div class="service-mark kalshi-service">K</div><div><h3>Kalshi</h3><p>Official API connection for personal market data.</p></div><span class="not-connected">Not connected</span><button type="button" data-connection="kalshi">Setup</button></article>
+        </div>
+      </section>
+    </section>
+    <section class="view" id="businesses" aria-labelledby="businesses-title">
+      <p class="eyebrow">Commerce</p><h2 id="businesses-title">Businesses</h2>
+      <article class="etsy-division">
+        <header><div><p class="eyebrow">MKN Commerce</p><h3>Etsy Division</h3></div><span><i data-lucide="activity"></i> Active</span></header>
+        <div class="division-stats"><div><small>Agents working</small><strong>3</strong></div><div><small>Products live</small><strong>7</strong></div><div><small>Products testing</small><strong>2</strong></div></div>
+        <div class="division-body">
+          <div class="division-finance"><h4>Monthly performance</h4><dl><div><dt>Revenue</dt><dd>$184.20</dd></div><div><dt>Platform &amp; production</dt><dd>-$91.73</dd></div><div><dt>AI &amp; tools</dt><dd>-$8.42</dd></div><div class="division-net"><dt>Net profit</dt><dd>$84.05</dd></div></dl></div>
+          <div class="division-team"><h4>Current team</h4><ul><li><span class="agent-initial">M</span><div><strong>Maya</strong><small>Product Research</small></div></li><li><span class="agent-initial">M</span><div><strong>Marcus</strong><small>Design</small></div></li><li><span class="agent-initial">A</span><div><strong>Avery</strong><small>Listing / SEO</small></div></li></ul></div>
+          <div class="division-discovery"><div class="discovery-label"><i data-lucide="sparkles"></i><span>Latest discovery</span></div><strong>Design #7 converts 2.4× better</strong><p>than the department average.</p><div class="director-action"><small>Director action</small><span>Shift more testing budget toward Design #7.</span><button type="button" data-open-view="approvals">Review recommendation</button></div></div>
+        </div>
+        <footer><i data-lucide="circle-alert"></i><span>Division totals are awaiting Treasury reconciliation before changing citywide cash.</span></footer>
+      </article>
+      <section class="handoff-pipeline" aria-labelledby="handoff-title">
+        <div class="handoff-heading"><div><p class="eyebrow">Agent handoff</p><h3 id="handoff-title">Research to Product Test</h3></div><span>Budget-gated</span></div>
+        <div class="handoff-flow">
+          <article class="handoff-complete"><i data-lucide="search-check"></i><strong>Research completed</strong><small>Evidence package ready</small></article>
+          <i data-lucide="arrow-right"></i>
+          <article class="handoff-complete"><i data-lucide="database"></i><strong>Stored in memory</strong><small>Sources and findings saved</small></article>
+          <i data-lucide="arrow-right"></i>
+          <article class="handoff-complete"><i data-lucide="bot"></i><strong>Commerce receives report</strong><small>Opportunity assigned</small></article>
+          <i data-lucide="arrow-right"></i>
+          <article class="handoff-complete"><i data-lucide="package-plus"></i><strong>Product test created</strong><small>Scope and stop rules set</small></article>
+          <i data-lucide="arrow-right"></i>
+          <article class="handoff-current"><i data-lucide="landmark"></i><strong>Treasury checks budget</strong><small>Funds and limits verified</small></article>
+          <i data-lucide="arrow-right"></i>
+          <article class="handoff-decision"><i data-lucide="git-branch"></i><strong>Decision</strong><small>Approve or reject test</small></article>
+        </div>
+      </section>
+      <section class="care-center" aria-labelledby="care-title">
+        <div class="care-heading"><div><p class="eyebrow">Commerce Department</p><h3 id="care-title">Customer Care Center</h3></div><span><i data-lucide="message-square-lock"></i> Draft-only messages</span></div>
+        <div class="care-coordinator"><i data-lucide="inbox"></i><div><small>Routing desk</small><strong>Inbox Coordinator</strong><span>Classifies and assigns every customer request</span></div></div>
+        <div class="care-branches">
+          <article><header><i data-lucide="package-search"></i><div><small>Lane 01</small><strong>Order Support</strong></div></header><ul><li>Tracking Agent</li><li>Delivery Agent</li><li>Customization AI</li></ul></article>
+          <article><header><i data-lucide="badge-dollar-sign"></i><div><small>Lane 02</small><strong>Sales Questions</strong></div></header><ul><li>Product Agent</li><li>FAQ Agent</li></ul></article>
+          <article><header><i data-lucide="life-buoy"></i><div><small>Lane 03</small><strong>Problem Resolution</strong></div></header><ul><li>Resolution Agent</li><li>Refund / Return Agent</li><li>Escalation Agent</li></ul></article>
+        </div>
+        <div class="care-output"><div><i data-lucide="clipboard-check"></i><span>QA Supervisor</span><small>Accuracy, tone, policy, and proposed remedy</small></div><i data-lucide="arrow-right"></i><div class="customer-message"><i data-lucide="send"></i><span>Customer Message</span><small>Owner-approved before sending</small></div></div>
+      </section>
+      <div class="property-heading">
+        <div><h3>Available commercial property</h3><p>Choose a building when an approved business is ready to move in.</p></div>
+        <span>2 vacant</span>
+      </div>
+      <div class="property-grid">
+        <article class="property-card">
+          <div class="building-visual building-one"><i data-lucide="building-2"></i><b>001</b></div>
+          <div class="property-details occupied-property"><span class="occupied-status">Testing</span><h3>MKN Thumbnails</h3><p>Building 001 · Founded 09/20/2026</p><dl><div><dt>Employees</dt><dd>3</dd></div><div><dt>Revenue</dt><dd>$0</dd></div><div><dt>Expenses</dt><dd>$0</dd></div></dl><button type="button" data-business="MKN Thumbnails">View business</button></div>
+        </article>
+        <article class="property-card">
+          <div class="building-visual building-two"><i data-lucide="warehouse"></i><b>002</b></div>
+          <div class="property-details"><span class="vacant-status">Vacant</span><h3>Building 002</h3><p>Flexible workspace suited to commerce and operations.</p><button type="button" data-property="Building 002">Inspect property</button></div>
+        </article>
+        <article class="property-card">
+          <div class="building-visual building-three"><i data-lucide="factory"></i><b>003</b></div>
+          <div class="property-details"><span class="vacant-status">Vacant</span><h3>Building 003</h3><p>Larger facility for automation, testing, and fulfillment research.</p><button type="button" data-property="Building 003">Inspect property</button></div>
+        </article>
+      </div>
+      <section class="upgrade-path" aria-labelledby="upgrade-title">
+        <div class="upgrade-heading"><div><p class="eyebrow">Building progression</p><h3 id="upgrade-title">MKN Thumbnails growth path</h3></div><span>Level 1</span></div>
+        <div class="upgrade-stages">
+          <article class="current"><i data-lucide="door-open"></i><div><small>Current</small><strong>Level 1 Office</strong><span>3 employees</span></div></article>
+          <i data-lucide="arrow-right"></i>
+          <article class="locked"><i data-lucide="building"></i><div><small>Locked</small><strong>Level 2 Office</strong><span>Expanded team</span></div></article>
+          <i data-lucide="arrow-right"></i>
+          <article class="locked"><i data-lucide="building-2"></i><div><small>Locked</small><strong>Multi-floor Building</strong><span>Multiple departments</span></div></article>
+          <i data-lucide="arrow-right"></i>
+          <article class="locked"><i data-lucide="landmark"></i><div><small>Locked</small><strong>Corporate HQ</strong><span>Enterprise operations</span></div></article>
+        </div>
+      </section>
+      <section class="closed-business" aria-labelledby="closed-store-title">
+        <div class="closed-icon"><i data-lucide="archive-x"></i></div>
+        <div class="closed-summary"><p class="eyebrow">Closed experiment</p><h3 id="closed-store-title">MKN Store #4</h3><span>Director decision: Close</span></div>
+        <dl><div><dt>Revenue</dt><dd>$32</dd></div><div><dt>Expenses</dt><dd>$91</dd></div><div><dt>Net</dt><dd class="loss">-$59</dd></div></dl>
+        <button type="button" data-open-view="memory"><i data-lucide="book-open"></i><span>View preserved lessons</span></button>
+      </section>
+      <section class="profit-calculator" aria-labelledby="profit-calc-title">
+        <div class="calculator-heading"><div><p class="eyebrow">Unit economics</p><h3 id="profit-calc-title">True Profit Calculator</h3></div><i data-lucide="calculator"></i></div>
+        <div class="calculator-layout">
+          <div class="price-input"><label for="selling-price">Selling price</label><div><span>$</span><input id="selling-price" class="profit-input" type="number" min="0" step="0.01" value="0.00"></div></div>
+          <div class="cost-inputs">
+            <label>Production<input class="profit-input cost-field" type="number" min="0" step="0.01" value="0.00"></label>
+            <label>Shipping subsidy<input class="profit-input cost-field" type="number" min="0" step="0.01" value="0.00"></label>
+            <label>Etsy listing fee<input class="profit-input cost-field" type="number" min="0" step="0.01" value="0.00"></label>
+            <label>Etsy transaction fee<input class="profit-input cost-field" type="number" min="0" step="0.01" value="0.00"></label>
+            <label>Payment processing<input class="profit-input cost-field" type="number" min="0" step="0.01" value="0.00"></label>
+            <label>Advertising<input class="profit-input cost-field" type="number" min="0" step="0.01" value="0.00"></label>
+            <label>Refund allowance<input class="profit-input cost-field" type="number" min="0" step="0.01" value="0.00"></label>
+            <label>Taxes and fee taxes<input class="profit-input cost-field" type="number" min="0" step="0.01" value="0.00"></label>
+            <label>Allocated AI cost<input class="profit-input cost-field" type="number" min="0" step="0.01" value="0.00"></label>
+          </div>
+          <div class="profit-result"><span>Total product cost</span><strong id="total-product-cost">$0.00</strong><hr><span>True profit</span><strong id="true-profit">$0.00</strong><small id="profit-margin">0.0% margin</small></div>
+        </div>
+        <div class="margin-scenario">
+          <div><span>Sale price</span><strong>$29.99</strong></div>
+          <i data-lucide="minus"></i><div><span>POD + shipping</span><strong>$16.00</strong></div>
+          <i data-lucide="minus"></i><div><span>Marketplace fees</span><strong>$3.00–$3.99</strong></div>
+          <i data-lucide="minus"></i><div><span>Expected ad cost</span><strong>$3.00</strong></div>
+          <i data-lucide="equal"></i><div class="scenario-result"><span>Expected contribution</span><strong>$7.00–$7.99</strong></div>
+        </div>
+      </section>
+      <section class="outreach-workflow" aria-labelledby="outreach-title">
+        <div class="outreach-heading"><div><p class="eyebrow">Client acquisition</p><h3 id="outreach-title">Research-to-Outreach Pipeline</h3></div><span><i data-lucide="shield-check"></i> Owner-gated</span></div>
+        <div class="outreach-stages">
+          <article><div class="stage-icon"><i data-lucide="radar"></i></div><small>1</small><strong>Research Scout</strong><span>Finds a potential company</span></article>
+          <i data-lucide="chevron-right"></i>
+          <article><div class="stage-icon"><i data-lucide="search-code"></i></div><small>2</small><strong>Company Researcher</strong><span>Studies the business</span></article>
+          <i data-lucide="chevron-right"></i>
+          <article><div class="stage-icon"><i data-lucide="presentation"></i></div><small>3</small><strong>Pitch Strategist</strong><span>Creates a custom proposal</span></article>
+          <i data-lucide="chevron-right"></i>
+          <article><div class="stage-icon"><i data-lucide="clipboard-check"></i></div><small>4</small><strong>Quality Control</strong><span>Checks evidence and claims</span></article>
+          <i data-lucide="chevron-right"></i>
+          <article><div class="stage-icon"><i data-lucide="briefcase-business"></i></div><small>5</small><strong>Director</strong><span>Recommends next action</span></article>
+          <i data-lucide="chevron-right"></i>
+          <article class="approval-stage"><div class="stage-icon"><i data-lucide="user-check"></i></div><small>6</small><strong>Michh Approval</strong><span>Approves recipient and message</span></article>
+          <i data-lucide="chevron-right"></i>
+          <article class="locked-stage"><div class="stage-icon"><i data-lucide="send"></i></div><small>7</small><strong>Outreach</strong><span>Locked until approval</span></article>
+        </div>
+        <div class="research-checklist"><span>Company research includes</span><b>Website</b><b>Social media</b><b>Products</b><b>Reviews</b><b>Competition</b><b>Problems &amp; opportunities</b></div>
+      </section>
+      <article class="opportunity-report">
+        <header><div><p class="eyebrow">Opportunity report</p><h3>Company / Creator: XXXX</h3></div><span>Pitch ready</span></header>
+        <div class="opportunity-grid">
+          <div class="opportunity-problem"><small>Problem detected</small><strong>Inconsistent thumbnail branding</strong><p>Recent thumbnails use four different visual systems.</p></div>
+          <div><small>Proposed service</small><strong>3 redesigned thumbnail concepts</strong></div>
+          <div><small>Potential contract</small><strong>$150–$300</strong></div>
+          <div><small>Estimated MKN cost</small><strong>$8–$20</strong></div>
+          <div><small>Projected gross contribution</small><strong>$130–$292</strong></div>
+          <div><small>Projected margin</small><strong>High</strong></div>
+        </div>
+        <footer><span><i data-lucide="lock-keyhole"></i> Outreach locked · awaiting Michh</span><button type="button" data-open-view="approvals">Review pitch</button></footer>
+      </article>
+      <section class="leverage-comparison" aria-labelledby="leverage-title">
+        <div class="leverage-heading"><p class="eyebrow">Business model leverage</p><h3 id="leverage-title">Sell the product or sell the expertise?</h3></div>
+        <div class="leverage-options">
+          <article><div class="leverage-icon product-leverage"><i data-lucide="shirt"></i></div><span>Product sale</span><strong>$8 profit</strong><p>Sell one shirt to one customer.</p></article>
+          <div class="versus">versus</div>
+          <article class="preferred-model"><div class="leverage-icon service-leverage"><i data-lucide="pen-tool"></i></div><span>Creative service</span><strong>$200 revenue</strong><p>Design merchandise for the company selling shirts.</p></article>
+        </div>
+        <div class="leverage-equation"><strong>1 design contract</strong><i data-lucide="equal"></i><strong>25 shirt profits</strong><span>before the service's own production costs</span></div>
+      </section>
+    </section>
+    <section class="view" id="approvals" aria-labelledby="approvals-title">
+      <p class="eyebrow">Mayor's Desk</p><h2 id="approvals-title">Approvals</h2>
+      <aside class="memory-alert" id="memory-alert">
+        <div class="memory-alert-icon"><i data-lucide="triangle-alert"></i></div>
+        <div class="memory-alert-copy"><p class="eyebrow">City Memory Alert</p><h3>Similar opportunity previously tested</h3><span>Experiment #00241 · Loss: <b>-$18.42</b></span></div>
+        <div class="memory-findings"><div><small>Primary problem</small><strong>Low conversion</strong></div><div><small>Previous supplier</small><strong>Print Provider A</strong></div><div><small>Successful component</small><strong>Graphic style drove strong engagement</strong></div></div>
+        <button type="button" id="review-memory"><i data-lucide="book-open-check"></i><span>Review before funding</span></button>
+      </aside>
+      <article class="staffing-request">
+        <header><div><p class="eyebrow">Production Staffing Request</p><h3>Order volume increased 41%</h3></div><span>Owner approval required</span></header>
+        <div class="capacity-visual"><div><small>Current capacity</small><strong>12</strong><span>jobs / day</span></div><i data-lucide="arrow-right"></i><div class="capacity-needed"><small>Needed capacity</small><strong>18</strong><span>jobs / day</span></div><div class="capacity-gap"><small>Capacity gap</small><strong>+6</strong><span>jobs / day</span></div></div>
+        <div class="staffing-recommendation"><div class="helper-count"><i data-lucide="hard-hat"></i><div><small>Director recommendation</small><strong>Create 2 temporary Production Helpers</strong></div></div><div><small>Added AI cost</small><strong>$3.20/day</strong></div><div><small>Approx. cost per added job</small><strong>$0.53</strong></div></div>
+        <footer><p>Requested capacity is 50% above current output, providing a buffer beyond the 41% order increase.</p><div><button type="button" class="decline-button"><i data-lucide="x"></i><span>Decline</span></button><button type="button" class="approve-button"><i data-lucide="check"></i><span>Approve temporary help</span></button></div></footer>
+      </article>
+      <article class="opportunity-approval" id="opportunity-0142">
+        <header><div><p class="eyebrow">Opportunity #0142</p><h3>Custom gaming-room wall art</h3></div><span>78% confidence</span></header>
+        <div class="opportunity-signals"><div><small>Demand</small><strong class="positive-signal">Strong</strong></div><div><small>Competition</small><strong class="medium-signal">Medium</strong></div><div><small>Selling range</small><strong>$XX–$XX</strong></div><div><small>Production cost</small><strong>$XX</strong></div><div><small>Fees</small><strong>$XX</strong></div><div><small>Contribution</small><strong>$XX / order</strong></div></div>
+        <div class="opportunity-insight"><div><h4>Customer complaints</h4><ul><li>Slow shipping</li><li>Limited personalization</li></ul></div><div class="differentiator"><h4>Our differentiator</h4><strong>Faster personalization + a different design direction</strong></div><div class="test-scope"><h4>Suggested test</h4><strong>3 designs</strong><span>$6 maximum</span></div></div>
+        <footer><div><i data-lucide="circle-alert"></i><span>Unit economics remain unresolved and must be completed during validation.</span></div><div class="opportunity-actions"><button type="button" class="decline-button"><i data-lucide="x"></i><span>Decline</span></button><button type="button" class="approve-button"><i data-lucide="check"></i><span>Approve $6 test</span></button></div></footer>
+      </article>
+      <article class="validation-request">
+        <header><div><p class="eyebrow">MKN Opportunity Report</p><h3>Validation test recommendation</h3></div><span>Awaiting Michh</span></header>
+        <div class="validation-metrics">
+          <div><small>Startup cost</small><strong class="good-rating">Low</strong></div>
+          <div><small>Recurring cost</small><strong class="good-rating">Low</strong></div>
+          <div><small>First test</small><strong>2 days</strong></div>
+          <div><small>Competition</small><strong class="medium-rating">Medium</strong></div>
+          <div><small>Potential margin</small><strong class="good-rating">High</strong></div>
+          <div><small>Automation</small><strong>89%</strong></div>
+          <div><small>Risk</small><strong class="good-rating">Low</strong></div>
+          <div><small>Evidence</small><strong class="good-rating">Strong</strong></div>
+        </div>
+        <div class="validation-decision"><div><small>Director recommendation</small><strong>Run $10 validation test</strong></div><div class="decision-buttons"><button type="button" class="decline-button"><i data-lucide="x"></i><span>Decline</span></button><button type="button" class="approve-button" disabled title="Review Experiment #00241 first"><i data-lucide="lock-keyhole"></i><span>Review memory first</span></button></div></div>
+      </article>
+      <article class="funding-request approved-request">
+        <header><div><p class="eyebrow">Funding Request #0007</p><h3>Houston-themed original POD shirts</h3></div><span><i data-lucide="check"></i> Treasurer approved</span></header>
+        <div class="request-money"><div><small>Requested</small><strong>$12.00</strong></div><div><small>Maximum loss</small><strong>$12.00</strong></div><div><small>Fund</small><strong>Experiment</strong></div></div>
+        <div class="request-body">
+          <div><h4>Use of funds</h4><ul><li><span>Listings</span><b>$2</b></li><li><span>Printify subscription</span><b>$0</b></li><li><span>Testing and creative</span><b>$10</b></li></ul></div>
+          <div><h4>Evidence package</h4><ul class="evidence-list"><li><i data-lucide="check"></i>Search trend research</li><li><i data-lucide="check"></i>Competition analysis</li><li><i data-lucide="check"></i>Estimated margins</li><li><i data-lucide="check"></i>Target customer</li><li><i data-lucide="check"></i>Risks documented</li></ul></div>
+        </div>
+        <footer><span><i data-lucide="wallet-cards"></i> $4.82 spent · $7.18 remaining</span><button type="button" data-open-view="businesses">View experiment</button></footer>
+      </article>
+    </section>
+    <section class="view" id="memory" aria-labelledby="memory-title">
+      <p class="eyebrow">Knowledge</p><h2 id="memory-title">Memory Archive</h2>
+      <article class="memory-record">
+        <div class="memory-record-icon"><i data-lucide="brain-circuit"></i></div>
+        <div class="memory-record-copy"><p class="eyebrow">City Memory · Validated</p><h3>Houston Design Test #3</h3><p>Design #3 outperformed Designs #1 and #2. Preserve its visual characteristics for future controlled tests.</p></div>
+        <div class="memory-evidence"><div><small>Revenue</small><strong>$43.71</strong></div><div><small>Net profit</small><strong>$18.20</strong></div><div><small>ROI</small><strong>Positive</strong></div></div>
+        <span class="memory-confidence"><i data-lucide="badge-check"></i> Evidence-backed</span>
+      </article>
+    </section>
+    <section class="view" id="treasury" aria-labelledby="treasury-title">
+      <p class="eyebrow">Finance</p><h2 id="treasury-title">Treasury</h2>
+      <div class="treasury-total"><div><span>City cash</span><strong>$168.20</strong><small>$150 initial capital + $18.20 realized profit</small></div><i data-lucide="landmark"></i></div>
+      <div class="fund-grid">
+        <article class="fund-card operating-fund"><div class="fund-icon"><i data-lucide="server-cog"></i></div><div><span>Operating money</span><strong>$0.00</strong><p>AI, APIs, hosting, and essential software</p></div><button type="button" title="Fund settings" aria-label="Operating money settings"><i data-lucide="settings"></i></button></article>
+        <article class="fund-card experiment-fund"><div class="fund-icon"><i data-lucide="flask-conical"></i></div><div><span>Experiment fund</span><strong>$7.18</strong><p>$4.82 spent from Funding Request #0007</p></div><button type="button" title="Fund settings" aria-label="Experiment fund settings"><i data-lucide="settings"></i></button></article>
+        <article class="fund-card growth-fund"><div class="fund-icon"><i data-lucide="trending-up"></i></div><div><span>Growth fund</span><strong>$0.00</strong><p>Expansion for businesses with proven results</p></div><button type="button" title="Fund settings" aria-label="Growth fund settings"><i data-lucide="settings"></i></button></article>
+        <article class="fund-card reserve-fund"><div class="fund-icon"><i data-lucide="shield-check"></i></div><div><span>Emergency reserve</span><strong>$100.00</strong><p>Protected for the 60-Day Mission</p></div><div class="locked-fund"><i data-lucide="lock-keyhole"></i><span>Locked</span></div></article>
+        <article class="fund-card profit-fund"><div class="fund-icon"><i data-lucide="vault"></i></div><div><span>Profit vault</span><strong>$0.00</strong><p>Realized profit kept outside operating budgets</p></div><button type="button" title="Fund settings" aria-label="Profit vault settings"><i data-lucide="settings"></i></button></article>
+      </div>
+      <section class="monthly-target" aria-labelledby="monthly-target-title">
+        <div class="monthly-target-heading"><div><p class="eyebrow">Month 1 target</p><h3 id="monthly-target-title">Reach positive operating leverage</h3></div><span>29.1% of revenue goal</span></div>
+        <div class="monthly-target-grid">
+          <div><span>AI &amp; hosting ceiling</span><strong>$40</strong></div>
+          <div><span>Tools &amp; subscriptions ceiling</span><strong>$20</strong></div>
+          <div><span>Hard spend ceiling</span><strong>$50</strong></div>
+          <div class="revenue-target"><span>Revenue target</span><strong>$150+</strong></div>
+          <div class="net-target"><span>Net target at $150</span><strong>$100+</strong></div>
+        </div>
+        <div class="monthly-progress"><div style="width:29.1%"></div></div>
+        <div class="monthly-progress-labels"><span>$43.71 recorded</span><span>$106.29 remaining to $150</span></div>
+      </section>
+      <div class="treasury-policy"><i data-lucide="badge-dollar-sign"></i><div><strong>Treasury rule</strong><p>Agents cannot transfer money between funds. Budget changes and reserve withdrawals require Michh's approval.</p></div></div>
+      <section class="spend-guardrail" aria-labelledby="guardrail-title">
+        <div class="blocked-strategy"><i data-lucide="ban"></i><span>Idea → Spend a lot → Hope</span><b>Blocked</b></div>
+        <div class="guardrail-heading"><div><p class="eyebrow">Experiment guardrail</p><h3 id="guardrail-title">Houston Design Test #3</h3></div><span>Completed · profitable</span></div>
+        <div class="budget-track"><div class="budget-fill" style="width:24.1%"></div><i style="left:25%"></i><i style="left:50%"></i><i style="left:75%"></i><i style="left:100%"></i></div>
+        <div class="budget-gates">
+          <article><strong>$5</strong><span>Promising</span><small>Continue</small></article>
+          <article><strong>$10</strong><span>Weak</span><small>Modify once</small></article>
+          <article><strong>$15</strong><span>Still weak</span><small>Freeze spending</small></article>
+          <article class="hard-stop"><strong>$20</strong><span>Maximum</span><small>Hard stop</small></article>
+        </div>
+      </section>
+      <section class="treasury-ledger" aria-labelledby="treasury-ledger-title">
+        <div class="ledger-heading"><div><h3 id="treasury-ledger-title">Recent Treasury activity</h3><p>Every expense is tied to an agent, business, and experiment.</p></div><span>Positive outcome</span></div>
+        <article class="transaction-row positive-transaction"><div class="transaction-icon"><i data-lucide="circle-dollar-sign"></i></div><div><strong>Houston Design Test #3 result</strong><span>Maya · MKN Merch · $25.51 total costs</span></div><div class="transaction-outcome"><small>Net profit</small><b>$18.20</b></div><strong class="transaction-amount">+$43.71</strong></article>
+        <div class="reconciliation-note"><i data-lucide="circle-alert"></i><span>$4.82 was itemized earlier. Categorize the remaining $20.69 of implied costs for complete accounting.</span></div>
+      </section>
+    </section>
+    <section class="view" id="markets" aria-labelledby="markets-title">
+      <p class="eyebrow">Personal Markets Desk</p><h2 id="markets-title">Sports &amp; Prediction Markets</h2>
+      <div class="markets-warning"><i data-lucide="shield-check"></i><div><strong>Analysis and tracking only</strong><p>MKN City does not place wagers automatically. You review every idea and act directly on the platform.</p></div></div>
+      <div class="market-summary">
+        <div><span>Tracking bankroll</span><strong>$0.00</strong></div>
+        <div><span>Open positions</span><strong>0</strong></div>
+        <div><span>Today's risk</span><strong>$0.00</strong></div>
+        <div><span>Net result</span><strong>$0.00</strong></div>
+      </div>
+      <div class="platform-grid">
+        <article class="platform-card">
+          <div class="platform-icon prize">P</div>
+          <div><span class="connection-state manual">Manual mode</span><h3>PrizePicks</h3><p>Record your own entries and results. Automated account access is disabled to respect platform rules.</p></div>
+          <button type="button" data-market-action="manual"><i data-lucide="square-pen"></i><span>Add manual entry</span></button>
+        </article>
+        <article class="platform-card">
+          <div class="platform-icon kalshi">K</div>
+          <div><span class="connection-state ready">API ready</span><h3>Kalshi</h3><p>Official API connection can be added later through a private backend with encrypted server-side secrets.</p></div>
+          <button type="button" data-market-action="kalshi"><i data-lucide="plug"></i><span>Connection details</span></button>
+        </article>
+      </div>
+      <section class="market-ledger">
+        <div class="ledger-heading"><div><h3>Personal activity ledger</h3><p>Stored only in this browser for the free prototype.</p></div><span id="ledger-count">0 records</span></div>
+        <div class="ledger-empty" id="ledger-content"><i data-lucide="notebook-tabs"></i><p>No entries recorded yet.</p></div>
+      </section>
+    </section>
+  </main>
+
+  <button class="command-launcher" id="command-launcher" type="button" aria-controls="command-console" aria-expanded="false"><i data-lucide="message-circle"></i><span>Command</span></button>
+  <aside class="command-console" id="command-console" aria-label="Founder command console" aria-hidden="true">
+    <header><div><span class="console-pulse"></span><div><small>MKN City AI</small><strong>Founder Command</strong></div></div><button id="close-console" type="button" title="Close command console" aria-label="Close command console"><i data-lucide="x"></i></button></header>
+    <div class="console-messages" id="console-messages" aria-live="polite">
+      <div class="console-message agent-message"><span>Director</span><p>City systems are ready. Ask for a status report, give an agent a task, or type <b>help</b>.</p></div>
+    </div>
+    <div class="quick-commands"><button type="button" data-command="city status">City status</button><button type="button" data-command="talk to Maya">Talk to Maya</button><button type="button" data-command="show approvals">Approvals</button><button type="button" id="start-tutorial"><i data-lucide="volume-2"></i> Tutorial</button></div>
+    <form id="command-form"><label class="sr-only" for="command-input">Command MKN City</label><input id="command-input" autocomplete="off" placeholder="Ask or command your city..."><button type="submit" title="Send command" aria-label="Send command"><i data-lucide="send"></i></button></form>
+  </aside>
+
+  <dialog class="tutorial-dialog" id="tutorial-dialog">
+    <div class="tutorial-scene"><div class="tutorial-character">D</div><div><p class="eyebrow">Director Tutorial</p><h2 id="tutorial-title">Welcome, Founder Michh</h2><p id="tutorial-copy">This is your Command Center. From here you can monitor money, agents, experiments, and approvals.</p></div></div>
+    <div class="tutorial-progress" id="tutorial-progress"><i class="active"></i><i></i><i></i><i></i></div>
+    <div class="tutorial-controls"><button id="tutorial-skip" type="button">Skip</button><button id="tutorial-next" class="primary-action" type="button">Next</button></div>
+  </dialog>
+
+  <nav class="bottom-nav" aria-label="City navigation">
+    <button class="nav-item active" data-view="city" type="button"><i data-lucide="map"></i><span>City</span></button>
+    <button class="nav-item" data-view="agents" type="button"><i data-lucide="bot"></i><span>Agents</span></button>
+    <button class="nav-item" data-view="businesses" type="button"><i data-lucide="store"></i><span>Business</span></button>
+    <button class="nav-item approval-link" data-view="approvals" type="button"><i data-lucide="circle-check-big"></i><span>Approvals</span><b>2</b></button>
+    <button class="nav-item" data-view="memory" type="button"><i data-lucide="brain"></i><span>Memory</span></button>
+    <button class="nav-item" data-view="treasury" type="button"><i data-lucide="landmark"></i><span>Treasury</span></button>
+    <button class="nav-item" data-view="markets" type="button"><i data-lucide="chart-candlestick"></i><span>Markets</span></button>
+  </nav>
+
+  <dialog class="property-dialog" id="property-dialog">
+    <form method="dialog" id="market-form">
+      <button class="dialog-close" value="cancel" title="Close" aria-label="Close property details"><i data-lucide="x"></i></button>
+      <p class="eyebrow">Commercial property</p>
+      <h2 id="dialog-property-name">Building 001</h2>
+      <div class="dialog-property-status"><span></span> Vacant and available</div>
+      <p>A building can be reserved only for an approved business proposal. Reserving property does not publish or launch the business.</p>
+      <label for="business-name">Proposed business</label>
+      <input id="business-name" name="business-name" placeholder="Enter business name" autocomplete="off">
+      <div class="dialog-actions">
+        <button value="cancel" type="submit">Cancel</button>
+        <button class="primary-action" id="reserve-property" value="default" type="submit">Request reservation</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="property-dialog" id="market-dialog">
+    <form method="dialog">
+      <button class="dialog-close" value="cancel" title="Close" aria-label="Close market dialog"><i data-lucide="x"></i></button>
+      <p class="eyebrow" id="market-dialog-label">Personal tracker</p>
+      <h2 id="market-dialog-title">Add manual entry</h2>
+      <div id="manual-entry-fields">
+        <p>Record an entry after you place it yourself on the platform. Never enter your platform password here.</p>
+        <label for="entry-description">Entry description</label>
+        <input id="entry-description" placeholder="Example: NBA two-pick entry" autocomplete="off">
+        <label for="entry-risk">Amount risked</label>
+        <input id="entry-risk" inputmode="decimal" placeholder="$0.00" autocomplete="off">
+      </div>
+      <div class="dialog-actions">
+        <button value="cancel" type="submit">Cancel</button>
+        <button class="primary-action" id="market-submit" value="default" type="submit">Save locally</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="property-dialog agent-dialog" id="agent-dialog">
+    <form method="dialog" id="agent-form">
+      <button class="dialog-close" value="cancel" title="Close" aria-label="Close agent creator"><i data-lucide="x"></i></button>
+      <p class="eyebrow">Employment Center</p>
+      <h2>Create agent candidate</h2>
+      <p>This creates a probationary candidate. External accounts remain unavailable until separately approved.</p>
+      <label for="agent-name">Agent name</label><input id="agent-name" required autocomplete="off" placeholder="Choose a name">
+      <label for="agent-role">Role</label><input id="agent-role" required autocomplete="off">
+      <label for="agent-department">Department</label>
+      <select id="agent-department"><option>Research</option><option>Creative</option><option>Business</option><option>Operations</option><option>Unassigned</option></select>
+      <label class="permission-check"><input type="checkbox" id="agent-draft-only" checked><span><strong>Draft-only access</strong><small>Agent cannot publish, spend, message customers, or place orders.</small></span></label>
+      <div class="dialog-actions"><button value="cancel" type="submit">Cancel</button><button class="primary-action" value="default" type="submit">Create candidate</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="property-dialog" id="connection-dialog">
+    <form method="dialog">
+      <button class="dialog-close" value="cancel" title="Close" aria-label="Close connection details"><i data-lucide="x"></i></button>
+      <p class="eyebrow">Connection Center</p><h2 id="connection-title">Connect account</h2>
+      <div id="connection-copy"></div>
+      <div class="dialog-actions"><button class="primary-action" value="default" type="submit">Close</button></div>
+    </form>
+  </dialog>
+
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

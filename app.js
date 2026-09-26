@@ -1,0 +1,459 @@
+const navItems = document.querySelectorAll('.nav-item');
+const views = document.querySelectorAll('.view');
+
+function openView(viewId) {
+  views.forEach((view) => view.classList.toggle('active', view.id === viewId));
+  navItems.forEach((item) => {
+    const active = item.dataset.view === viewId;
+    item.classList.toggle('active', active);
+    item.setAttribute('aria-current', active ? 'page' : 'false');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+navItems.forEach((item) => {
+  item.addEventListener('click', () => openView(item.dataset.view));
+});
+
+document.querySelectorAll('[data-open-view]').forEach((button) => {
+  button.addEventListener('click', () => openView(button.dataset.openView));
+});
+
+document.querySelectorAll('.district').forEach((district) => {
+  district.addEventListener('click', () => openView('city'));
+});
+
+const workflowSteps = document.querySelectorAll('.workflow-steps li');
+const researchAgent = document.querySelector('#research-agent');
+const workflowStatus = document.querySelector('#workflow-status');
+const replayWorkflow = document.querySelector('#replay-workflow');
+let workflowTimers = [];
+
+function runResearchHandoff() {
+  workflowTimers.forEach(clearTimeout);
+  workflowTimers = [];
+  workflowSteps.forEach((step, index) => {
+    step.classList.toggle('complete', index === 0);
+    step.classList.toggle('active', index === 1);
+  });
+  workflowStatus.textContent = 'In progress';
+  workflowStatus.classList.remove('review');
+  researchAgent.classList.remove('moving');
+  void researchAgent.offsetWidth;
+  researchAgent.classList.add('moving');
+
+  [1300, 3100, 5000, 6200].forEach((delay, offset) => {
+    workflowTimers.push(setTimeout(() => {
+      workflowSteps.forEach((step, index) => {
+        step.classList.toggle('complete', index <= offset + 1);
+        step.classList.toggle('active', index === offset + 2);
+      });
+      if (offset === 3) {
+        workflowSteps[4].classList.add('active');
+        workflowStatus.textContent = 'Director review';
+        workflowStatus.classList.add('review');
+      }
+    }, delay));
+  });
+}
+
+replayWorkflow.addEventListener('click', runResearchHandoff);
+runResearchHandoff();
+
+const propertyDialog = document.querySelector('#property-dialog');
+const dialogPropertyName = document.querySelector('#dialog-property-name');
+
+document.querySelectorAll('[data-property]').forEach((button) => {
+  button.addEventListener('click', () => {
+    dialogPropertyName.textContent = button.dataset.property;
+    propertyDialog.querySelector('.eyebrow').textContent = 'Commercial property';
+    propertyDialog.querySelector('.dialog-property-status').innerHTML = '<span></span> Vacant and available';
+    propertyDialog.querySelector('p:not(.eyebrow)').textContent = 'A building can be reserved only for an approved business proposal. Reserving property does not publish or launch the business.';
+    propertyDialog.querySelector('label').hidden = false;
+    propertyDialog.querySelector('input').hidden = false;
+    propertyDialog.querySelector('#reserve-property').textContent = 'Request reservation';
+    propertyDialog.showModal();
+  });
+});
+
+document.querySelectorAll('[data-business]').forEach((button) => {
+  button.addEventListener('click', () => {
+    dialogPropertyName.textContent = button.dataset.business;
+    propertyDialog.querySelector('.eyebrow').textContent = 'Building 001';
+    propertyDialog.querySelector('.dialog-property-status').innerHTML = '<span></span> Testing';
+    propertyDialog.querySelector('p:not(.eyebrow)').textContent = 'Founded 09/20/2026 · 3 employees · $0 revenue · $0 expenses. This business is completing its first validation test.';
+    propertyDialog.querySelector('label').hidden = true;
+    propertyDialog.querySelector('input').hidden = true;
+    propertyDialog.querySelector('#reserve-property').textContent = 'Close';
+    propertyDialog.showModal();
+  });
+});
+
+document.querySelector('.expand-action').addEventListener('click', () => openView('businesses'));
+
+const marketDialog = document.querySelector('#market-dialog');
+const marketDialogTitle = document.querySelector('#market-dialog-title');
+const marketDialogLabel = document.querySelector('#market-dialog-label');
+const manualEntryFields = document.querySelector('#manual-entry-fields');
+const marketForm = document.querySelector('#market-form');
+const marketSubmit = document.querySelector('#market-submit');
+const ledgerContent = document.querySelector('#ledger-content');
+const ledgerCount = document.querySelector('#ledger-count');
+let marketMode = 'manual';
+
+function getMarketEntries() {
+  try { return JSON.parse(localStorage.getItem('mkn-market-entries') || '[]'); }
+  catch { return []; }
+}
+
+function escapeHtml(value) {
+  return value.replace(/[&<>'"]/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  })[character]);
+}
+
+function renderMarketLedger() {
+  const entries = getMarketEntries();
+  ledgerCount.textContent = `${entries.length} ${entries.length === 1 ? 'record' : 'records'}`;
+  if (!entries.length) {
+    ledgerContent.className = 'ledger-empty';
+    ledgerContent.innerHTML = '<i data-lucide="notebook-tabs"></i><p>No entries recorded yet.</p>';
+  } else {
+    ledgerContent.className = '';
+    ledgerContent.innerHTML = `<ul class="ledger-list">${entries.map((entry) => `<li><div><strong>${escapeHtml(entry.description)}</strong><small>PrizePicks · ${escapeHtml(entry.date)}</small></div><b>$${entry.risk.toFixed(2)}</b></li>`).join('')}</ul>`;
+  }
+  lucide.createIcons();
+}
+
+document.querySelectorAll('[data-market-action]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const manual = button.dataset.marketAction === 'manual';
+    marketMode = manual ? 'manual' : 'kalshi';
+    marketDialogLabel.textContent = manual ? 'Personal tracker' : 'Official API boundary';
+    marketDialogTitle.textContent = manual ? 'Add manual entry' : 'Kalshi connection details';
+    manualEntryFields.innerHTML = manual
+      ? '<p>Record an entry after you place it yourself on the platform. Never enter your platform password here.</p><label for="entry-description">Entry description</label><input id="entry-description" placeholder="Example: NBA two-pick entry" autocomplete="off"><label for="entry-risk">Amount risked</label><input id="entry-risk" inputmode="decimal" placeholder="$0.00" autocomplete="off">'
+      : '<p>Kalshi offers an official REST API. A future connection will use a private server route and encrypted environment variables on Render. API credentials will never be stored in browser code or committed to GitHub.</p>';
+    marketSubmit.textContent = manual ? 'Save locally' : 'Close';
+    marketDialog.showModal();
+  });
+});
+
+marketForm.addEventListener('submit', (event) => {
+  if (marketMode !== 'manual' || event.submitter?.value === 'cancel') return;
+  const description = document.querySelector('#entry-description')?.value.trim();
+  const risk = Number(document.querySelector('#entry-risk')?.value.replace(/[$,]/g, ''));
+  if (!description || !Number.isFinite(risk) || risk <= 0) {
+    event.preventDefault();
+    return;
+  }
+  const entries = getMarketEntries();
+  entries.unshift({ description, risk, date: new Date().toLocaleDateString() });
+  localStorage.setItem('mkn-market-entries', JSON.stringify(entries));
+  renderMarketLedger();
+});
+
+renderMarketLedger();
+
+const agentDialog = document.querySelector('#agent-dialog');
+const agentForm = document.querySelector('#agent-form');
+const agentName = document.querySelector('#agent-name');
+const agentRole = document.querySelector('#agent-role');
+const agentDepartment = document.querySelector('#agent-department');
+const agentCount = document.querySelector('#agent-count');
+
+document.querySelectorAll('.template-card button').forEach((button) => {
+  button.addEventListener('click', () => {
+    const template = button.closest('.template-card');
+    agentName.value = '';
+    agentRole.value = template.dataset.template;
+    agentDepartment.value = template.dataset.department;
+    agentDialog.showModal();
+    agentName.focus();
+  });
+});
+
+agentForm.addEventListener('submit', (event) => {
+  if (event.submitter?.value === 'cancel') return;
+  const current = Number(localStorage.getItem('mkn-created-agents') || '0') + 1;
+  localStorage.setItem('mkn-created-agents', String(current));
+  agentCount.textContent = `${6 + current} active`;
+});
+
+const savedAgentCount = Number(localStorage.getItem('mkn-created-agents') || '0');
+agentCount.textContent = `${6 + savedAgentCount} active`;
+
+const connectionDialog = document.querySelector('#connection-dialog');
+const connectionTitle = document.querySelector('#connection-title');
+const connectionCopy = document.querySelector('#connection-copy');
+const connectionDetails = {
+  openai: { title: 'Configure OpenAI API', copy: '<p>OpenAI application access uses an API project key, not a ChatGPT password.</p><ul><li>Store the key as a private Render environment variable.</li><li>Never put it in browser code or GitHub.</li><li>Set project spend limits before enabling agents.</li></ul>' },
+  etsy: { title: 'Connect Etsy', copy: '<p>Etsy uses OAuth 2.0 with explicit scopes.</p><ul><li>Start with a Seller App for your own shop.</li><li>Use read-only scopes first.</li><li>A private backend is required for token exchange and refresh.</li></ul>' },
+  kalshi: { title: 'Configure Kalshi API', copy: '<p>Kalshi provides an official API for market and personal account data.</p><ul><li>Credentials stay on the Render backend.</li><li>Begin with read-only analysis.</li><li>Keep all trading actions behind owner approval.</li></ul>' }
+};
+
+document.querySelectorAll('[data-connection]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const details = connectionDetails[button.dataset.connection];
+    connectionTitle.textContent = details.title;
+    connectionCopy.innerHTML = details.copy;
+    connectionDialog.showModal();
+  });
+});
+
+const sellingPrice = document.querySelector('#selling-price');
+const costFields = document.querySelectorAll('.cost-field');
+const totalProductCost = document.querySelector('#total-product-cost');
+const trueProfit = document.querySelector('#true-profit');
+const profitMargin = document.querySelector('#profit-margin');
+const profitResult = document.querySelector('.profit-result');
+
+function calculateTrueProfit() {
+  const price = Number(sellingPrice.value) || 0;
+  const costs = [...costFields].reduce((sum, field) => sum + (Number(field.value) || 0), 0);
+  const profit = price - costs;
+  const margin = price > 0 ? (profit / price) * 100 : 0;
+  totalProductCost.textContent = `$${costs.toFixed(2)}`;
+  trueProfit.textContent = `${profit < 0 ? '-' : ''}$${Math.abs(profit).toFixed(2)}`;
+  profitMargin.textContent = `${margin.toFixed(1)}% margin`;
+  profitResult.classList.toggle('loss-result', profit < 0);
+}
+
+document.querySelectorAll('.profit-input').forEach((input) => input.addEventListener('input', calculateTrueProfit));
+calculateTrueProfit();
+
+document.querySelectorAll('.validation-request').forEach((request) => {
+  const status = request.querySelector('header > span');
+  const approve = request.querySelector('.approve-button');
+  const decline = request.querySelector('.decline-button');
+  const resolve = (decision) => {
+    status.textContent = decision === 'approved' ? 'Approved by Michh' : 'Declined by Michh';
+    status.style.background = decision === 'approved' ? 'var(--green-soft)' : '#f8e7e3';
+    status.style.color = decision === 'approved' ? 'var(--green)' : '#9b3d31';
+    approve.disabled = true;
+    decline.disabled = true;
+    localStorage.setItem('mkn-validation-decision', decision);
+  };
+  approve.addEventListener('click', () => resolve('approved'));
+  decline.addEventListener('click', () => resolve('declined'));
+  const savedDecision = localStorage.getItem('mkn-validation-decision');
+  if (savedDecision) resolve(savedDecision);
+});
+
+const reviewMemory = document.querySelector('#review-memory');
+const memoryAlert = document.querySelector('#memory-alert');
+const validationApprove = document.querySelector('.validation-request .approve-button');
+
+function markMemoryReviewed() {
+  reviewMemory.innerHTML = '<i data-lucide="check"></i><span>Prior experiment reviewed</span>';
+  memoryAlert.classList.add('reviewed');
+  if (!localStorage.getItem('mkn-validation-decision')) {
+    validationApprove.disabled = false;
+    validationApprove.title = '';
+    validationApprove.innerHTML = '<i data-lucide="check"></i><span>Approve $10</span>';
+  }
+  lucide.createIcons();
+}
+
+reviewMemory.addEventListener('click', () => {
+  localStorage.setItem('mkn-memory-00241-reviewed', 'true');
+  markMemoryReviewed();
+});
+
+if (localStorage.getItem('mkn-memory-00241-reviewed') === 'true') markMemoryReviewed();
+
+const staffingRequest = document.querySelector('.staffing-request');
+const staffingStatus = staffingRequest.querySelector('header > span');
+const staffingApprove = staffingRequest.querySelector('.approve-button');
+const staffingDecline = staffingRequest.querySelector('.decline-button');
+
+function resolveStaffing(decision) {
+  staffingStatus.textContent = decision === 'approved' ? 'Approved by Michh' : 'Declined by Michh';
+  staffingStatus.style.color = decision === 'approved' ? 'var(--green)' : '#9b3d31';
+  staffingApprove.disabled = true;
+  staffingDecline.disabled = true;
+  localStorage.setItem('mkn-staffing-decision', decision);
+}
+
+staffingApprove.addEventListener('click', () => resolveStaffing('approved'));
+staffingDecline.addEventListener('click', () => resolveStaffing('declined'));
+const savedStaffingDecision = localStorage.getItem('mkn-staffing-decision');
+if (savedStaffingDecision) resolveStaffing(savedStaffingDecision);
+
+const opportunity0142 = document.querySelector('#opportunity-0142');
+const opportunity0142Status = opportunity0142.querySelector('header > span');
+const opportunity0142Approve = opportunity0142.querySelector('.approve-button');
+const opportunity0142Decline = opportunity0142.querySelector('.decline-button');
+
+function resolveOpportunity0142(decision) {
+  opportunity0142Status.textContent = decision === 'approved' ? 'Approved by Michh' : 'Declined by Michh';
+  opportunity0142Status.style.background = decision === 'approved' ? 'var(--green-soft)' : '#f8e7e3';
+  opportunity0142Status.style.color = decision === 'approved' ? 'var(--green)' : '#9b3d31';
+  opportunity0142Approve.disabled = true;
+  opportunity0142Decline.disabled = true;
+  localStorage.setItem('mkn-opportunity-0142-decision', decision);
+}
+
+opportunity0142Approve.addEventListener('click', () => resolveOpportunity0142('approved'));
+opportunity0142Decline.addEventListener('click', () => resolveOpportunity0142('declined'));
+const savedOpportunity0142 = localStorage.getItem('mkn-opportunity-0142-decision');
+if (savedOpportunity0142) resolveOpportunity0142(savedOpportunity0142);
+
+const commandLauncher = document.querySelector('#command-launcher');
+const commandConsole = document.querySelector('#command-console');
+const closeConsole = document.querySelector('#close-console');
+const commandForm = document.querySelector('#command-form');
+const commandInput = document.querySelector('#command-input');
+const consoleMessages = document.querySelector('#console-messages');
+
+function setConsole(open) {
+  commandConsole.classList.toggle('open', open);
+  commandConsole.setAttribute('aria-hidden', String(!open));
+  commandLauncher.setAttribute('aria-expanded', String(open));
+  if (open) commandInput.focus();
+}
+
+function addConsoleMessage(speaker, text, user = false) {
+  const message = document.createElement('div');
+  message.className = `console-message ${user ? 'user-message' : 'agent-message'}`;
+  const label = document.createElement('span');
+  const copy = document.createElement('p');
+  label.textContent = speaker;
+  copy.textContent = text;
+  message.append(label, copy);
+  consoleMessages.append(message);
+  consoleMessages.scrollTop = consoleMessages.scrollHeight;
+  return message;
+}
+
+function speakAsAgent(agent, text) {
+  const mapAgent = document.querySelector(`[data-agent-chat="${agent}"]`);
+  if (!mapAgent) return;
+  mapAgent.querySelector('.speech-bubble').textContent = text.slice(0, 90);
+  mapAgent.classList.add('speaking');
+  setTimeout(() => mapAgent.classList.remove('speaking'), 5000);
+}
+
+function runLocalCommand(command) {
+  const normalized = command.toLowerCase().trim();
+  const routes = [
+    { terms: ['show agents', 'view agents', 'go to agents'], view: 'agents', reply: 'Opening the Employment Center and agent roster.' },
+    { terms: ['show businesses', 'view businesses', 'go to business'], view: 'businesses', reply: 'Opening the Business District.' },
+    { terms: ['show approvals', 'view approvals', 'go to approvals'], view: 'approvals', reply: 'Opening your approval queue.' },
+    { terms: ['show memory', 'view memory', 'go to memory'], view: 'memory', reply: 'Opening the Memory Archive.' },
+    { terms: ['show treasury', 'view treasury', 'go to treasury'], view: 'treasury', reply: 'Opening Treasury. The emergency reserve remains locked.' },
+    { terms: ['show markets', 'view markets', 'go to markets'], view: 'markets', reply: 'Opening the personal Markets Desk.' },
+    { terms: ['show city', 'view city', 'go home'], view: 'city', reply: 'Returning to the City Command Center.' }
+  ];
+  const route = routes.find((item) => item.terms.some((term) => normalized.includes(term)));
+  if (route) {
+    openView(route.view);
+    return { handled: true, reply: route.reply };
+  }
+  if (normalized === 'help' || normalized.includes('what can i do')) {
+    return { handled: true, reply: 'Try: city status, show agents, show approvals, show treasury, talk to Maya, or ask the Director a business question.' };
+  }
+  if (normalized.includes('city status') || normalized === 'status') {
+    return { handled: true, reply: 'City cash is $168.20. Two businesses and six agents are active. The 60-day mission has completed Goals 1 and 2.' };
+  }
+  if (normalized.includes('talk to maya') || normalized === 'maya') {
+    speakAsAgent('Maya', 'I am checking the strongest evidence now.');
+    return { handled: true, reply: 'Maya: I am researching active opportunities. My manager rule is to submit once confidence is sufficient.' };
+  }
+  return { handled: false };
+}
+
+async function submitCommand(command) {
+  addConsoleMessage('Michh', command, true);
+  const local = runLocalCommand(command);
+  if (local.handled) return addConsoleMessage('Director', local.reply);
+  const thinking = addConsoleMessage('Director', 'Reviewing your command...');
+  thinking.classList.add('thinking');
+  try {
+    const response = await fetch('/api/command', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: command }) });
+    const data = await response.json();
+    thinking.remove();
+    addConsoleMessage(data.mode === 'openai' ? 'Chief Director AI' : 'Director · Demo Mode', data.reply || data.error || 'No response received.');
+  } catch {
+    thinking.remove();
+    addConsoleMessage('Director · Offline', 'The server is unavailable. Navigation commands still work locally.');
+  }
+}
+
+commandLauncher.addEventListener('click', () => setConsole(!commandConsole.classList.contains('open')));
+closeConsole.addEventListener('click', () => setConsole(false));
+commandForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const command = commandInput.value.trim();
+  if (!command) return;
+  commandInput.value = '';
+  submitCommand(command);
+});
+document.querySelectorAll('[data-command]').forEach((button) => button.addEventListener('click', () => submitCommand(button.dataset.command)));
+document.querySelectorAll('[data-agent-chat]').forEach((agent) => agent.addEventListener('click', () => {
+  setConsole(true);
+  submitCommand(`talk to ${agent.dataset.agentChat}`);
+}));
+
+const tutorialDialog = document.querySelector('#tutorial-dialog');
+const tutorialTitle = document.querySelector('#tutorial-title');
+const tutorialCopy = document.querySelector('#tutorial-copy');
+const tutorialNext = document.querySelector('#tutorial-next');
+const tutorialSkip = document.querySelector('#tutorial-skip');
+const tutorialProgress = document.querySelectorAll('#tutorial-progress i');
+const tutorialSteps = [
+  { title: 'Welcome, Founder Michh', copy: 'This is your Command Center. Monitor money, agents, experiments, and approvals from here.', view: 'city' },
+  { title: 'Talk to your agents', copy: 'Tap an agent on the map or open Founder Command. Agents can answer questions and receive text instructions.', view: 'city' },
+  { title: 'Control every risk', copy: 'Hiring, spending, publishing, outreach, and account actions wait in Approvals until you decide.', view: 'approvals' },
+  { title: 'Grow through evidence', copy: 'Complete missions, earn profit, unlock levels, hire specialists, and expand MKN City one proven step at a time.', view: 'businesses' }
+];
+let tutorialStep = 0;
+
+function narrate(text) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.96;
+  utterance.pitch = 0.92;
+  speechSynthesis.speak(utterance);
+}
+
+function showTutorialStep() {
+  const step = tutorialSteps[tutorialStep];
+  tutorialTitle.textContent = step.title;
+  tutorialCopy.textContent = step.copy;
+  tutorialNext.textContent = tutorialStep === tutorialSteps.length - 1 ? 'Enter city' : 'Next';
+  tutorialProgress.forEach((dot, index) => dot.classList.toggle('active', index <= tutorialStep));
+  openView(step.view);
+  narrate(`${step.title}. ${step.copy}`);
+}
+
+document.querySelector('#start-tutorial').addEventListener('click', () => {
+  tutorialStep = 0;
+  tutorialDialog.showModal();
+  showTutorialStep();
+});
+tutorialNext.addEventListener('click', () => {
+  if (tutorialStep === tutorialSteps.length - 1) {
+    tutorialDialog.close();
+    localStorage.setItem('mkn-tutorial-complete', 'true');
+    window.speechSynthesis?.cancel();
+    return;
+  }
+  tutorialStep += 1;
+  showTutorialStep();
+});
+tutorialSkip.addEventListener('click', () => {
+  tutorialDialog.close();
+  localStorage.setItem('mkn-tutorial-complete', 'true');
+  window.speechSynthesis?.cancel();
+});
+
+if (!localStorage.getItem('mkn-tutorial-complete')) {
+  setTimeout(() => {
+    tutorialDialog.showModal();
+    showTutorialStep();
+  }, 500);
+}
+
+lucide.createIcons();
