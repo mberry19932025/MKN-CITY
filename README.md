@@ -10,6 +10,17 @@ npm start
 
 Open `http://localhost:4173`.
 
+### Windows
+
+Install Node.js 20 or newer, then either double-click `start-windows.bat` or run:
+
+```powershell
+npm install
+npm run start:windows
+```
+
+Open `http://localhost:4173` in Edge, Chrome, or Firefox. The application uses browser-standard HTML, CSS, and JavaScript; API keys remain server-side on Windows and Render.
+
 The city works in demo mode without paid APIs. To enable generated agent responses, set both `OPENAI_API_KEY` and `FOUNDER_ACCESS_CODE` in your environment. Never put either secret in this repository or in frontend JavaScript.
 
 ## Deploy on Render

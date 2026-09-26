@@ -77,17 +77,32 @@ function renderOffice(officeId) {
     </article>
   `;
   }).join('');
+  const ownerDesk = officeId === 'founder' ? `
+    <article class="office-desk owner-desk">
+      <div class="owner-office-seal"><i data-lucide="crown"></i></div>
+      <small>Founder / Big Boss</small><strong>MICHH</strong>
+      <p>Final authority for money, hiring, external actions, and city expansion.</p>
+      <div><span>Capital control</span><span>Final approval</span><span>Director oversight</span></div>
+      <button type="button" data-owner-approvals><i data-lucide="badge-check"></i><span>Open approvals</span></button>
+    </article>
+  ` : '';
   const vacantCount = Math.max(1, 3 - office.agents.length);
   const vacancies = Array.from({ length: vacantCount }, (_, index) => `
     <article class="office-desk vacant-desk"><i data-lucide="armchair"></i><strong>${officeId === 'university' ? 'Training station' : `Desk ${office.agents.length + index + 1}`}</strong><span>${officeId === 'university' ? 'Ready for a candidate' : 'Vacant'}</span></article>
   `).join('');
-  officeFloor.innerHTML = desks + vacancies;
+  officeFloor.innerHTML = ownerDesk + desks + vacancies;
   lucide.createIcons();
   officeDialog.showModal();
 }
 
 document.querySelectorAll('[data-office]').forEach((district) => district.addEventListener('click', () => renderOffice(district.dataset.office)));
+document.querySelector('[data-enter-founder-office]').addEventListener('click', () => renderOffice('founder'));
 officeFloor.addEventListener('click', (event) => {
+  const approvalsButton = event.target.closest('[data-owner-approvals]');
+  if (approvalsButton) {
+    officeDialog.close();
+    return openView('approvals');
+  }
   const button = event.target.closest('[data-office-command]');
   if (!button) return;
   officeDialog.close();
@@ -568,6 +583,8 @@ function runLocalCommand(command) {
     { terms: ['show approvals', 'view approvals', 'go to approvals'], view: 'approvals', reply: 'Opening your approval queue.' },
     { terms: ['show memory', 'view memory', 'go to memory'], view: 'memory', reply: 'Opening the Memory Archive.' },
     { terms: ['show treasury', 'view treasury', 'go to treasury'], view: 'treasury', reply: 'Opening Treasury. The emergency reserve remains locked.' },
+    { terms: ['show money ecosystem', 'money ecosystem', 'show money flow'], view: 'treasury', reply: 'Opening the Money Ecosystem. Demo, pending, and verified funds remain separate.' },
+    { terms: ['open founder tower', 'show founder office', 'big boss office'], view: 'city', office: 'founder', reply: 'Opening Founder Tower.' },
     { terms: ['show markets', 'view markets', 'go to markets'], view: 'markets', reply: 'Opening the personal Markets Desk.' },
     { terms: ['show account', 'view account', 'privacy', 'payment methods', 'responsible gaming', 'responsible play', 'deposit', 'withdrawal'], view: 'account', reply: 'Opening Account & Safety. MKN does not hold wagering funds; deposits and withdrawals stay on the licensed platform.' },
     { terms: ['show city', 'view city', 'go home'], view: 'city', reply: 'Returning to the City Command Center.' }
@@ -575,6 +592,7 @@ function runLocalCommand(command) {
   const route = routes.find((item) => item.terms.some((term) => normalized.includes(term)));
   if (route) {
     openView(route.view);
+    if (route.office) renderOffice(route.office);
     return { handled: true, reply: route.reply };
   }
   if (normalized === 'help' || normalized.includes('what can i do')) {
