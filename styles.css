@@ -440,6 +440,7 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .approve-button { border: 1px solid var(--green); background: var(--green); color: white; }
 .approve-button:disabled { border-color: #c6cbc7; background: #dfe3df; color: #7d857f; cursor: not-allowed; }
 .approve-button.decision-selected { box-shadow: 0 0 0 3px rgba(38,162,105,.22); }.decline-button.decision-selected { box-shadow: 0 0 0 3px rgba(155,61,49,.2); }
+.opportunity-actions, .decision-buttons, .staffing-request footer > div { position: relative; z-index: 30; }
 .funding-request header { padding: 17px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); }
 .funding-request header h3 { font-size: 1rem; }
 .funding-request header > span { display: flex; align-items: center; gap: 5px; color: var(--green); font-size: .68rem; font-weight: 700; }

@@ -1490,18 +1490,29 @@ const opportunity0142Approve = opportunity0142.querySelector('.approve-button');
 const opportunity0142Decline = opportunity0142.querySelector('.decline-button');
 
 function resolveOpportunity0142(decision) {
-  opportunity0142Status.textContent = decision === 'approved' ? 'Approved by Michh' : 'Declined by Michh';
+  opportunity0142Status.textContent = decision === 'approved' ? 'Approved · validation queued' : 'Declined by Michh';
   opportunity0142Status.style.background = decision === 'approved' ? 'var(--green-soft)' : '#f8e7e3';
   opportunity0142Status.style.color = decision === 'approved' ? 'var(--green)' : '#9b3d31';
   opportunity0142Approve.disabled = false;
   opportunity0142Decline.disabled = false;
   opportunity0142Approve.classList.toggle('decision-selected', decision === 'approved');
   opportunity0142Decline.classList.toggle('decision-selected', decision === 'declined');
+  opportunity0142Approve.querySelector('span').textContent = decision === 'approved' ? 'Approved · test queued' : 'Approve controlled test';
+  let workOrders = getWorkOrders().filter((order) => order.controlledTestId !== 'opportunity-0142');
+  if (decision === 'approved') {
+    const createdAt = new Date().toISOString();
+    workOrders = workOrders.concat([
+      { id: `0142-research-${Date.now()}`, office: 'research', name: 'Opportunity #0142 unit economics', objective: 'Resolve selling range, production cost, marketplace fees, shipping, and contribution margin before launch.', deliverable: 'Sourced unit-economics report with stop condition', priority: 'High', budget: 0, status: 'Queued', controlledTestId: 'opportunity-0142', createdAt },
+      { id: `0142-creative-${Date.now()}`, office: 'creative', name: 'Gaming-room wall art validation set', objective: 'Create three original concepts using the approved differentiation without copying competitors.', deliverable: 'Three original test-ready designs', priority: 'High', budget: 0, status: 'Queued', controlledTestId: 'opportunity-0142', createdAt },
+      { id: `0142-commerce-${Date.now()}`, office: 'business', name: 'Opportunity #0142 controlled listing test', objective: 'Prepare one validation listing and measurement plan after unit economics pass review.', deliverable: 'Draft listing, metrics, and $6 hard-stop plan', priority: 'Normal', budget: 6, status: 'Queued', controlledTestId: 'opportunity-0142', createdAt }
+    ]);
+  }
+  localStorage.setItem('mkn-work-orders', JSON.stringify(workOrders));
   localStorage.setItem('mkn-opportunity-0142-decision', decision);
   updateApprovalCount();
 }
 
-opportunity0142Approve.addEventListener('click', () => { resolveOpportunity0142('approved'); showToast('Opportunity test approved. Decision saved.'); });
+opportunity0142Approve.addEventListener('click', () => { resolveOpportunity0142('approved'); showToast('Controlled test approved. Research, Creative, and Commerce tasks were queued.'); });
 opportunity0142Decline.addEventListener('click', () => { resolveOpportunity0142('declined'); showToast('Opportunity declined. Decision saved.'); });
 const savedOpportunity0142 = localStorage.getItem('mkn-opportunity-0142-decision');
 if (savedOpportunity0142) resolveOpportunity0142(savedOpportunity0142);
