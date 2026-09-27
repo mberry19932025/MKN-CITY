@@ -1263,6 +1263,8 @@ document.querySelectorAll('.validation-request').forEach((request) => {
     status.textContent = decision === 'approved' ? 'Approved by Michh' : 'Declined by Michh';
     status.style.background = decision === 'approved' ? 'var(--green-soft)' : '#f8e7e3';
     status.style.color = decision === 'approved' ? 'var(--green)' : '#9b3d31';
+    approve.disabled = false;
+    decline.disabled = false;
     approve.classList.toggle('decision-selected', decision === 'approved');
     decline.classList.toggle('decision-selected', decision === 'declined');
     localStorage.setItem('mkn-validation-decision', decision);
@@ -1302,6 +1304,8 @@ const staffingDecline = staffingRequest.querySelector('.decline-button');
 function resolveStaffing(decision) {
   staffingStatus.textContent = decision === 'approved' ? 'Approved by Michh' : 'Declined by Michh';
   staffingStatus.style.color = decision === 'approved' ? 'var(--green)' : '#9b3d31';
+  staffingApprove.disabled = false;
+  staffingDecline.disabled = false;
   staffingApprove.classList.toggle('decision-selected', decision === 'approved');
   staffingDecline.classList.toggle('decision-selected', decision === 'declined');
   localStorage.setItem('mkn-staffing-decision', decision);
@@ -1322,6 +1326,8 @@ function resolveOpportunity0142(decision) {
   opportunity0142Status.textContent = decision === 'approved' ? 'Approved by Michh' : 'Declined by Michh';
   opportunity0142Status.style.background = decision === 'approved' ? 'var(--green-soft)' : '#f8e7e3';
   opportunity0142Status.style.color = decision === 'approved' ? 'var(--green)' : '#9b3d31';
+  opportunity0142Approve.disabled = false;
+  opportunity0142Decline.disabled = false;
   opportunity0142Approve.classList.toggle('decision-selected', decision === 'approved');
   opportunity0142Decline.classList.toggle('decision-selected', decision === 'declined');
   localStorage.setItem('mkn-opportunity-0142-decision', decision);

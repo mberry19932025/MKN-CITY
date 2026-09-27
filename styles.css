@@ -1307,6 +1307,8 @@ main { width: min(1460px, 95vw); margin: 0 auto; padding: 38px 0 130px; }
 .founder-night .opportunity-problem,
 .founder-night .handoff-current,
 .founder-night .care-output .customer-message { background: #302a1c; color: #eed887; }
+.founder-night .differentiator { background: #171d19; }.founder-night .differentiator strong { color: #e5c96f; }
+.founder-night .approve-button { border-color: #7a6530; background: #342d19; color: #f1d47b; }.founder-night .approve-button:hover { background: #4a3d1e; }.founder-night .approve-button.decision-selected { border-color: #d8b854; background: #51431f; color: #ffe7a1; }.founder-night .decline-button.decision-selected { border-color: #a85d54; background: #39201d; color: #f3b0a8; }
 .founder-night .customer-ledger-summary, .founder-night .customer-ledger th { background: #121713; }
 .founder-night .customer-ledger .record-chip { background: #252c28; }
 .founder-night .customer-ledger .record-chip.pending { background: #302a1c; color: #eed887; }
