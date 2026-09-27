@@ -153,9 +153,8 @@ document.querySelector('#run-policy-review').addEventListener('click', () => {
     result.textContent = 'Observed · 1 deny recommendation, 2 escalations';
     return showToast('Review complete. No decisions changed in Observe mode.');
   }
-  if (!localStorage.getItem('mkn-opportunity-0142-decision')) resolveOpportunity0142('declined');
-  result.textContent = '1 internal task approved · 1 weak test denied · 2 escalated';
-  showToast('Guarded review complete. Spending and hiring remain with Michh.');
+  result.textContent = '1 internal task approved · prior loss flagged · 3 escalated';
+  showToast('Guarded review complete. Prior losses are warnings; Michh keeps final approval.');
 });
 
 function showToast(message) {
@@ -1192,6 +1191,7 @@ let rosterPage = 1;
 function renderCandidateRoster() {
   const candidates = JSON.parse(localStorage.getItem('mkn-agent-candidates') || '[]');
   const totalWorkforce = 8 + candidates.length;
+  agentCount.textContent = `${totalWorkforce} active`;
   document.querySelector('#workforce-total').textContent = String(totalWorkforce);
   const scaleState = document.querySelector('#workforce-scale-state');
   scaleState.textContent = totalWorkforce > 60 ? 'Create department divisions' : totalWorkforce > 24 ? 'Add another manager' : 'Capacity healthy';
@@ -1356,17 +1356,27 @@ const staffingApprove = staffingRequest.querySelector('.approve-button');
 const staffingDecline = staffingRequest.querySelector('.decline-button');
 
 function resolveStaffing(decision) {
-  staffingStatus.textContent = decision === 'approved' ? 'Approved by Michh' : 'Declined by Michh';
+  staffingStatus.textContent = decision === 'approved' ? 'Approved · 2 helpers created' : 'Declined by Michh';
   staffingStatus.style.color = decision === 'approved' ? 'var(--green)' : '#9b3d31';
   staffingApprove.disabled = false;
   staffingDecline.disabled = false;
   staffingApprove.classList.toggle('decision-selected', decision === 'approved');
   staffingDecline.classList.toggle('decision-selected', decision === 'declined');
+  const candidates = JSON.parse(localStorage.getItem('mkn-agent-candidates') || '[]').filter((candidate) => candidate.staffingRequestId !== 'production-help-001');
+  if (decision === 'approved') {
+    ['Production Helper A', 'Production Helper B'].forEach((name) => candidates.push({
+      name, role: 'Temporary Production Helper', department: 'Operations', building: 'Production Works', shift: 'Workday', personality: 'Steady and quality-focused',
+      traits: ['Reliable', 'Efficient', 'Careful'], primaryTask: 'Complete one approved production queue task', status: 'probation', tasksCompleted: 0,
+      staffingRequestId: 'production-help-001', temporary: true, createdAt: new Date().toISOString()
+    }));
+  }
+  localStorage.setItem('mkn-agent-candidates', JSON.stringify(candidates));
+  renderCandidateRoster();
   localStorage.setItem('mkn-staffing-decision', decision);
   updateApprovalCount();
 }
 
-staffingApprove.addEventListener('click', () => { resolveStaffing('approved'); showToast('Staffing approved. Decision saved.'); });
+staffingApprove.addEventListener('click', () => { resolveStaffing('approved'); showToast('Approved. Two temporary Production Helpers were added to Agents.'); });
 staffingDecline.addEventListener('click', () => { resolveStaffing('declined'); showToast('Staffing declined. Decision saved.'); });
 const savedStaffingDecision = localStorage.getItem('mkn-staffing-decision');
 if (savedStaffingDecision) resolveStaffing(savedStaffingDecision);
