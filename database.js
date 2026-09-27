@@ -49,8 +49,53 @@ async function initializeDatabase() {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
     CREATE INDEX IF NOT EXISTS business_memories_lookup_idx ON business_memories (business_type, status, confidence DESC);
+    CREATE TABLE IF NOT EXISTS agent_task_runs (
+      id BIGSERIAL PRIMARY KEY,
+      agent_name TEXT NOT NULL,
+      department TEXT NOT NULL,
+      task_type TEXT NOT NULL,
+      status TEXT NOT NULL CHECK (status IN ('completed', 'retraining', 'failed')),
+      duration_ms INTEGER NOT NULL CHECK (duration_ms > 0),
+      quality_score NUMERIC(5,2) NOT NULL CHECK (quality_score >= 0 AND quality_score <= 100),
+      source_accuracy NUMERIC(5,2) NOT NULL CHECK (source_accuracy >= 0 AND source_accuracy <= 100),
+      corrections INTEGER NOT NULL DEFAULT 0 CHECK (corrections >= 0),
+      hallucinations INTEGER NOT NULL DEFAULT 0 CHECK (hallucinations >= 0),
+      input_tokens INTEGER NOT NULL DEFAULT 0 CHECK (input_tokens >= 0),
+      output_tokens INTEGER NOT NULL DEFAULT 0 CHECK (output_tokens >= 0),
+      estimated_cost_cents INTEGER NOT NULL DEFAULT 0 CHECK (estimated_cost_cents >= 0),
+      lesson TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS agent_task_runs_agent_idx ON agent_task_runs (agent_name, created_at DESC);
   `);
   return true;
+}
+
+async function recordTaskRun(run) {
+  const database = getPool();
+  if (!database) throw new Error('Database is not configured.');
+  const result = await database.query(`
+    INSERT INTO agent_task_runs (agent_name, department, task_type, status, duration_ms, quality_score, source_accuracy, corrections, hallucinations, input_tokens, output_tokens, estimated_cost_cents, lesson)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+    RETURNING id, created_at
+  `, [run.agentName, run.department, run.taskType, run.status, run.durationMs, run.qualityScore, run.sourceAccuracy, run.corrections, run.hallucinations, run.inputTokens, run.outputTokens, run.estimatedCostCents, run.lesson || null]);
+  return result.rows[0];
+}
+
+async function getAgentPerformance() {
+  const database = getPool();
+  if (!database) return null;
+  const result = await database.query(`
+    SELECT agent_name, department, COUNT(*)::int AS task_count,
+      ROUND(AVG(duration_ms))::int AS average_duration_ms,
+      ROUND(AVG(quality_score), 1) AS average_quality,
+      ROUND(AVG(source_accuracy), 1) AS average_source_accuracy,
+      SUM(corrections)::int AS corrections, SUM(hallucinations)::int AS hallucinations,
+      SUM(estimated_cost_cents)::int AS estimated_cost_cents,
+      MAX(created_at) AS last_task_at
+    FROM agent_task_runs GROUP BY agent_name, department ORDER BY average_quality DESC, task_count DESC
+  `);
+  return result.rows;
 }
 
 async function getBusinessMemories(businessType) {
@@ -133,4 +178,4 @@ async function getEconomySummary() {
   };
 }
 
-module.exports = { getPool, initializeDatabase, recordLedgerEvent, getEconomySummary, getBusinessMemories, recordBusinessMemory };
+module.exports = { getPool, initializeDatabase, recordLedgerEvent, getEconomySummary, getBusinessMemories, recordBusinessMemory, recordTaskRun, getAgentPerformance };

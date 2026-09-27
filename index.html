@@ -253,6 +253,13 @@
         </div>
         <footer><div><i data-lucide="shield-check"></i><p><strong>Evidence rule</strong><span>No finding becomes company memory without a source, date, confidence level, and reviewer.</span></p></div><div><button type="button" data-agent-chat="Maya"><i data-lucide="message-square"></i> Ask Maya</button><button type="button" data-office="research"><i data-lucide="microscope"></i> Enter lab</button></div></footer>
       </section>
+      <section class="learning-engine" aria-labelledby="learning-engine-title">
+        <header><div><p class="eyebrow">AI University</p><h3 id="learning-engine-title">Task Learning Engine</h3></div><span id="learning-engine-state">Demo training</span></header>
+        <div class="learning-metrics"><div><small>Tasks measured</small><strong id="learning-task-count">0</strong></div><div><small>Average quality</small><strong id="learning-quality">--</strong></div><div><small>Average speed</small><strong id="learning-speed">--</strong></div><div><small>Source accuracy</small><strong id="learning-accuracy">--</strong></div><div><small>Retraining flags</small><strong id="learning-retraining">0</strong></div></div>
+        <div class="learning-console"><div><small>Current trainee</small><strong id="learning-agent">Maya · Trend Research</strong><p id="learning-task">Verify one demand signal with dated sources.</p></div><button type="button" id="run-training-task"><i data-lucide="play"></i><span>Run measured demo task</span></button></div>
+        <div class="learning-rule"><i data-lucide="shield-check"></i><p><strong>Quality gate</strong><span>Speed improves only after quality ≥85, source accuracy ≥90, and zero hallucinations. Failed work is routed to retraining.</span></p></div>
+        <div id="learning-history" class="learning-history"><p>No measured task runs yet.</p></div>
+      </section>
       <div class="agent-toolbar"><div><h3>Create from a template</h3><p>Start with a focused role, then customize its department and permissions.</p></div><span id="agent-count">8 active</span></div>
       <section class="workforce-control" aria-labelledby="workforce-control-title">
         <header><div><p class="eyebrow">Director Recommendation</p><h3 id="workforce-control-title">Controlled workforce scaling</h3></div><span id="workforce-scale-state">Capacity healthy</span></header>
@@ -305,7 +312,7 @@
       <section class="connections-panel">
         <div class="connections-heading"><div><h3>Connected accounts</h3><p>Connections belong to the owner and are granted to agents by permission.</p></div><i data-lucide="key-round"></i></div>
         <div class="connection-list">
-          <article><div class="service-mark openai">AI</div><div><h3>OpenAI API</h3><p>Server-side project key for approved agents.</p></div><span class="not-connected">Not configured</span><button type="button" data-connection="openai">Setup</button></article>
+          <article><div class="service-mark openai">AI</div><div><h3>OpenAI API</h3><p>Server-side project key for approved agents.</p></div><span class="not-connected" id="openai-connection-state">Checking</span><button type="button" data-connection="openai">Setup</button></article>
           <article><div class="service-mark etsy">E</div><div><h3>Etsy</h3><p>OAuth connection with listing and shop scopes.</p></div><span class="not-connected">Not connected</span><button type="button" data-connection="etsy">Connect</button></article>
           <article><div class="service-mark fiverr-service">F</div><div><h3>Fiverr Seller</h3><p>Assisted workflow for research, gig drafts, creative production, and order tracking.</p></div><span class="assisted-connection">Assisted mode</span><button type="button" data-connection="fiverr">Setup</button></article>
           <article><div class="service-mark kalshi-service">K</div><div><h3>Kalshi</h3><p>Official API connection for personal market data.</p></div><span class="not-connected">Not connected</span><button type="button" data-connection="kalshi">Setup</button></article>

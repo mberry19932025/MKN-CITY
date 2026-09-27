@@ -2,7 +2,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { getPool, initializeDatabase, recordLedgerEvent, getEconomySummary, getBusinessMemories, recordBusinessMemory } = require('./database');
+const { getPool, initializeDatabase, recordLedgerEvent, getEconomySummary, getBusinessMemories, recordBusinessMemory, recordTaskRun, getAgentPerformance } = require('./database');
 
 const port = Number(process.env.PORT || 4173);
 const root = __dirname;
@@ -132,6 +132,25 @@ async function handleMemories(request, response, pathname) {
   return sendJson(response, 201, { recorded: true, ...(await recordBusinessMemory(memory)) });
 }
 
+async function handleTaskRuns(request, response) {
+  if (!founderAuthorized(request)) return sendJson(response, 401, { error: 'Founder access code required.' });
+  if (!getPool()) return sendJson(response, 200, { mode: 'demo', records: [] });
+  if (request.method === 'GET') return sendJson(response, 200, { mode: 'database', records: await getAgentPerformance() });
+  const payload = JSON.parse(await readBody(request));
+  const run = {
+    agentName: cleanText(payload.agentName, 80), department: cleanText(payload.department, 80), taskType: cleanText(payload.taskType, 120),
+    status: cleanText(payload.status, 20), durationMs: Number(payload.durationMs), qualityScore: Number(payload.qualityScore), sourceAccuracy: Number(payload.sourceAccuracy),
+    corrections: Number(payload.corrections || 0), hallucinations: Number(payload.hallucinations || 0), inputTokens: Number(payload.inputTokens || 0), outputTokens: Number(payload.outputTokens || 0),
+    estimatedCostCents: Number(payload.estimatedCostCents || 0), lesson: cleanText(payload.lesson, 500)
+  };
+  const valid = run.agentName && run.department && run.taskType && ['completed', 'retraining', 'failed'].includes(run.status)
+    && Number.isInteger(run.durationMs) && run.durationMs > 0
+    && [run.qualityScore, run.sourceAccuracy].every((value) => Number.isFinite(value) && value >= 0 && value <= 100)
+    && [run.corrections, run.hallucinations, run.inputTokens, run.outputTokens, run.estimatedCostCents].every((value) => Number.isInteger(value) && value >= 0);
+  if (!valid) return sendJson(response, 400, { error: 'Invalid task performance record.' });
+  return sendJson(response, 201, { recorded: true, ...(await recordTaskRun(run)) });
+}
+
 function demoReply(message) {
   const normalized = message.toLowerCase();
   if (normalized.includes('maya')) return 'Maya: I am reviewing trend evidence and will stop once confidence is sufficient. My next report will separate facts from assumptions.';
@@ -226,11 +245,16 @@ const server = http.createServer(async (request, response) => {
       return sendJson(response, 500, { error: 'Business memory could not be processed.' });
     });
   }
+  if ((request.method === 'GET' || request.method === 'POST') && pathname === '/api/task-runs') return handleTaskRuns(request, response).catch((error) => {
+    console.error('Task performance API failed:', error);
+    return sendJson(response, 500, { error: 'Task performance could not be processed.' });
+  });
   if (request.method === 'GET' && pathname === '/api/health') return sendJson(response, 200, {
     status: 'ok',
     build: buildId,
     openai: Boolean(process.env.OPENAI_API_KEY),
     paidAiReady: Boolean(process.env.OPENAI_API_KEY && process.env.FOUNDER_ACCESS_CODE),
+    databaseReady: Boolean(getPool()),
     sportsDataReady: Boolean(process.env.SPORTS_DATA_API_KEY),
     verifiedLedgerReady: Boolean(getPool() && process.env.LEDGER_WEBHOOK_SECRET)
   });

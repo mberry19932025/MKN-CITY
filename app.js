@@ -458,6 +458,60 @@ const officeData = {
   ] }
 };
 
+const trainingSequence = [
+  { agent: 'Maya', role: 'Trend Research', task: 'Verify one demand signal with dated sources.', duration: 420, quality: 86, accuracy: 92, corrections: 1, hallucinations: 0, lesson: 'Use a fixed evidence checklist before expanding the search.' },
+  { agent: 'Marcus', role: 'Thumbnail Design', task: 'Produce one brief-matched concept and self-check it.', duration: 510, quality: 89, accuracy: 94, corrections: 1, hallucinations: 0, lesson: 'Reuse the approved production checklist, not the creative output.' },
+  { agent: 'Avery', role: 'Listing / SEO', task: 'Draft one listing from verified product facts.', duration: 390, quality: 82, accuracy: 88, corrections: 2, hallucinations: 1, lesson: 'Retrain on claim verification before optimizing speed.' },
+  { agent: 'Maya', role: 'Trend Research', task: 'Repeat the evidence workflow on a new demand signal.', duration: 345, quality: 92, accuracy: 97, corrections: 0, hallucinations: 0, lesson: 'Checklist reduced time while improving source accuracy.' },
+  { agent: 'Marcus', role: 'Thumbnail Design', task: 'Create a controlled variation from the approved brief.', duration: 405, quality: 93, accuracy: 96, corrections: 0, hallucinations: 0, lesson: 'A reusable QA pass reduced revision time.' }
+];
+
+function getTrainingRuns() {
+  try { return JSON.parse(localStorage.getItem('mkn-training-runs') || '[]'); }
+  catch { return []; }
+}
+
+function renderLearningEngine() {
+  const runs = getTrainingRuns();
+  const average = (field) => runs.length ? runs.reduce((total, run) => total + run[field], 0) / runs.length : 0;
+  document.querySelector('#learning-task-count').textContent = runs.length;
+  document.querySelector('#learning-quality').textContent = runs.length ? `${average('quality').toFixed(1)}%` : '--';
+  document.querySelector('#learning-speed').textContent = runs.length ? `${average('duration').toFixed(0)} sec` : '--';
+  document.querySelector('#learning-accuracy').textContent = runs.length ? `${average('accuracy').toFixed(1)}%` : '--';
+  document.querySelector('#learning-retraining').textContent = runs.filter((run) => run.status === 'retraining').length;
+  const next = trainingSequence[runs.length % trainingSequence.length];
+  document.querySelector('#learning-agent').textContent = `${next.agent} · ${next.role}`;
+  document.querySelector('#learning-task').textContent = next.task;
+  document.querySelector('#learning-history').innerHTML = runs.length ? runs.slice(-5).reverse().map((run) => `<article><b>${safeDemoText(run.agent)}</b><div><strong>${safeDemoText(run.status === 'retraining' ? 'Retraining assigned' : 'Quality gate passed')}</strong><span>${safeDemoText(run.lesson)}</span></div><small>${run.duration}s · Q${run.quality} · A${run.accuracy}</small></article>`).join('') : '<p>No measured task runs yet.</p>';
+}
+
+document.querySelector('#run-training-task').addEventListener('click', () => {
+  const runs = getTrainingRuns();
+  const sample = trainingSequence[runs.length % trainingSequence.length];
+  const passed = sample.quality >= 85 && sample.accuracy >= 90 && sample.hallucinations === 0;
+  runs.push({ ...sample, status: passed ? 'completed' : 'retraining', recordedAt: new Date().toISOString(), demo: true });
+  localStorage.setItem('mkn-training-runs', JSON.stringify(runs));
+  renderLearningEngine();
+  showToast(passed ? `${sample.agent} passed the quality gate. Workflow lesson saved.` : `${sample.agent} was routed to AI University retraining.`);
+});
+
+async function refreshPlatformReadiness() {
+  const state = document.querySelector('#openai-connection-state');
+  try {
+    const response = await fetch('/api/health', { headers: { Accept: 'application/json' } });
+    const health = response.ok ? await response.json() : {};
+    state.textContent = health.paidAiReady ? 'Live AI ready' : health.openai ? 'Key found · access code needed' : 'Not configured';
+    state.className = health.paidAiReady ? 'connected-state' : 'not-connected';
+    document.querySelector('#learning-engine-state').textContent = health.databaseReady ? 'Database recording ready' : 'Demo training · database needed';
+  } catch {
+    state.textContent = 'Backend unavailable';
+    state.className = 'not-connected';
+  }
+}
+
+renderLearningEngine();
+refreshPlatformReadiness();
+
 try {
   const savedAudit = JSON.parse(localStorage.getItem('mkn-systems-audit') || '{}');
   renderSystemsAudit(Array.isArray(savedAudit.results) ? savedAudit.results : []);
