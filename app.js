@@ -594,7 +594,7 @@ function renderOffice(officeId) {
   officeDescription.textContent = office.description;
   officeShift.innerHTML = `<i></i>${isNightCycle ? 'Low-cost night cycle' : period.phase}`;
   officeDialog.dataset.office = officeId;
-  const zone = `<aside class="office-zone"><i data-lucide="${office.zoneIcon}"></i><div><small>Active location</small><strong>${office.zone}</strong><span>${office.zoneDetail}</span></div><b><i></i> Online</b></aside>`;
+  const zone = `<aside class="office-zone"><i data-lucide="${office.zoneIcon}"></i><div><small>Active location</small><strong>${office.zone}</strong><span>${office.zoneDetail}</span></div><b><i></i> Online</b><button type="button" data-new-work-order="${officeId}"><i data-lucide="clipboard-plus"></i><span>New task</span></button></aside>`;
   const desks = office.agents.map((agent) => {
     const liveStatus = isNightCycle && agent.name !== 'Director' ? 'Consolidating memory'
       : period.schedule === 4 ? 'Knowledge exchange'
@@ -623,9 +623,11 @@ function renderOffice(officeId) {
   const vacancies = Array.from({ length: vacantCount }, (_, index) => `
     <article class="office-desk vacant-desk"><i data-lucide="armchair"></i><strong>${officeId === 'university' ? 'Training station' : `Desk ${office.agents.length + index + 1}`}</strong><span>${officeId === 'university' ? 'Ready for a candidate' : 'Vacant'}</span></article>
   `).join('');
-  officeFloor.innerHTML = zone + ownerDesk + desks + vacancies;
+  const workOrders = getWorkOrders().filter((order) => order.office === officeId).slice(-3).reverse();
+  const taskQueue = `<section class="office-task-queue"><header><strong>Department queue</strong><span>${workOrders.length} shown</span></header>${workOrders.length ? workOrders.map((order) => `<article><div><small>${safeDemoText(order.priority)} priority</small><strong>${safeDemoText(order.name)}</strong><p>${safeDemoText(order.deliverable)}</p></div><b>${safeDemoText(order.status)}</b><button type="button" data-advance-work-order="${safeDemoText(order.id)}">${order.status === 'Complete' ? 'Reopen' : 'Advance'}</button></article>`).join('') : '<p>No custom work orders. Create one to put this department to work.</p>'}</section>`;
+  officeFloor.innerHTML = zone + taskQueue + ownerDesk + desks + vacancies;
   refreshIcons();
-  officeDialog.showModal();
+  if (!officeDialog.open) officeDialog.showModal();
   let discovered;
   try { discovered = new Set(JSON.parse(localStorage.getItem('mkn-discovered-offices') || '[]')); }
   catch { discovered = new Set(); }
@@ -647,6 +649,23 @@ document.querySelectorAll('[data-office]').forEach((district) => district.addEve
 }));
 document.querySelector('[data-enter-founder-office]').addEventListener('click', () => renderOffice('founder'));
 officeFloor.addEventListener('click', (event) => {
+  const advanceButton = event.target.closest('[data-advance-work-order]');
+  if (advanceButton) {
+    const statuses = ['Queued', 'Working', 'QA Review', 'Complete'];
+    const orders = getWorkOrders();
+    const order = orders.find((item) => String(item.id) === advanceButton.dataset.advanceWorkOrder);
+    if (!order) return;
+    order.status = statuses[(statuses.indexOf(order.status) + 1) % statuses.length];
+    order.updatedAt = new Date().toISOString();
+    localStorage.setItem('mkn-work-orders', JSON.stringify(orders));
+    renderOffice(order.office);
+    return showToast(`${order.name} moved to ${order.status}.`);
+  }
+  const workOrderButton = event.target.closest('[data-new-work-order]');
+  if (workOrderButton) {
+    officeDialog.close();
+    return openWorkOrderDialog(workOrderButton.dataset.newWorkOrder);
+  }
   const approvalsButton = event.target.closest('[data-owner-approvals]');
   if (approvalsButton) {
     officeDialog.close();
@@ -657,6 +676,35 @@ officeFloor.addEventListener('click', (event) => {
   officeDialog.close();
   setConsole(true);
   submitCommand(`talk to ${button.dataset.officeCommand}`);
+});
+
+const workOrderDialog = document.querySelector('#work-order-dialog');
+const workOrderForm = document.querySelector('#work-order-form');
+const workOrderLabels = { research: 'Research Brief', creative: 'Creative Brief', business: 'Commerce Job', factory: 'Production Work Order', university: 'Training Assignment', government: 'Capture Task', founder: 'Founder Directive' };
+function getWorkOrders() {
+  try { return JSON.parse(localStorage.getItem('mkn-work-orders') || '[]'); }
+  catch { return []; }
+}
+function openWorkOrderDialog(officeId) {
+  const office = officeData[officeId];
+  document.querySelector('#work-order-office').value = officeId;
+  document.querySelector('#work-order-department').textContent = office?.district || 'Department';
+  document.querySelector('#work-order-title').textContent = workOrderLabels[officeId] || 'Create Work Order';
+  workOrderForm.reset();
+  document.querySelector('#work-order-office').value = officeId;
+  document.querySelector('#work-order-budget').value = '0';
+  workOrderDialog.showModal();
+}
+workOrderForm.addEventListener('submit', (event) => {
+  if (event.submitter?.value === 'cancel') return;
+  const office = document.querySelector('#work-order-office').value;
+  const order = { id: crypto.randomUUID?.() || String(Date.now()), office, name: document.querySelector('#work-order-name').value.trim(), objective: document.querySelector('#work-order-objective').value.trim(), deliverable: document.querySelector('#work-order-deliverable').value.trim(), priority: document.querySelector('#work-order-priority').value, budget: Number(document.querySelector('#work-order-budget').value || 0), status: 'Queued', createdAt: new Date().toISOString() };
+  if (!order.name || !order.objective || !order.deliverable) { event.preventDefault(); return showToast('Complete the assignment, objective, and deliverable.'); }
+  const orders = getWorkOrders();
+  orders.push(order);
+  localStorage.setItem('mkn-work-orders', JSON.stringify(orders.slice(-100)));
+  showToast(`${workOrderLabels[office] || 'Work order'} queued and saved.`);
+  setTimeout(() => renderOffice(office), 0);
 });
 
 const workflowSteps = document.querySelectorAll('.workflow-steps li');

@@ -960,6 +960,20 @@
     </form>
   </dialog>
 
+  <dialog class="property-dialog work-order-dialog" id="work-order-dialog">
+    <form id="work-order-form" method="dialog">
+      <button class="dialog-close" value="cancel" title="Close" aria-label="Close work order"><i data-lucide="x"></i></button>
+      <p class="eyebrow" id="work-order-department">Department</p><h2 id="work-order-title">Create Work Order</h2>
+      <input id="work-order-office" type="hidden">
+      <label for="work-order-name">Assignment</label><input id="work-order-name" required maxlength="100" placeholder="One focused assignment">
+      <label for="work-order-objective">Objective</label><textarea id="work-order-objective" required maxlength="500" rows="3" placeholder="What outcome should this task produce?"></textarea>
+      <label for="work-order-deliverable">Required deliverable</label><input id="work-order-deliverable" required maxlength="160" placeholder="Example: 3 original thumbnail concepts">
+      <div class="work-order-fields"><label><span>Priority</span><select id="work-order-priority"><option>Normal</option><option>High</option><option>Urgent</option></select></label><label><span>Maximum budget</span><input id="work-order-budget" type="number" min="0" step="0.01" value="0"></label></div>
+      <p class="field-note">Saving creates an internal queued task. It does not publish, spend, contact customers, or access an external account.</p>
+      <div class="dialog-actions"><button value="cancel" type="submit">Cancel</button><button class="primary-action" value="default" type="submit"><i data-lucide="clipboard-plus"></i> Queue task</button></div>
+    </form>
+  </dialog>
+
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
   <script src="app.js?v=autonomy-catchup-1"></script>
 </body>
