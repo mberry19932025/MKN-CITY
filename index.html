@@ -189,6 +189,11 @@
         <footer><div><i data-lucide="database"></i><p><strong id="demo-autonomy-status">Autopilot preparing next shift</strong><span>Simulated records persist on this device and have no cash value.</span></p></div><div><button type="button" id="reset-demo-season"><i data-lucide="rotate-ccw"></i> Reset week</button><button type="button" id="advance-demo-day"><i data-lucide="play"></i> Run next demo day</button></div></footer>
       </section>
 
+      <section class="district-readiness" aria-labelledby="district-readiness-title">
+        <header><div><p class="eyebrow">City Buildout</p><h3 id="district-readiness-title">Every District Readiness</h3></div><span id="district-readiness-total">Checking city</span></header>
+        <div id="district-readiness-grid" class="district-readiness-grid"></div>
+      </section>
+
       <section class="workflow-panel" aria-labelledby="workflow-title">
         <div class="workflow-heading">
           <div><p class="eyebrow">Live workflow</p><h3 id="workflow-title">Research report handoff</h3></div>
@@ -351,18 +356,40 @@
       <section class="government-center" aria-labelledby="government-center-title">
         <header><div><p class="eyebrow">Public Sector Division</p><h3 id="government-center-title">Government Contracting Center</h3></div><span><i data-lucide="shield-alert"></i> Readiness required</span></header>
         <div class="government-readiness">
-          <div class="readiness-score"><small>Bid readiness</small><strong>1 / 8</strong><span>Not ready to submit</span></div>
-          <ol>
-            <li class="ready"><i data-lucide="check"></i><span>Human approval authority</span><b>Michh</b></li>
-            <li><i data-lucide="circle"></i><span>Sellable capability + NAICS</span><b>Needed</b></li>
-            <li><i data-lucide="circle"></i><span>Active SAM registration + UEI</span><b>Verify</b></li>
-            <li><i data-lucide="circle"></i><span>Annual representations and certifications</span><b>Verify</b></li>
-            <li><i data-lucide="circle"></i><span>One-page capability statement</span><b>Needed</b></li>
-            <li><i data-lucide="circle"></i><span>Target agencies + opportunity profile</span><b>Needed</b></li>
-            <li><i data-lucide="circle"></i><span>Documented pricing + delivery capacity</span><b>Needed</b></li>
-            <li><i data-lucide="circle"></i><span>Past-performance evidence</span><b>Needed</b></li>
+          <div class="readiness-score"><small>Bid readiness</small><strong id="contract-readiness-score">1 / 10</strong><span id="contract-readiness-label">Not ready to submit</span></div>
+          <ol id="contract-readiness-list">
+            <li class="ready" data-readiness="owner"><i data-lucide="check"></i><span>Human approval authority</span><b>Michh</b></li>
+            <li data-readiness="identity"><i data-lucide="circle"></i><span>Legal entity + UEI</span><b>Needed</b></li>
+            <li data-readiness="sam"><i data-lucide="circle"></i><span>Active SAM registration</span><b>Verify</b></li>
+            <li data-readiness="naics"><i data-lucide="circle"></i><span>Sellable capability + NAICS</span><b>Needed</b></li>
+            <li data-readiness="reps"><i data-lucide="circle"></i><span>Annual representations and certifications</span><b>Verify</b></li>
+            <li data-readiness="statement"><i data-lucide="circle"></i><span>One-page capability statement</span><b>Needed</b></li>
+            <li data-readiness="targets"><i data-lucide="circle"></i><span>Target agencies + opportunity profile</span><b>Needed</b></li>
+            <li data-readiness="pricing"><i data-lucide="circle"></i><span>Pricing + delivery capacity</span><b>Needed</b></li>
+            <li data-readiness="performance"><i data-lucide="circle"></i><span>Past-performance evidence</span><b>Needed</b></li>
+            <li data-readiness="security"><i data-lucide="circle"></i><span>Security + compliance review</span><b>Needed</b></li>
           </ol>
         </div>
+        <details class="contractor-file">
+          <summary><span><i data-lucide="briefcase-business"></i><strong>Contractor Readiness File</strong></span><b>Configure</b></summary>
+          <form id="contractor-profile-form">
+            <label><span>Legal business name</span><input name="legalName" type="text" autocomplete="organization"></label>
+            <label><span>UEI</span><input name="uei" type="text" maxlength="12" placeholder="12-character UEI"></label>
+            <label><span>SAM expiration</span><input name="samExpiration" type="date"></label>
+            <label><span>NAICS code(s)</span><input name="naics" type="text" placeholder="Comma-separated codes"></label>
+            <label><span>Target agencies</span><input name="agencies" type="text" placeholder="Agencies that buy your service"></label>
+            <label><span>Opportunity keywords</span><input name="keywords" type="text" placeholder="Services and notice keywords"></label>
+            <label class="wide-field"><span>Capability statement</span><textarea name="capabilityStatement" rows="3" placeholder="Core competencies, differentiators, company data, and contact details"></textarea></label>
+            <label><span>Pricing basis</span><input name="pricing" type="text" placeholder="Documented rates or cost method"></label>
+            <label><span>Delivery capacity</span><input name="capacity" type="text" placeholder="People, volume, schedule"></label>
+            <label class="wide-field"><span>Past-performance evidence</span><textarea name="pastPerformance" rows="2" placeholder="Customer, scope, dates, outcome, and reference you can verify"></textarea></label>
+            <label class="wide-field"><span>Security and compliance controls</span><textarea name="security" rows="2" placeholder="Data handling, access controls, insurance, licenses, or required reviews"></textarea></label>
+            <label><span>Opportunity watch</span><select name="watchCadence"><option value="off">Off</option><option value="shift">Every autonomous shift</option><option value="daily">Daily when city is online</option></select></label>
+            <label class="verification-check"><input name="annualReps" type="checkbox"><span>Annual SAM representations reviewed and current</span></label>
+            <label class="verification-check"><input name="complianceReview" type="checkbox"><span>Founder/legal compliance review completed</span></label>
+            <footer><button type="submit"><i data-lucide="save"></i> Save contractor file</button><button type="button" id="export-contract-packet"><i data-lucide="download"></i> Export review packet</button></footer>
+          </form>
+        </details>
         <div class="contract-agent-grid">
           <article><i data-lucide="radar"></i><strong>Opportunity Scout</strong><span>Find matching notices</span></article>
           <article><i data-lucide="scan-search"></i><strong>Capture Analyst</strong><span>Recommend bid / no-bid</span></article>

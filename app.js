@@ -106,7 +106,34 @@ function updateApprovalCount() {
   document.querySelector('#nav-approval-count').textContent = waiting;
   document.querySelector('#approval-summary').textContent = waiting ? `${waiting} ${waiting === 1 ? 'decision' : 'decisions'} waiting` : 'All decisions reviewed';
   document.querySelector('.notification-dot').hidden = waiting === 0;
+  renderDistrictReadiness();
 }
+
+function renderDistrictReadiness() {
+  const grid = document.querySelector('#district-readiness-grid');
+  if (!grid) return;
+  const decisionsWaiting = decisionKeys.filter((key) => !localStorage.getItem(key)).length;
+  const contractProfile = typeof contractorReadiness === 'function' ? contractorReadiness() : {};
+  const contractReady = Object.values(contractProfile).filter(Boolean).length;
+  const districts = [
+    { office: 'research', icon: 'microscope', name: 'Research Lab', ready: true, detail: 'Agents assigned · evidence rules active' },
+    { office: 'creative', icon: 'palette', name: 'Creative Studio', ready: true, detail: 'Production role ready · live orders need an account' },
+    { office: 'business', icon: 'shopping-bag', name: 'Commerce & Ops', ready: false, detail: 'Connect a marketplace before real publishing' },
+    { office: 'factory', icon: 'factory', name: 'Production Works', ready: true, detail: 'Demo queue active · real work needs approved orders' },
+    { office: 'university', icon: 'graduation-cap', name: 'AI University', ready: true, detail: 'Training, exams, and probation roles active' },
+    { office: 'government', icon: 'landmark', name: 'Contracting Center', ready: contractReady === 10, detail: `${contractReady}/10 contractor requirements ready` },
+    { office: 'founder', icon: 'crown', name: 'Founder Tower', ready: decisionsWaiting === 0, detail: decisionsWaiting ? `${decisionsWaiting} owner decisions waiting` : 'Decision queue reviewed' }
+  ];
+  const readyCount = districts.filter((district) => district.ready).length;
+  document.querySelector('#district-readiness-total').textContent = `${readyCount}/${districts.length} operational`;
+  grid.innerHTML = districts.map((district) => `<button type="button" data-readiness-office="${district.office}" class="${district.ready ? 'district-ready' : 'district-gap'}"><i data-lucide="${district.icon}"></i><div><strong>${district.name}</strong><span>${district.detail}</span></div><b>${district.ready ? 'Ready' : 'Missing'}</b></button>`).join('');
+  refreshIcons();
+}
+
+document.querySelector('#district-readiness-grid').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-readiness-office]');
+  if (button) renderOffice(button.dataset.readinessOffice);
+});
 
 const autopilotMode = document.querySelector('#autopilot-mode');
 const savedAutopilotMode = localStorage.getItem('mkn-autopilot-mode') || 'guarded';
@@ -1236,8 +1263,8 @@ document.querySelectorAll('.validation-request').forEach((request) => {
     status.textContent = decision === 'approved' ? 'Approved by Michh' : 'Declined by Michh';
     status.style.background = decision === 'approved' ? 'var(--green-soft)' : '#f8e7e3';
     status.style.color = decision === 'approved' ? 'var(--green)' : '#9b3d31';
-    approve.disabled = true;
-    decline.disabled = true;
+    approve.classList.toggle('decision-selected', decision === 'approved');
+    decline.classList.toggle('decision-selected', decision === 'declined');
     localStorage.setItem('mkn-validation-decision', decision);
     updateApprovalCount();
   };
@@ -1275,8 +1302,8 @@ const staffingDecline = staffingRequest.querySelector('.decline-button');
 function resolveStaffing(decision) {
   staffingStatus.textContent = decision === 'approved' ? 'Approved by Michh' : 'Declined by Michh';
   staffingStatus.style.color = decision === 'approved' ? 'var(--green)' : '#9b3d31';
-  staffingApprove.disabled = true;
-  staffingDecline.disabled = true;
+  staffingApprove.classList.toggle('decision-selected', decision === 'approved');
+  staffingDecline.classList.toggle('decision-selected', decision === 'declined');
   localStorage.setItem('mkn-staffing-decision', decision);
   updateApprovalCount();
 }
@@ -1295,8 +1322,8 @@ function resolveOpportunity0142(decision) {
   opportunity0142Status.textContent = decision === 'approved' ? 'Approved by Michh' : 'Declined by Michh';
   opportunity0142Status.style.background = decision === 'approved' ? 'var(--green-soft)' : '#f8e7e3';
   opportunity0142Status.style.color = decision === 'approved' ? 'var(--green)' : '#9b3d31';
-  opportunity0142Approve.disabled = true;
-  opportunity0142Decline.disabled = true;
+  opportunity0142Approve.classList.toggle('decision-selected', decision === 'approved');
+  opportunity0142Decline.classList.toggle('decision-selected', decision === 'declined');
   localStorage.setItem('mkn-opportunity-0142-decision', decision);
   updateApprovalCount();
 }
@@ -1309,7 +1336,13 @@ if (savedOpportunity0142) resolveOpportunity0142(savedOpportunity0142);
 document.querySelector('#reset-demo-decisions').addEventListener('click', () => {
   decisionKeys.forEach((key) => localStorage.removeItem(key));
   localStorage.removeItem('mkn-memory-00241-reviewed');
-  window.location.reload();
+  [staffingApprove, staffingDecline, opportunity0142Approve, opportunity0142Decline].forEach((button) => button.classList.remove('decision-selected'));
+  document.querySelectorAll('.validation-request').forEach((request) => request.querySelectorAll('.decision-selected').forEach((button) => button.classList.remove('decision-selected')));
+  staffingStatus.textContent = 'Owner approval required';
+  opportunity0142Status.textContent = '78% confidence';
+  document.querySelector('.validation-request header > span').textContent = 'Awaiting Michh';
+  updateApprovalCount();
+  showToast('Demo decisions reset. All approval buttons are active.');
 });
 
 updateApprovalCount();
@@ -1471,12 +1504,82 @@ async function submitCommand(command, { skipLocal = false } = {}) {
 }
 
 const bidIntakeForm = document.querySelector('#bid-intake-form');
+const contractorProfileForm = document.querySelector('#contractor-profile-form');
+
+function getContractorProfile() {
+  try { return JSON.parse(localStorage.getItem('mkn-contractor-profile') || '{}'); }
+  catch { return {}; }
+}
+
+function contractorReadiness(profile = getContractorProfile()) {
+  const samActive = profile.samExpiration && new Date(`${profile.samExpiration}T23:59:59`) > new Date();
+  return {
+    owner: true,
+    identity: Boolean(profile.legalName && /^[A-Z0-9]{12}$/i.test(profile.uei || '')),
+    sam: Boolean(samActive),
+    naics: Boolean(profile.naics && profile.capabilityStatement),
+    reps: Boolean(profile.annualReps),
+    statement: Boolean((profile.capabilityStatement || '').length >= 80),
+    targets: Boolean(profile.agencies && profile.keywords),
+    pricing: Boolean(profile.pricing && profile.capacity),
+    performance: Boolean((profile.pastPerformance || '').length >= 30),
+    security: Boolean((profile.security || '').length >= 20 && profile.complianceReview)
+  };
+}
+
+function renderContractorProfile() {
+  const profile = getContractorProfile();
+  [...contractorProfileForm.elements].forEach((field) => {
+    if (!field.name) return;
+    if (field.type === 'checkbox') field.checked = Boolean(profile[field.name]);
+    else field.value = profile[field.name] || '';
+  });
+  const readiness = contractorReadiness(profile);
+  const complete = Object.values(readiness).filter(Boolean).length;
+  document.querySelector('#contract-readiness-score').textContent = `${complete} / ${Object.keys(readiness).length}`;
+  document.querySelector('#contract-readiness-label').textContent = complete === 10 ? 'Ready for opportunity-specific review' : 'Not ready to submit';
+  document.querySelectorAll('[data-readiness]').forEach((item) => {
+    const ready = readiness[item.dataset.readiness];
+    item.classList.toggle('ready', ready);
+    item.querySelector('svg')?.setAttribute('data-lucide', ready ? 'check' : 'circle');
+    item.querySelector('b').textContent = ready ? 'Ready' : 'Needed';
+  });
+  refreshIcons();
+  renderDistrictReadiness();
+}
+
+contractorProfileForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const data = new FormData(contractorProfileForm);
+  const profile = Object.fromEntries(data.entries());
+  profile.annualReps = contractorProfileForm.elements.annualReps.checked;
+  profile.complianceReview = contractorProfileForm.elements.complianceReview.checked;
+  profile.updatedAt = new Date().toISOString();
+  localStorage.setItem('mkn-contractor-profile', JSON.stringify(profile));
+  renderContractorProfile();
+  showToast('Contractor readiness file saved. Unverified gaps remain marked.');
+});
+
+document.querySelector('#export-contract-packet').addEventListener('click', () => {
+  const profile = getContractorProfile();
+  const packet = { exportedAt: new Date().toISOString(), profile, readiness: contractorReadiness(profile), bidIntake: JSON.parse(localStorage.getItem('mkn-bid-intake') || 'null'), warning: 'Review packet only. Not an offer, certification, signature, or submission.' };
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' }));
+  link.download = `mkn-contract-readiness-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+  showToast('Contract readiness review packet exported.');
+});
+
+renderContractorProfile();
+
 bidIntakeForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const notice = document.querySelector('#bid-notice').value.trim();
   const capability = document.querySelector('#bid-capability').value.trim();
   if (!notice || !capability) return showToast('Add the exact notice and a verified capability summary first.');
-  const intake = { notice, capability, createdAt: new Date().toISOString(), status: 'research-requested' };
+  const readiness = contractorReadiness();
+  const intake = { notice, capability, createdAt: new Date().toISOString(), status: 'research-requested', readiness };
   localStorage.setItem('mkn-bid-intake', JSON.stringify(intake));
   let liveAi = false;
   try {
