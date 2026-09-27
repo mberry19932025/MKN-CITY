@@ -66,6 +66,15 @@ document.querySelectorAll('[data-open-view]').forEach((button) => {
   button.addEventListener('click', () => openView(button.dataset.openView));
 });
 
+const businessPanelGroups = { commerce: ['.etsy-division', '.fiverr-operations', '.care-center', '.customer-ledger'], production: ['.production-works', '.city-growth-path', '.handoff-pipeline'], government: ['.government-center'], property: ['.property-heading', '.property-grid', '.upgrade-path', '.closed-business'], finance: ['.profit-calculator', '.leverage-comparison'], outreach: ['.outreach-workflow', '.opportunity-report'] };
+function openBusinessTab(tabId) {
+  Object.entries(businessPanelGroups).forEach(([group, selectors]) => selectors.forEach((selector) => document.querySelectorAll(`#businesses > ${selector}`).forEach((panel) => { panel.hidden = group !== tabId; })));
+  document.querySelectorAll('[data-business-tab]').forEach((button) => { const active = button.dataset.businessTab === tabId; button.classList.toggle('active', active); button.setAttribute('aria-selected', String(active)); });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.querySelectorAll('[data-business-tab]').forEach((button) => button.addEventListener('click', () => openBusinessTab(button.dataset.businessTab)));
+openBusinessTab('commerce');
+
 function getCampaignState() {
   try { return JSON.parse(localStorage.getItem('mkn-revenue-campaign') || '{"engine":"service","step":0}'); }
   catch { return { engine: 'service', step: 0 }; }
