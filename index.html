@@ -551,6 +551,13 @@
         <div class="leverage-equation"><strong>1 design contract</strong><i data-lucide="equal"></i><strong>25 shirt profits</strong><span>before the service's own production costs</span></div>
       </section>
     </section>
+    <section class="view" id="analytics" aria-labelledby="analytics-title">
+      <div class="analytics-heading"><div><p class="eyebrow">City Intelligence</p><h2 id="analytics-title">Analytics Center</h2><p>Performance, economics, and agent learning in one dedicated workspace.</p></div><div><button type="button" data-open-view="treasury"><i data-lucide="landmark"></i> Treasury</button><button type="button" data-open-view="markets"><i data-lucide="chart-candlestick"></i> Markets</button></div></div>
+      <div class="analytics-kpis"><article><small>Demo revenue</small><strong id="analytics-revenue">$0.00</strong><span>Simulation only</span></article><article><small>Demo net</small><strong id="analytics-net">$0.00</strong><span>Revenue minus recorded costs</span></article><article><small>Tasks completed</small><strong id="analytics-tasks">0</strong><span>Across rolling demo weeks</span></article><article><small>Agent quality</small><strong id="analytics-quality">--</strong><span>Measured training average</span></article></div>
+      <section class="analytics-chart-panel" aria-labelledby="revenue-chart-title"><header><div><p class="eyebrow">Rolling Performance</p><h3 id="revenue-chart-title">Revenue and expense by shift</h3></div><span>Latest 14 shifts</span></header><div class="analytics-chart" id="analytics-revenue-chart"><p>Run a demo shift to populate this graph.</p></div><footer><span><i class="revenue-key"></i> Revenue</span><span><i class="expense-key"></i> Expense</span></footer></section>
+      <div id="analytics-home" class="analytics-home"></div>
+    </section>
+
     <section class="view" id="approvals" aria-labelledby="approvals-title">
       <div class="approval-page-heading"><div><p class="eyebrow">Mayor's Desk</p><h2 id="approvals-title">Approvals</h2></div><div><span id="approval-summary">3 decisions waiting</span><button type="button" id="reset-demo-decisions"><i data-lucide="rotate-ccw"></i> Reset demo decisions</button></div></div>
       <section class="big-boss-policy" aria-labelledby="big-boss-policy-title">
@@ -807,10 +814,10 @@
     <button class="nav-item active" data-view="city" type="button"><i data-lucide="map"></i><span>City</span></button>
     <button class="nav-item" data-view="agents" type="button"><i data-lucide="bot"></i><span>Agents</span></button>
     <button class="nav-item" data-view="businesses" type="button"><i data-lucide="store"></i><span>Business</span></button>
+    <button class="nav-item" data-view="analytics" type="button"><i data-lucide="chart-no-axes-combined"></i><span>Analytics</span></button>
     <button class="nav-item approval-link" data-view="approvals" type="button"><i data-lucide="circle-check-big"></i><span>Approvals</span><b id="nav-approval-count">3</b></button>
     <button class="nav-item" data-view="memory" type="button"><i data-lucide="brain"></i><span>Memory</span></button>
     <button class="nav-item" data-view="treasury" type="button"><i data-lucide="landmark"></i><span>Treasury</span></button>
-    <button class="nav-item" data-view="markets" type="button"><i data-lucide="chart-candlestick"></i><span>Markets</span></button>
     <button class="nav-item" data-view="account" type="button"><i data-lucide="circle-user-round"></i><span>Account</span></button>
   </nav>
 

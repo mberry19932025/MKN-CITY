@@ -174,7 +174,12 @@ const founderDeck = document.querySelector('.game-command-deck');
 const founderCard = document.querySelector('.founder-command-card');
 if (founderDeck && founderCard) founderCard.after(founderDeck);
 const demoSeasonPanel = document.querySelector('#demo-season');
-if (founderDeck && demoSeasonPanel) founderDeck.after(demoSeasonPanel);
+const analyticsHome = document.querySelector('#analytics-home');
+if (analyticsHome && demoSeasonPanel) analyticsHome.append(demoSeasonPanel);
+['.learning-engine', '.monthly-target'].forEach((selector) => {
+  const panel = document.querySelector(selector);
+  if (analyticsHome && panel) analyticsHome.append(panel);
+});
 const enterCityFocus = document.querySelector('#enter-city-focus');
 const exitCityFocus = document.querySelector('#exit-city-focus');
 
@@ -306,11 +311,25 @@ function renderDemoSeason() {
   document.querySelector('#season-health').textContent = health;
   document.querySelector('#season-health-fill').style.width = `${health}%`;
   renderGrowthPlan(totals);
+  renderAnalytics(totals);
   updateCityGrowth(net);
   document.querySelector('#season-ledger').innerHTML = season.records.length ? season.records.slice().reverse().map((record) => `<article><b>W${record.week || 1} · D${record.day}</b><div><strong>${safeDemoText(record.work)}</strong><span>${safeDemoText(record.lesson)}</span></div><small>${record.tasks} tasks · $${record.revenue.toFixed(2)} revenue · $${record.expenses.toFixed(2)} cost</small></article>`).join('') : '<p>No simulated workdays recorded yet.</p>';
   document.querySelector('#advance-demo-day').disabled = false;
   document.querySelector('#advance-demo-day').innerHTML = season.day >= 7 ? '<i data-lucide="rotate-cw"></i> Start next week' : '<i data-lucide="play"></i> Run next demo day';
   refreshIcons();
+}
+
+function renderAnalytics(totals = { tasks: 0, revenue: 0, expenses: 0 }) {
+  const net = totals.revenue - totals.expenses;
+  const runs = typeof getTrainingRuns === 'function' ? getTrainingRuns() : [];
+  const quality = runs.length ? runs.reduce((sum, run) => sum + run.quality, 0) / runs.length : 0;
+  document.querySelector('#analytics-revenue').textContent = `$${totals.revenue.toFixed(2)}`;
+  document.querySelector('#analytics-net').textContent = `${net < 0 ? '-' : ''}$${Math.abs(net).toFixed(2)}`;
+  document.querySelector('#analytics-tasks').textContent = totals.tasks;
+  document.querySelector('#analytics-quality').textContent = runs.length ? `${quality.toFixed(1)}%` : '--';
+  const records = getDemoSeason().records.slice(-14);
+  const maxValue = Math.max(1, ...records.flatMap((record) => [record.revenue, record.expenses]));
+  document.querySelector('#analytics-revenue-chart').innerHTML = records.length ? records.map((record) => `<article title="Week ${record.week || 1}, Day ${record.day}"><div><i class="chart-revenue" style="height:${Math.max(2, (record.revenue / maxValue) * 100)}%"></i><i class="chart-expense" style="height:${Math.max(2, (record.expenses / maxValue) * 100)}%"></i></div><small>W${record.week || 1}D${record.day}</small></article>`).join('') : '<p>Run a demo shift to populate this graph.</p>';
 }
 
 function updateCityGrowth(netProfit) {
@@ -500,6 +519,9 @@ function renderLearningEngine() {
   document.querySelector('#learning-agent').textContent = `${next.agent} · ${next.role}`;
   document.querySelector('#learning-task').textContent = next.task;
   document.querySelector('#learning-history').innerHTML = runs.length ? runs.slice(-5).reverse().map((run) => `<article><b>${safeDemoText(run.agent)}</b><div><strong>${safeDemoText(run.status === 'retraining' ? 'Retraining assigned' : 'Quality gate passed')}</strong><span>${safeDemoText(run.lesson)}</span></div><small>${run.duration}s · Q${run.quality} · A${run.accuracy}</small></article>`).join('') : '<p>No measured task runs yet.</p>';
+  const season = getDemoSeason();
+  const totals = season.records.reduce((sum, record) => ({ tasks: sum.tasks + record.tasks, revenue: sum.revenue + record.revenue, expenses: sum.expenses + record.expenses }), { tasks: 0, revenue: 0, expenses: 0 });
+  renderAnalytics(totals);
 }
 
 document.querySelector('#run-training-task').addEventListener('click', () => {
@@ -1511,6 +1533,7 @@ function runLocalCommand(command) {
   const routes = [
     { terms: ['show agents', 'view agents', 'go to agents'], view: 'agents', reply: 'Opening the Employment Center and agent roster.' },
     { terms: ['show businesses', 'view businesses', 'go to business'], view: 'businesses', reply: 'Opening the Business District.' },
+    { terms: ['show analytics', 'view analytics', 'show graphs', 'performance dashboard'], view: 'analytics', reply: 'Opening the Analytics Center.' },
     { terms: ['government contract', 'contracting center', 'show government', 'sam.gov', 'sam gov'], view: 'businesses', office: 'government', reply: 'Opening the Government Contracting Center. Readiness must be verified before any bid is submitted.' },
     { terms: ['show approvals', 'view approvals', 'go to approvals'], view: 'approvals', reply: 'Opening your approval queue.' },
     { terms: ['autopilot off', 'manual approvals'], view: 'approvals', reply: 'Opening Approvals. Set Big Boss Autopilot to Manual to keep every decision with you.' },
