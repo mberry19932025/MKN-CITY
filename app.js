@@ -332,12 +332,15 @@ function updateCityGrowth(netProfit) {
 
 const demoAutonomy = document.querySelector('#demo-autonomy');
 const demoAutonomyStatus = document.querySelector('#demo-autonomy-status');
+const DEMO_SHIFT_MS = 60_000;
 demoAutonomy.checked = localStorage.getItem('mkn-demo-autonomy') !== 'paused';
 
 function updateDemoAutonomyStatus() {
   const season = getDemoSeason();
+  const lastRun = Date.parse(localStorage.getItem('mkn-demo-last-run') || '') || Date.now();
+  const seconds = Math.max(0, Math.ceil((DEMO_SHIFT_MS - (Date.now() - lastRun)) / 1000));
   demoAutonomyStatus.textContent = season.day >= 7 ? 'Proof week complete · Director review ready'
-    : demoAutonomy.checked ? 'Autopilot active · next shift runs automatically'
+    : demoAutonomy.checked ? `Autopilot active · next shift in ${seconds}s`
     : 'Autopilot paused by Founder';
 }
 
@@ -356,11 +359,26 @@ function runDemoDay(source = 'manual') {
   return true;
 }
 
+function catchUpAutonomousShifts() {
+  if (!demoAutonomy.checked || getDemoSeason().day >= 7) return updateDemoAutonomyStatus();
+  let lastRun = Date.parse(localStorage.getItem('mkn-demo-last-run') || '');
+  if (!Number.isFinite(lastRun)) {
+    lastRun = Date.now() - DEMO_SHIFT_MS;
+    localStorage.setItem('mkn-demo-last-run', new Date(lastRun).toISOString());
+  }
+  const due = Math.min(3, Math.floor((Date.now() - lastRun) / DEMO_SHIFT_MS), 7 - getDemoSeason().day);
+  for (let index = 0; index < due; index += 1) runDemoDay('autonomous');
+  if (due > 0) localStorage.setItem('mkn-demo-last-run', new Date(lastRun + (due * DEMO_SHIFT_MS)).toISOString());
+  updateDemoAutonomyStatus();
+}
+
 document.querySelector('#advance-demo-day').addEventListener('click', () => runDemoDay('manual'));
 document.querySelector('#run-systems-audit').addEventListener('click', () => runSystemsAudit());
 
 demoAutonomy.addEventListener('change', () => {
   localStorage.setItem('mkn-demo-autonomy', demoAutonomy.checked ? 'active' : 'paused');
+  if (demoAutonomy.checked) localStorage.setItem('mkn-demo-last-run', new Date(Date.now() - DEMO_SHIFT_MS).toISOString());
+  catchUpAutonomousShifts();
   updateDemoAutonomyStatus();
   showToast(demoAutonomy.checked ? 'Autonomous demo shifts enabled.' : 'Autonomous demo shifts paused.');
 });
@@ -370,7 +388,7 @@ document.querySelector('#reset-demo-season').addEventListener('click', () => {
   localStorage.removeItem('mkn-demo-season');
   localStorage.removeItem('mkn-demo-last-run');
   renderDemoSeason();
-  updateDemoAutonomyStatus();
+  setTimeout(catchUpAutonomousShifts, 750);
   showToast('Seven-day demo season reset.');
 });
 
@@ -415,13 +433,10 @@ growthForm.addEventListener('submit', (event) => {
 });
 
 renderDemoSeason();
-updateDemoAutonomyStatus();
-setTimeout(() => {
-  if (demoAutonomy.checked) runDemoDay('autonomous');
-}, 12000);
-setInterval(() => {
-  if (demoAutonomy.checked && document.visibilityState === 'visible') runDemoDay('autonomous');
-}, 90000);
+catchUpAutonomousShifts();
+setInterval(catchUpAutonomousShifts, 15_000);
+setInterval(updateDemoAutonomyStatus, 1_000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') catchUpAutonomousShifts(); });
 const officeData = {
   research: { district: 'Research District', title: 'Market Intelligence Lab', description: 'Evidence collection, source checks, and opportunity reports.', zone: 'Evidence Bay', zoneDetail: 'Trend wall active · source verification in progress', zoneIcon: 'scan-search', agents: [
     { name: 'Maya', role: 'Trend Researcher', task: 'Find and verify one product trend', sprite: 'research-sprite', status: 'Researching' },
