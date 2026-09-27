@@ -1371,6 +1371,12 @@ staffingDecline.addEventListener('click', () => { resolveStaffing('declined'); s
 const savedStaffingDecision = localStorage.getItem('mkn-staffing-decision');
 if (savedStaffingDecision) resolveStaffing(savedStaffingDecision);
 
+window.addEventListener('pageshow', () => {
+  document.querySelectorAll('#approvals .approve-button, #approvals .decline-button').forEach((button) => { button.disabled = false; });
+  const staffingDecision = localStorage.getItem('mkn-staffing-decision');
+  if (staffingDecision) resolveStaffing(staffingDecision);
+});
+
 const opportunity0142 = document.querySelector('#opportunity-0142');
 const opportunity0142Status = opportunity0142.querySelector('header > span');
 const opportunity0142Approve = opportunity0142.querySelector('.approve-button');
