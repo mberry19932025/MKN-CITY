@@ -247,8 +247,8 @@ async function runSystemsAudit({ quiet = false } = {}) {
 }
 
 function getDemoSeason() {
-  try { return JSON.parse(localStorage.getItem('mkn-demo-season') || '{"day":0,"records":[]}'); }
-  catch { return { day: 0, records: [] }; }
+  try { return { week: 1, ...JSON.parse(localStorage.getItem('mkn-demo-season') || '{"day":0,"records":[]}') }; }
+  catch { return { week: 1, day: 0, records: [] }; }
 }
 
 const defaultGrowthPlan = { capital: 200, reserve: 100, activeCapital: 40, experimentCap: 20, revenueGoal: 300, reinvest: 25 };
@@ -298,7 +298,7 @@ function renderDemoSeason() {
   const totals = season.records.reduce((sum, record) => ({ tasks: sum.tasks + record.tasks, revenue: sum.revenue + record.revenue, expenses: sum.expenses + record.expenses }), { tasks: 0, revenue: 0, expenses: 0 });
   const net = totals.revenue - totals.expenses;
   const health = Math.max(0, Math.min(100, Math.round(50 + (net / 4) + (totals.tasks * .35))));
-  document.querySelector('#season-day').textContent = `${season.day} / 7`;
+  document.querySelector('#season-day').textContent = `${season.day} / 7 · W${season.week || 1}`;
   document.querySelector('#season-tasks').textContent = totals.tasks;
   document.querySelector('#season-revenue').textContent = `$${totals.revenue.toFixed(2)}`;
   document.querySelector('#season-expenses').textContent = `$${totals.expenses.toFixed(2)}`;
@@ -307,9 +307,9 @@ function renderDemoSeason() {
   document.querySelector('#season-health-fill').style.width = `${health}%`;
   renderGrowthPlan(totals);
   updateCityGrowth(net);
-  document.querySelector('#season-ledger').innerHTML = season.records.length ? season.records.slice().reverse().map((record) => `<article><b>Day ${record.day}</b><div><strong>${safeDemoText(record.work)}</strong><span>${safeDemoText(record.lesson)}</span></div><small>${record.tasks} tasks · $${record.revenue.toFixed(2)} revenue · $${record.expenses.toFixed(2)} cost</small></article>`).join('') : '<p>No simulated workdays recorded yet.</p>';
-  document.querySelector('#advance-demo-day').disabled = season.day >= 7;
-  document.querySelector('#advance-demo-day').innerHTML = season.day >= 7 ? '<i data-lucide="check"></i> Week complete' : '<i data-lucide="play"></i> Run next demo day';
+  document.querySelector('#season-ledger').innerHTML = season.records.length ? season.records.slice().reverse().map((record) => `<article><b>W${record.week || 1} · D${record.day}</b><div><strong>${safeDemoText(record.work)}</strong><span>${safeDemoText(record.lesson)}</span></div><small>${record.tasks} tasks · $${record.revenue.toFixed(2)} revenue · $${record.expenses.toFixed(2)} cost</small></article>`).join('') : '<p>No simulated workdays recorded yet.</p>';
+  document.querySelector('#advance-demo-day').disabled = false;
+  document.querySelector('#advance-demo-day').innerHTML = season.day >= 7 ? '<i data-lucide="rotate-cw"></i> Start next week' : '<i data-lucide="play"></i> Run next demo day';
   refreshIcons();
 }
 
@@ -339,17 +339,20 @@ function updateDemoAutonomyStatus() {
   const season = getDemoSeason();
   const lastRun = Date.parse(localStorage.getItem('mkn-demo-last-run') || '') || Date.now();
   const seconds = Math.max(0, Math.ceil((DEMO_SHIFT_MS - (Date.now() - lastRun)) / 1000));
-  demoAutonomyStatus.textContent = season.day >= 7 ? 'Proof week complete · Director review ready'
-    : demoAutonomy.checked ? `Autopilot active · next shift in ${seconds}s`
+  demoAutonomyStatus.textContent = demoAutonomy.checked ? `${season.day >= 7 ? 'Week complete · next cycle' : 'Autopilot active · next shift'} in ${seconds}s`
     : 'Autopilot paused by Founder';
 }
 
 function runDemoDay(source = 'manual') {
   const season = getDemoSeason();
-  if (season.day >= 7) return false;
+  if (season.day >= 7) {
+    season.day = 0;
+    season.week = (season.week || 1) + 1;
+  }
   const plan = demoDayPlans[season.day];
   season.day += 1;
-  season.records.push({ day: season.day, recordedAt: new Date().toISOString(), source, ...plan });
+  season.records.push({ week: season.week || 1, day: season.day, recordedAt: new Date().toISOString(), source, ...plan });
+  season.records = season.records.slice(-35);
   localStorage.setItem('mkn-demo-season', JSON.stringify(season));
   localStorage.setItem('mkn-demo-last-run', new Date().toISOString());
   renderDemoSeason();
@@ -360,13 +363,13 @@ function runDemoDay(source = 'manual') {
 }
 
 function catchUpAutonomousShifts() {
-  if (!demoAutonomy.checked || getDemoSeason().day >= 7) return updateDemoAutonomyStatus();
+  if (!demoAutonomy.checked) return updateDemoAutonomyStatus();
   let lastRun = Date.parse(localStorage.getItem('mkn-demo-last-run') || '');
   if (!Number.isFinite(lastRun)) {
     lastRun = Date.now() - DEMO_SHIFT_MS;
     localStorage.setItem('mkn-demo-last-run', new Date(lastRun).toISOString());
   }
-  const due = Math.min(3, Math.floor((Date.now() - lastRun) / DEMO_SHIFT_MS), 7 - getDemoSeason().day);
+  const due = Math.min(3, Math.floor((Date.now() - lastRun) / DEMO_SHIFT_MS));
   for (let index = 0; index < due; index += 1) runDemoDay('autonomous');
   if (due > 0) localStorage.setItem('mkn-demo-last-run', new Date(lastRun + (due * DEMO_SHIFT_MS)).toISOString());
   updateDemoAutonomyStatus();
