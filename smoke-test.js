@@ -29,12 +29,21 @@ async function run() {
 
   const home = await fetch(`${base}/?smoke=1`);
   assert.equal(home.status, 200);
-  assert.match(await home.text(), /MKN AI City/);
+  const homeMarkup = await home.text();
+  assert.match(homeMarkup, /MKN AI City/);
+  assert.match(homeMarkup, /id="opportunity-0142-approve"/);
+  assert.match(homeMarkup, /id="staffing-approve"/);
+  assert.match(homeMarkup, /id="property-approval-slot"/);
+  assert.match(homeMarkup, /data-view="analytics"/);
   assert.match(home.headers.get('cache-control'), /no-store/);
 
   const app = await fetch(`${base}/app.js?smoke=1`);
   assert.equal(app.status, 200);
-  assert.match(await app.text(), /setCityFocus/);
+  const appSource = await app.text();
+  assert.match(appSource, /setCityFocus/);
+  assert.match(appSource, /replaceControlledWork/);
+  assert.match(appSource, /advanceAutonomousWork/);
+  assert.match(appSource, /renderPropertyApproval/);
 
   const command = await fetch(`${base}/api/command?smoke=1`, {
     method: 'POST',

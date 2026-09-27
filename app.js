@@ -109,13 +109,42 @@ let toastTimer;
 
 const decisionKeys = ['mkn-staffing-decision', 'mkn-opportunity-0142-decision', 'mkn-validation-decision'];
 
+function replaceControlledWork(controlledTestId, orders = []) {
+  const retained = getWorkOrders().filter((order) => order.controlledTestId !== controlledTestId);
+  localStorage.setItem('mkn-work-orders', JSON.stringify(retained.concat(orders).slice(-100)));
+}
+
 function updateApprovalCount() {
-  const waiting = decisionKeys.filter((key) => !localStorage.getItem(key)).length;
+  const propertyWaiting = localStorage.getItem('mkn-property-request') && !localStorage.getItem('mkn-property-decision') ? 1 : 0;
+  const waiting = decisionKeys.filter((key) => !localStorage.getItem(key)).length + propertyWaiting;
   document.querySelector('#founder-approval-count').textContent = waiting;
   document.querySelector('#nav-approval-count').textContent = waiting;
   document.querySelector('#approval-summary').textContent = waiting ? `${waiting} ${waiting === 1 ? 'decision' : 'decisions'} waiting` : 'All decisions reviewed';
   document.querySelector('.notification-dot').hidden = waiting === 0;
   renderDistrictReadiness();
+}
+
+function renderPropertyApproval() {
+  const slot = document.querySelector('#property-approval-slot');
+  let request;
+  try { request = JSON.parse(localStorage.getItem('mkn-property-request') || 'null'); }
+  catch { request = null; }
+  if (!request) {
+    slot.innerHTML = '';
+    return;
+  }
+  const decision = localStorage.getItem('mkn-property-decision');
+  slot.innerHTML = `<article class="property-approval-card"><header><div><p class="eyebrow">Property request</p><h3>${safeDemoText(request.business)}</h3></div><span>${decision ? safeDemoText(`${decision} by Michh`) : 'Owner decision required'}</span></header><div><small>Requested location</small><strong>${safeDemoText(request.building)}</strong><p>Reserving this demo property assigns the building. It does not launch, publish, or spend money.</p></div><footer><button type="button" class="decline-button" data-property-decision="declined"><i data-lucide="x"></i><span>Decline</span></button><button type="button" class="approve-button" data-property-decision="approved"><i data-lucide="check"></i><span>Approve reservation</span></button></footer></article>`;
+  slot.querySelectorAll('[data-property-decision]').forEach((button) => button.addEventListener('click', () => {
+    const nextDecision = button.dataset.propertyDecision;
+    localStorage.setItem('mkn-property-decision', nextDecision);
+    if (nextDecision === 'approved') localStorage.setItem('mkn-property-reservation', JSON.stringify({ ...request, approvedAt: new Date().toISOString() }));
+    else localStorage.removeItem('mkn-property-reservation');
+    renderPropertyApproval();
+    updateApprovalCount();
+    showToast(nextDecision === 'approved' ? `${request.building} reserved for ${request.business}.` : 'Property request declined.');
+  }));
+  refreshIcons();
 }
 
 function renderDistrictReadiness() {
@@ -216,11 +245,11 @@ const demoDayPlans = [
 
 const founderEdition = true;
 const systemAuditChecks = [
-  { id: 'navigation', label: 'Navigation and district routing', test: () => Boolean(document.querySelector('[data-open-view="agents"]') && document.querySelector('[data-office="research"]')) },
+  { id: 'navigation', label: 'Navigation and district routing', test: () => [...navItems].every((item) => Boolean(document.querySelector(`#${item.dataset.view}.view`))) },
   { id: 'memory', label: 'Agent and city memory storage', test: () => { localStorage.setItem('mkn-audit-memory', 'ready'); return localStorage.getItem('mkn-audit-memory') === 'ready'; } },
   { id: 'builder', label: 'Room, hallway, and city builder', test: () => Boolean(document.querySelector('#toggle-build-mode') && document.querySelector('[data-build-tool="wall"]')) },
-  { id: 'workforce', label: 'Agent creation and hiring tools', test: () => Boolean(document.querySelector('[data-open-view="agents"]') && Object.values(officeData).some((office) => office.agents.length > 0)) },
-  { id: 'orders', label: 'Customer orders and profit ledger', test: () => Boolean(document.querySelector('#customer-ledger') || document.querySelector('[data-open-view="businesses"]')) },
+  { id: 'workforce', label: 'Agent creation and hiring tools', test: () => Array.isArray(JSON.parse(localStorage.getItem('mkn-agent-candidates') || '[]')) && Boolean(document.querySelector('#agent-form')) },
+  { id: 'orders', label: 'Customer orders and profit ledger', test: () => Array.isArray(getCustomerOrders()) && Boolean(document.querySelector('#order-form')) },
   { id: 'treasury', label: 'Treasury limits and growth plan', test: () => { const plan = getGrowthPlan(); return plan.reserve + plan.activeCapital <= plan.capital && plan.experimentCap <= plan.activeCapital; } },
   { id: 'contracts', label: 'Government bid intake and safeguards', test: () => Boolean(document.querySelector('#bid-intake-form') && document.querySelector('#bid-notice') && document.querySelector('#bid-capability')) },
   { id: 'ai', label: 'OpenAI command and live research route', external: true }
@@ -383,11 +412,24 @@ function runDemoDay(source = 'manual') {
   season.records = season.records.slice(-35);
   localStorage.setItem('mkn-demo-season', JSON.stringify(season));
   localStorage.setItem('mkn-demo-last-run', new Date().toISOString());
+  advanceAutonomousWork();
   renderDemoSeason();
   updateDemoAutonomyStatus();
   runSystemsAudit({ quiet: true });
   showToast(`${source === 'autonomous' ? 'Autonomous shift' : 'Demo Day'} ${season.day} recorded. City health recalculated.`);
   return true;
+}
+
+function advanceAutonomousWork() {
+  const statuses = ['Queued', 'Working', 'QA Review', 'Complete'];
+  const orders = getWorkOrders();
+  const next = orders.find((order) => order.status !== 'Complete');
+  if (!next) return;
+  const current = Math.max(0, statuses.indexOf(next.status));
+  next.status = statuses[Math.min(statuses.length - 1, current + 1)];
+  next.updatedAt = new Date().toISOString();
+  next.lastRunBy = 'Demo Autopilot';
+  localStorage.setItem('mkn-work-orders', JSON.stringify(orders));
 }
 
 function catchUpAutonomousShifts() {
@@ -1418,6 +1460,11 @@ document.querySelectorAll('.validation-request').forEach((request) => {
     decline.disabled = false;
     approve.classList.toggle('decision-selected', decision === 'approved');
     decline.classList.toggle('decision-selected', decision === 'declined');
+    const createdAt = new Date().toISOString();
+    replaceControlledWork('validation-recommendation', decision === 'approved' ? [
+      { id: `validation-research-${Date.now()}`, office: 'research', name: 'Validate recommended opportunity', objective: 'Verify demand, competition, fees, and the stated automation potential before money is used.', deliverable: 'Sourced validation report and stop conditions', priority: 'High', budget: 0, status: 'Queued', controlledTestId: 'validation-recommendation', createdAt },
+      { id: `validation-business-${Date.now()}`, office: 'business', name: '$10 opportunity validation', objective: 'Prepare a small measurable test after the evidence report passes review.', deliverable: 'Test plan with metrics and a $10 hard stop', priority: 'Normal', budget: 10, status: 'Queued', controlledTestId: 'validation-recommendation', createdAt }
+    ] : []);
     localStorage.setItem('mkn-validation-decision', decision);
     updateApprovalCount();
   };
@@ -1459,6 +1506,7 @@ function resolveStaffing(decision) {
   staffingDecline.disabled = false;
   staffingApprove.classList.toggle('decision-selected', decision === 'approved');
   staffingDecline.classList.toggle('decision-selected', decision === 'declined');
+  staffingApprove.querySelector('span').textContent = decision === 'approved' ? 'Approved · helpers created' : 'Approve temporary help';
   const candidates = JSON.parse(localStorage.getItem('mkn-agent-candidates') || '[]').filter((candidate) => candidate.staffingRequestId !== 'production-help-001');
   if (decision === 'approved') {
     ['Production Helper A', 'Production Helper B'].forEach((name) => candidates.push({
@@ -1488,6 +1536,7 @@ const opportunity0142 = document.querySelector('#opportunity-0142');
 const opportunity0142Status = opportunity0142.querySelector('header > span');
 const opportunity0142Approve = opportunity0142.querySelector('.approve-button');
 const opportunity0142Decline = opportunity0142.querySelector('.decline-button');
+const opportunity0142Work = document.querySelector('#opportunity-0142-work');
 
 function resolveOpportunity0142(decision) {
   opportunity0142Status.textContent = decision === 'approved' ? 'Approved · validation queued' : 'Declined by Michh';
@@ -1498,38 +1547,52 @@ function resolveOpportunity0142(decision) {
   opportunity0142Approve.classList.toggle('decision-selected', decision === 'approved');
   opportunity0142Decline.classList.toggle('decision-selected', decision === 'declined');
   opportunity0142Approve.querySelector('span').textContent = decision === 'approved' ? 'Approved · test queued' : 'Approve controlled test';
-  let workOrders = getWorkOrders().filter((order) => order.controlledTestId !== 'opportunity-0142');
+  let workOrders = [];
   if (decision === 'approved') {
     const createdAt = new Date().toISOString();
-    workOrders = workOrders.concat([
+    workOrders = [
       { id: `0142-research-${Date.now()}`, office: 'research', name: 'Opportunity #0142 unit economics', objective: 'Resolve selling range, production cost, marketplace fees, shipping, and contribution margin before launch.', deliverable: 'Sourced unit-economics report with stop condition', priority: 'High', budget: 0, status: 'Queued', controlledTestId: 'opportunity-0142', createdAt },
       { id: `0142-creative-${Date.now()}`, office: 'creative', name: 'Gaming-room wall art validation set', objective: 'Create three original concepts using the approved differentiation without copying competitors.', deliverable: 'Three original test-ready designs', priority: 'High', budget: 0, status: 'Queued', controlledTestId: 'opportunity-0142', createdAt },
       { id: `0142-commerce-${Date.now()}`, office: 'business', name: 'Opportunity #0142 controlled listing test', objective: 'Prepare one validation listing and measurement plan after unit economics pass review.', deliverable: 'Draft listing, metrics, and $6 hard-stop plan', priority: 'Normal', budget: 6, status: 'Queued', controlledTestId: 'opportunity-0142', createdAt }
-    ]);
+    ];
   }
-  localStorage.setItem('mkn-work-orders', JSON.stringify(workOrders));
+  replaceControlledWork('opportunity-0142', workOrders);
+  opportunity0142Work.hidden = decision !== 'approved';
   localStorage.setItem('mkn-opportunity-0142-decision', decision);
   updateApprovalCount();
 }
 
 opportunity0142Approve.addEventListener('click', () => { resolveOpportunity0142('approved'); showToast('Controlled test approved. Research, Creative, and Commerce tasks were queued.'); });
 opportunity0142Decline.addEventListener('click', () => { resolveOpportunity0142('declined'); showToast('Opportunity declined. Decision saved.'); });
+opportunity0142Work.addEventListener('click', () => { openView('businesses'); openBusinessTab('production'); renderOffice('business'); });
 const savedOpportunity0142 = localStorage.getItem('mkn-opportunity-0142-decision');
 if (savedOpportunity0142) resolveOpportunity0142(savedOpportunity0142);
 
 document.querySelector('#reset-demo-decisions').addEventListener('click', () => {
   decisionKeys.forEach((key) => localStorage.removeItem(key));
   localStorage.removeItem('mkn-memory-00241-reviewed');
+  localStorage.removeItem('mkn-property-decision');
+  localStorage.removeItem('mkn-property-reservation');
   [staffingApprove, staffingDecline, opportunity0142Approve, opportunity0142Decline].forEach((button) => button.classList.remove('decision-selected'));
   document.querySelectorAll('.validation-request').forEach((request) => request.querySelectorAll('.decision-selected').forEach((button) => button.classList.remove('decision-selected')));
   staffingStatus.textContent = 'Owner approval required';
+  staffingApprove.querySelector('span').textContent = 'Approve temporary help';
   opportunity0142Status.textContent = '78% confidence';
+  opportunity0142Approve.querySelector('span').textContent = 'Approve controlled test';
+  opportunity0142Work.hidden = true;
   document.querySelector('.validation-request header > span').textContent = 'Awaiting Michh';
+  const candidates = JSON.parse(localStorage.getItem('mkn-agent-candidates') || '[]').filter((candidate) => candidate.staffingRequestId !== 'production-help-001');
+  localStorage.setItem('mkn-agent-candidates', JSON.stringify(candidates));
+  replaceControlledWork('opportunity-0142');
+  replaceControlledWork('validation-recommendation');
+  renderCandidateRoster();
+  renderPropertyApproval();
   updateApprovalCount();
   showToast('Demo decisions reset. All approval buttons are active.');
 });
 
 updateApprovalCount();
+renderPropertyApproval();
 
 const commandLauncher = document.querySelector('#command-launcher');
 const commandConsole = document.querySelector('#command-console');
@@ -1871,7 +1934,10 @@ propertyForm.addEventListener('submit', (event) => {
   if (event.submitter?.value === 'cancel') return;
   const businessName = document.querySelector('#business-name').value.trim();
   if (!businessName || document.querySelector('#business-name').hidden) return;
-  localStorage.setItem('mkn-property-request', JSON.stringify({ building: dialogPropertyName.textContent, business: businessName }));
+  localStorage.setItem('mkn-property-request', JSON.stringify({ building: dialogPropertyName.textContent, business: businessName, requestedAt: new Date().toISOString() }));
+  localStorage.removeItem('mkn-property-decision');
+  renderPropertyApproval();
+  updateApprovalCount();
   showToast(`${dialogPropertyName.textContent} reservation sent to Approvals for ${businessName}.`);
 });
 

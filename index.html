@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=controlled-test-3">
+  <link rel="stylesheet" href="styles.css?v=operations-audit-1">
 </head>
 <body class="founder-night">
   <header class="topbar">
@@ -561,6 +561,7 @@
 
     <section class="view" id="approvals" aria-labelledby="approvals-title">
       <div class="approval-page-heading"><div><p class="eyebrow">Mayor's Desk</p><h2 id="approvals-title">Approvals</h2></div><div><span id="approval-summary">3 decisions waiting</span><button type="button" id="reset-demo-decisions"><i data-lucide="rotate-ccw"></i> Reset demo decisions</button></div></div>
+      <div id="property-approval-slot"></div>
       <section class="big-boss-policy" aria-labelledby="big-boss-policy-title">
         <header><div><p class="eyebrow">Decision Engine</p><h3 id="big-boss-policy-title">Big Boss Guarded Autopilot</h3></div><label><span>Mode</span><select id="autopilot-mode"><option value="guarded">Guarded</option><option value="manual">Manual</option><option value="observe">Observe only</option></select></label></header>
         <div class="policy-lanes">
@@ -580,13 +581,13 @@
         <header><div><p class="eyebrow">Production Staffing Request</p><h3>Order volume increased 41%</h3></div><span>Owner approval required</span></header>
         <div class="capacity-visual"><div><small>Current capacity</small><strong>12</strong><span>jobs / day</span></div><i data-lucide="arrow-right"></i><div class="capacity-needed"><small>Needed capacity</small><strong>18</strong><span>jobs / day</span></div><div class="capacity-gap"><small>Capacity gap</small><strong>+6</strong><span>jobs / day</span></div></div>
         <div class="staffing-recommendation"><div class="helper-count"><i data-lucide="hard-hat"></i><div><small>Director recommendation</small><strong>Create 2 temporary Production Helpers</strong></div></div><div><small>Added AI cost</small><strong>$3.20/day</strong></div><div><small>Approx. cost per added job</small><strong>$0.53</strong></div></div>
-        <footer><p>Requested capacity is 50% above current output, providing a buffer beyond the 41% order increase.</p><div><button type="button" class="decline-button"><i data-lucide="x"></i><span>Decline</span></button><button type="button" class="approve-button"><i data-lucide="check"></i><span>Approve temporary help</span></button></div></footer>
+        <footer><p>Requested capacity is 50% above current output, providing a buffer beyond the 41% order increase.</p><div><button id="staffing-decline" type="button" class="decline-button"><i data-lucide="x"></i><span>Decline</span></button><button id="staffing-approve" type="button" class="approve-button"><i data-lucide="check"></i><span>Approve temporary help</span></button></div></footer>
       </article>
       <article class="opportunity-approval" id="opportunity-0142">
         <header><div><p class="eyebrow">Opportunity #0142</p><h3>Custom gaming-room wall art</h3></div><span>78% confidence</span></header>
         <div class="opportunity-signals"><div><small>Demand</small><strong class="positive-signal">Strong</strong></div><div><small>Competition</small><strong class="medium-signal">Medium</strong></div><div><small>Selling range</small><strong>$XX–$XX</strong></div><div><small>Production cost</small><strong>$XX</strong></div><div><small>Fees</small><strong>$XX</strong></div><div><small>Contribution</small><strong>$XX / order</strong></div></div>
         <div class="opportunity-insight"><div><h4>Customer complaints</h4><ul><li>Slow shipping</li><li>Limited personalization</li></ul></div><div class="differentiator"><h4>Our differentiator</h4><strong>Faster personalization + a different design direction</strong></div><div class="test-scope"><h4>Suggested test</h4><strong>3 designs</strong><span>$6 maximum</span></div></div>
-        <footer><div><i data-lucide="circle-alert"></i><span>Prior loss noted. Founder may approve a controlled $6 test with a hard stop.</span></div><div class="opportunity-actions"><button type="button" class="decline-button"><i data-lucide="x"></i><span>Decline</span></button><button type="button" class="approve-button"><i data-lucide="check"></i><span>Approve controlled test</span></button></div></footer>
+        <footer><div><i data-lucide="circle-alert"></i><span>Prior loss noted. Founder may approve a controlled $6 test with a hard stop.</span></div><div class="opportunity-actions"><button id="opportunity-0142-decline" type="button" class="decline-button"><i data-lucide="x"></i><span>Decline</span></button><button id="opportunity-0142-approve" type="button" class="approve-button"><i data-lucide="check"></i><span>Approve controlled test</span></button><button id="opportunity-0142-work" type="button" hidden><i data-lucide="list-checks"></i><span>View queued work</span></button></div></footer>
       </article>
       <article class="validation-request">
         <header><div><p class="eyebrow">MKN Opportunity Report</p><h3>Validation test recommendation</h3></div><span>Awaiting Michh</span></header>
@@ -600,7 +601,7 @@
           <div><small>Risk</small><strong class="good-rating">Low</strong></div>
           <div><small>Evidence</small><strong class="good-rating">Strong</strong></div>
         </div>
-        <div class="validation-decision"><div><small>Director recommendation</small><strong>Run $10 validation test</strong></div><div class="decision-buttons"><button type="button" class="decline-button"><i data-lucide="x"></i><span>Decline</span></button><button type="button" class="approve-button"><i data-lucide="check"></i><span>Approve $10</span></button></div></div>
+        <div class="validation-decision"><div><small>Director recommendation</small><strong>Run $10 validation test</strong></div><div class="decision-buttons"><button id="validation-decline" type="button" class="decline-button"><i data-lucide="x"></i><span>Decline</span></button><button id="validation-approve" type="button" class="approve-button"><i data-lucide="check"></i><span>Approve $10</span></button></div></div>
       </article>
       <article class="funding-request approved-request">
         <header><div><p class="eyebrow">Funding Request #0007</p><h3>Houston-themed original POD shirts</h3></div><span><i data-lucide="check"></i> Treasurer approved</span></header>
@@ -975,6 +976,6 @@
   </dialog>
 
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-  <script src="app.js?v=controlled-test-3"></script>
+  <script src="app.js?v=operations-audit-1"></script>
 </body>
 </html>
