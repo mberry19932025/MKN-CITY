@@ -260,6 +260,11 @@
         <div class="learning-rule"><i data-lucide="shield-check"></i><p><strong>Quality gate</strong><span>Speed improves only after quality ≥85, source accuracy ≥90, and zero hallucinations. Failed work is routed to retraining.</span></p></div>
         <div id="learning-history" class="learning-history"><p>No measured task runs yet.</p></div>
       </section>
+      <section class="certification-center" aria-labelledby="certification-title">
+        <header><div><p class="eyebrow">AI University Personnel Records</p><h3 id="certification-title">Field Certification & XP</h3></div><div><span id="certified-agent-count">0/8 certified</span><span id="workforce-xp-total">0 city XP</span></div></header>
+        <div class="enforcer-console"><div><i data-lucide="shield-alert"></i><p><strong>Knox · City Enforcer</strong><span id="enforcer-report">Ready to inspect budgets, permissions, failures, and probationary assignments.</span></p></div><button type="button" id="run-enforcer-audit"><i data-lucide="scan-search"></i>Run compliance patrol</button></div>
+        <div id="certification-grid" class="certification-grid"></div>
+      </section>
       <div class="agent-toolbar"><div><h3>Create from a template</h3><p>Start with a focused role, then customize its department and permissions.</p></div><span id="agent-count">8 active</span></div>
       <section class="workforce-control" aria-labelledby="workforce-control-title">
         <header><div><p class="eyebrow">Director Recommendation</p><h3 id="workforce-control-title">Controlled workforce scaling</h3></div><span id="workforce-scale-state">Capacity healthy</span></header>
@@ -1017,6 +1022,6 @@
   </dialog>
 
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-  <script src="app.js?v=approval-recovery-1"></script>
+  <script src="app.js?v=workforce-xp-1"></script>
 </body>
 </html>

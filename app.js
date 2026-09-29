@@ -76,14 +76,59 @@ document.querySelectorAll('[data-business-tab]').forEach((button) => button.addE
 openBusinessTab('commerce');
 
 const coreAgents = [
-  { id: 'overseer', name: 'Director', role: 'MKN Overseer', manager: 'Michh', tools: ['Delegate', 'Reports'], permission: 'Approval-gated' },
-  { id: 'market-scout', name: 'Maya', role: 'Market Scout', manager: 'Director', tools: ['Research', 'Files'], permission: 'No spend or publish' },
-  { id: 'originality', name: 'Sage', role: 'Originality Guard', manager: 'POD Manager', tools: ['Database', 'Files'], permission: 'Review only' },
-  { id: 'creative', name: 'Marcus', role: 'Creative Agent', manager: 'Factory Manager', tools: ['Images', 'Files'], permission: 'Draft only' },
-  { id: 'qa', name: 'Quinn', role: 'QA Agent', manager: 'Factory Manager', tools: ['Files', 'Reports'], permission: 'Cannot publish' },
-  { id: 'pod-manager', name: 'Nova', role: 'POD Manager', manager: 'Director', tools: ['Delegate', 'Orders'], permission: 'Spend by approval' },
-  { id: 'thumbnail-manager', name: 'Avery', role: 'Thumbnail Manager', manager: 'Director', tools: ['Delegate', 'Briefs'], permission: 'Delivery by approval' }
+  { id: 'overseer', name: 'Director', role: 'MKN Overseer', field: 'Executive Operations', examScore: 94, manager: 'Michh', tools: ['Delegate', 'Reports'], permission: 'Approval-gated' },
+  { id: 'enforcer', name: 'Knox', role: 'City Enforcer', field: 'Audit & Compliance', examScore: 96, manager: 'Director', tools: ['Audit Log', 'Permissions', 'Reports'], permission: 'Pause and escalate only' },
+  { id: 'market-scout', name: 'Maya', role: 'Market Scout', field: 'Market Research', examScore: 93, manager: 'Director', tools: ['Research', 'Files'], permission: 'No spend or publish' },
+  { id: 'originality', name: 'Sage', role: 'Originality Guard', field: 'Originality Review', examScore: 91, manager: 'POD Manager', tools: ['Database', 'Files'], permission: 'Review only' },
+  { id: 'creative', name: 'Marcus', role: 'Creative Agent', field: 'Visual Production', examScore: 90, manager: 'Factory Manager', tools: ['Images', 'Files'], permission: 'Draft only' },
+  { id: 'qa', name: 'Quinn', role: 'QA Agent', field: 'Quality Assurance', examScore: 95, manager: 'Factory Manager', tools: ['Files', 'Reports'], permission: 'Cannot publish' },
+  { id: 'pod-manager', name: 'Nova', role: 'POD Manager', field: 'Production Operations', examScore: 89, manager: 'Director', tools: ['Delegate', 'Orders'], permission: 'Spend by approval' },
+  { id: 'thumbnail-manager', name: 'Avery', role: 'Thumbnail Manager', field: 'Marketplace Delivery', examScore: 92, manager: 'Director', tools: ['Delegate', 'Briefs'], permission: 'Delivery by approval' }
 ];
+
+function getAgentRecords() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('mkn-agent-records') || '{}'); } catch {}
+  coreAgents.forEach((agent) => {
+    saved[agent.id] = { xp: 0, certified: false, examAttempts: 0, tasksCompleted: 0, lastScore: null, ...saved[agent.id] };
+  });
+  localStorage.setItem('mkn-agent-records', JSON.stringify(saved));
+  return saved;
+}
+
+function awardAgentXp(agentName, amount, completedTask = false) {
+  const agent = coreAgents.find((item) => item.name === agentName);
+  if (!agent) return;
+  const records = getAgentRecords();
+  records[agent.id].xp += amount;
+  if (completedTask) records[agent.id].tasksCompleted += 1;
+  localStorage.setItem('mkn-agent-records', JSON.stringify(records));
+}
+
+function getAgentAssignment(agentName) {
+  const activeJobs = getCityJobs().filter((job) => ['running', 'waiting_approval'].includes(job.status));
+  for (const job of activeJobs) {
+    const task = job.tasks.find((item) => item.agent === agentName && ['working', 'waiting_owner'].includes(item.status));
+    if (task) return { job, task };
+  }
+  return null;
+}
+
+function renderCertificationCenter() {
+  const grid = document.querySelector('#certification-grid');
+  if (!grid) return;
+  const records = getAgentRecords();
+  const certified = coreAgents.filter((agent) => records[agent.id].certified).length;
+  const totalXp = coreAgents.reduce((sum, agent) => sum + records[agent.id].xp, 0);
+  document.querySelector('#certified-agent-count').textContent = `${certified}/${coreAgents.length} certified`;
+  document.querySelector('#workforce-xp-total').textContent = `${totalXp} city XP`;
+  grid.innerHTML = coreAgents.map((agent) => {
+    const record = records[agent.id];
+    const level = Math.floor(record.xp / 100) + 1;
+    const progress = record.xp % 100;
+    return `<article class="certification-card"><header><div><small>${safeDemoText(agent.field)}</small><strong>${safeDemoText(agent.name)}</strong><span>${safeDemoText(agent.role)}</span></div><b class="${record.certified ? 'certified' : ''}">${record.certified ? 'Certified' : 'Probation'}</b></header><div class="xp-track"><i style="width:${progress}%"></i></div><p>Level ${level} · ${record.xp} XP · ${record.tasksCompleted} tasks passed</p><button type="button" data-field-exam="${agent.id}"><i data-lucide="graduation-cap"></i>${record.certified ? 'Retake field exam' : 'Run field exam'}</button></article>`;
+  }).join('');
+}
 
 const factoryWorkflows = {
   thumbnail: {
@@ -152,6 +197,7 @@ function advanceCityJob(jobId) {
   task.status = 'completed';
   task.cost = task.budget;
   task.completedAt = new Date().toISOString();
+  awardAgentXp(task.agent, 10, true);
   job.cost = Number(job.tasks.reduce((sum, item) => sum + Number(item.cost || 0), 0).toFixed(2));
   recordCityEvent('task.completed', job, `${task.agent} completed ${task.name} · $${task.cost.toFixed(2)} demo cost`);
   const nextIndex = job.currentStep + 1;
@@ -242,6 +288,7 @@ function renderOperatingSystem() {
   document.querySelector('#creative-work-list').innerHTML = creativeJobs.length ? creativeJobs.slice().reverse().map((job) => { const task = job.tasks.find((item) => item.capability === 'Creative'); return `<article><div><small>${safeDemoText(job.id)} · ${safeDemoText(job.factory)}</small><strong>${safeDemoText(job.goal)}</strong><p>${safeDemoText(task.name)} assigned to ${safeDemoText(task.agent)}</p></div><span>${safeDemoText(task.status)}</span><button type="button" data-view-job="${job.id}">Open job</button></article>`; }).join('') : '<p>No creative work is queued. Start a factory workflow or create a brief.</p>';
   renderJobApprovals(jobs);
   document.querySelector('#core-agent-grid').innerHTML = coreAgents.map((agent) => `<button type="button" data-core-agent="${agent.name}"><i data-lucide="bot"></i><div><small>${safeDemoText(agent.role)}</small><strong>${safeDemoText(agent.name)}</strong><span>Reports to ${safeDemoText(agent.manager)}</span></div><b>${safeDemoText(agent.permission)}</b></button>`).join('');
+  renderCertificationCenter();
   refreshIcons();
 }
 
@@ -254,6 +301,35 @@ document.querySelector('#job-filter').addEventListener('change', renderOperating
 document.querySelector('#job-list').addEventListener('click', (event) => { const advance = event.target.closest('[data-advance-job]'); if (advance) return advanceCityJob(advance.dataset.advanceJob); const retry = event.target.closest('[data-retry-job]'); if (retry) return recoverCityJob(retry.dataset.retryJob, 'retry'); const archive = event.target.closest('[data-archive-job]'); if (archive) return recoverCityJob(archive.dataset.archiveJob, 'archive'); if (event.target.closest('[data-open-job-approvals]')) openView('approvals'); });
 document.querySelector('#creative-work-list').addEventListener('click', (event) => { if (event.target.closest('[data-view-job]')) openView('jobs'); });
 document.querySelector('#core-agent-grid').addEventListener('click', (event) => { const agent = event.target.closest('[data-core-agent]'); if (!agent) return; setConsole(true); submitCommand(`talk to ${agent.dataset.coreAgent}`); });
+document.querySelector('#certification-grid').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-field-exam]');
+  if (!button) return;
+  const agent = coreAgents.find((item) => item.id === button.dataset.fieldExam);
+  const records = getAgentRecords();
+  const record = records[agent.id];
+  record.examAttempts += 1;
+  record.lastScore = agent.examScore;
+  record.certified = agent.examScore >= 85;
+  record.xp += record.certified ? 25 : 5;
+  localStorage.setItem('mkn-agent-records', JSON.stringify(records));
+  recordCityEvent(record.certified ? 'certification.passed' : 'certification.failed', { id: `EXAM-${agent.id}`, factory: 'AI University' }, `${agent.name} scored ${agent.examScore}/100 in ${agent.field}.`);
+  renderOperatingSystem();
+  showToast(record.certified ? `${agent.name} passed ${agent.field} with ${agent.examScore}/100 and earned 25 XP.` : `${agent.name} entered retraining. The exam can be taken again.`);
+});
+document.querySelector('#run-enforcer-audit').addEventListener('click', () => {
+  const jobs = getCityJobs();
+  const records = getAgentRecords();
+  const overBudget = jobs.filter((job) => Number(job.cost) > Number(job.budget)).length;
+  const failed = jobs.filter((job) => ['failed', 'needs_review'].includes(job.status)).length;
+  const uncertifiedWorking = new Set(jobs.filter((job) => job.status === 'running').flatMap((job) => job.tasks.filter((task) => task.status === 'working').map((task) => task.agent)).filter((name) => { const agent = coreAgents.find((item) => item.name === name); return agent && !records[agent.id].certified; })).size;
+  const findings = overBudget + failed + uncertifiedWorking;
+  const report = `${overBudget} over budget · ${failed} failed awaiting recovery · ${uncertifiedWorking} probationary agents working`;
+  document.querySelector('#enforcer-report').textContent = findings ? report : 'No active compliance findings. Work may continue.';
+  awardAgentXp('Knox', 10, true);
+  recordCityEvent('enforcer.audit', { id: 'CITY-AUDIT', factory: 'Audit Center' }, report);
+  renderOperatingSystem();
+  showToast(findings ? `Knox logged ${findings} advisory findings. New work remains available.` : 'Knox completed the patrol. No findings.');
+});
 document.querySelector('#clear-demo-jobs').addEventListener('click', () => { if (!window.confirm('Reset all locally recorded demo jobs and events?')) return; localStorage.removeItem('mkn-city-jobs'); localStorage.removeItem('mkn-city-events'); renderOperatingSystem(); updateApprovalCount(); showToast('Demo jobs and events reset.'); });
 renderOperatingSystem();
 
@@ -714,7 +790,8 @@ const officeData = {
     { name: 'Quinn', role: 'Quality Inspector', task: 'Inspect one completed output against its brief', sprite: 'business-sprite', status: 'Inspecting' }
   ] },
   founder: { district: 'Downtown', title: 'Founder Tower', description: 'City oversight, approvals, budgets, and department coordination.', zone: 'Command Deck', zoneDetail: 'Treasury, approvals, and city intelligence', zoneIcon: 'crown', agents: [
-    { name: 'Director', role: 'Chief Director', task: 'Review city performance and escalate decisions', sprite: 'director-sprite', status: 'Reviewing' }
+    { name: 'Director', role: 'Chief Director', task: 'Review city performance and escalate decisions', sprite: 'director-sprite', status: 'Reviewing' },
+    { name: 'Knox', role: 'City Enforcer', task: 'Audit permissions, budgets, and unresolved failures', sprite: 'operations-sprite', status: 'Patrolling' }
   ] },
   university: { district: 'North MKN City', title: 'AI University', description: 'Classroom instruction, practical work samples, exams, certification, and formal retraining.', zone: 'Skills Campus', zoneDetail: 'Classroom, practical lab, exams, and certification', zoneIcon: 'graduation-cap', agents: [
     { name: 'Dean Ellis', role: 'Training Director', task: 'Evaluate one probationary agent work sample', sprite: 'director-sprite', status: 'Teaching' },
@@ -767,7 +844,9 @@ document.querySelector('#run-training-task').addEventListener('click', () => {
   const passed = sample.quality >= 85 && sample.accuracy >= 90 && sample.hallucinations === 0;
   runs.push({ ...sample, status: passed ? 'completed' : 'retraining', recordedAt: new Date().toISOString(), demo: true });
   localStorage.setItem('mkn-training-runs', JSON.stringify(runs));
+  awardAgentXp(sample.agent, passed ? 15 : 5, passed);
   renderLearningEngine();
+  renderCertificationCenter();
   showToast(passed ? `${sample.agent} passed the quality gate. Workflow lesson saved.` : `${sample.agent} was routed to AI University retraining.`);
 });
 
@@ -824,15 +903,20 @@ function renderOffice(officeId) {
   officeDialog.dataset.office = officeId;
   const zone = `<aside class="office-zone"><i data-lucide="${office.zoneIcon}"></i><div><small>Active location</small><strong>${office.zone}</strong><span>${office.zoneDetail}</span></div><b><i></i> Online</b><button type="button" data-new-work-order="${officeId}"><i data-lucide="clipboard-plus"></i><span>New task</span></button></aside>`;
   const desks = office.agents.map((agent) => {
+    const assignment = getAgentAssignment(agent.name);
+    const coreAgent = coreAgents.find((item) => item.name === agent.name);
+    const record = coreAgent ? getAgentRecords()[coreAgent.id] : null;
     const liveStatus = isNightCycle && agent.name !== 'Director' ? 'Consolidating memory'
       : period.schedule === 4 ? 'Knowledge exchange'
       : period.schedule === 3 ? 'Filing daily report'
-      : agent.status;
+      : assignment ? `Working · ${assignment.job.id}` : agent.status;
+    const taskName = assignment?.task.name || agent.task;
+    const workstationMeta = record ? `${record.certified ? 'Certified' : 'Probation'} · ${record.xp} XP` : 'Department support';
     return `
     <article class="office-desk occupied-desk">
       <div class="desk-workstation"><i data-lucide="monitor"></i><span></span></div>
       <div class="office-agent"><span class="office-agent-sprite ${agent.sprite}"></span><div><small>${agent.role}</small><strong>${agent.name}</strong><span><i></i>${liveStatus}</span></div></div>
-      <div class="desk-task"><small>Focus-locked task</small><p>${agent.task}</p></div>
+      <div class="desk-task"><small>Computer online · ${workstationMeta}</small><p>${safeDemoText(taskName)}</p></div>
       <button type="button" data-office-command="${agent.name}"><i data-lucide="message-square"></i><span>Command</span></button>
     </article>
   `;
