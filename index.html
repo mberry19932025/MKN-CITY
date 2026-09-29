@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=orbital-city-1">
+  <link rel="stylesheet" href="styles.css?v=orchestrator-mvp-1">
 </head>
 <body class="founder-night">
   <header class="topbar">
@@ -552,6 +552,31 @@
         <div class="leverage-equation"><strong>1 design contract</strong><i data-lucide="equal"></i><strong>25 shirt profits</strong><span>before the service's own production costs</span></div>
       </section>
     </section>
+    <section class="view" id="creative" aria-labelledby="creative-title">
+      <div class="operations-heading"><div><p class="eyebrow">Design District</p><h2 id="creative-title">Creative Studio</h2><p>Original concepts move from approved briefs through creation and QA.</p></div><div><button type="button" data-creative-action="new"><i data-lucide="file-plus-2"></i> New brief</button><button type="button" data-open-view="jobs"><i data-lucide="list-checks"></i> Job queue</button></div></div>
+      <div class="studio-status-grid"><article><small>Creative jobs</small><strong id="creative-job-count">0</strong><span>Recorded locally</span></article><article><small>Waiting for design</small><strong id="creative-ready-count">0</strong><span>Research cleared</span></article><article><small>In QA</small><strong id="creative-qa-count">0</strong><span>Owner delivery blocked</span></article><article><small>Originality rule</small><strong>Active</strong><span>Market signal, not copied expression</span></article></div>
+      <section class="creative-workbench" aria-labelledby="creative-workbench-title">
+        <header><div><p class="eyebrow">Live Workbench</p><h3 id="creative-workbench-title">Assigned creative work</h3></div><span><i></i> Event driven</span></header>
+        <div id="creative-work-list" class="creative-work-list"><p>No creative work is queued. Start a factory workflow or create a brief.</p></div>
+      </section>
+      <section class="creative-pipeline" aria-label="Creative safety pipeline"><article><i data-lucide="radar"></i><strong>Research</strong><span>Demand signal</span></article><i data-lucide="chevron-right"></i><article><i data-lucide="shield-check"></i><strong>Originality Guard</strong><span>Risk screen</span></article><i data-lucide="chevron-right"></i><article><i data-lucide="palette"></i><strong>Creative Agent</strong><span>Original concept</span></article><i data-lucide="chevron-right"></i><article><i data-lucide="scan-search"></i><strong>QA Agent</strong><span>Quality gate</span></article><i data-lucide="chevron-right"></i><article><i data-lucide="crown"></i><strong>Founder</strong><span>Final approval</span></article></section>
+    </section>
+
+    <section class="view" id="factories" aria-labelledby="factories-title">
+      <div class="operations-heading"><div><p class="eyebrow">Production Systems</p><h2 id="factories-title">Factories</h2><p>Reusable workflows managed by specialist teams.</p></div><button type="button" data-open-view="jobs"><i data-lucide="list-checks"></i> View all jobs</button></div>
+      <div class="factory-grid">
+        <article class="factory-command-card" data-factory-card="thumbnail"><header><div class="factory-mark"><i data-lucide="image"></i></div><div><small>Business 01 · Fiverr assisted</small><h3>Thumbnail Factory</h3></div><span>Ready</span></header><p>Brief analysis, research, creative direction, thumbnail creation, QA, and Founder-controlled delivery.</p><ol><li>Brief</li><li>Research</li><li>Create</li><li>QA</li><li>Approve</li></ol><footer><button type="button" data-factory-office="creative"><i data-lucide="door-open"></i> Enter studio</button><button type="button" class="primary-action" data-start-factory="thumbnail"><i data-lucide="play"></i> Start practice job</button></footer></article>
+        <article class="factory-command-card" data-factory-card="pod"><header><div class="factory-mark"><i data-lucide="shirt"></i></div><div><small>Business 02 · Etsy + Printify</small><h3>POD Product Factory</h3></div><span>Ready</span></header><p>Trend research, originality screening, creative brief, design, mockup, QA, listing draft, and Founder approval.</p><ol><li>Trend</li><li>IP check</li><li>Design</li><li>Listing</li><li>Approve</li></ol><footer><button type="button" data-factory-office="factory"><i data-lucide="door-open"></i> Production floor</button><button type="button" class="primary-action" data-start-factory="pod"><i data-lucide="play"></i> Start practice job</button></footer></article>
+      </div>
+      <section class="factory-roster"><header><div><p class="eyebrow">Core Team</p><h3>Seven-agent operating unit</h3></div><span>Least-privilege permissions</span></header><div id="core-agent-grid"></div></section>
+    </section>
+
+    <section class="view" id="jobs" aria-labelledby="jobs-title">
+      <div class="operations-heading"><div><p class="eyebrow">Orchestrator</p><h2 id="jobs-title">Jobs &amp; Events</h2><p>Every task, cost, status change, and approval is traceable here.</p></div><div><button type="button" id="create-custom-job"><i data-lucide="plus"></i> Create job</button><button type="button" id="clear-demo-jobs"><i data-lucide="rotate-ccw"></i> Reset jobs</button></div></div>
+      <div class="job-summary"><article><small>Total jobs</small><strong id="job-total">0</strong></article><article><small>Running</small><strong id="job-running">0</strong></article><article><small>Waiting approval</small><strong id="job-waiting">0</strong></article><article><small>Demo cost</small><strong id="job-cost">$0.00</strong></article></div>
+      <div class="jobs-layout"><section class="job-board"><header><strong>Job queue</strong><select id="job-filter" aria-label="Filter jobs"><option value="all">All jobs</option><option value="running">Running</option><option value="approval">Waiting approval</option><option value="completed">Completed</option></select></header><div id="job-list"></div></section><aside class="event-stream"><header><div><small>City event bus</small><strong>Recorded events</strong></div><span>Local demo</span></header><div id="event-list"><p>No events recorded.</p></div></aside></div>
+    </section>
+
     <section class="view" id="analytics" aria-labelledby="analytics-title">
       <div class="analytics-heading"><div><p class="eyebrow">City Intelligence</p><h2 id="analytics-title">Analytics Center</h2><p>Performance, economics, and agent learning in one dedicated workspace.</p></div><div><button type="button" data-open-view="treasury"><i data-lucide="landmark"></i> Treasury</button><button type="button" data-open-view="markets"><i data-lucide="chart-candlestick"></i> Markets</button></div></div>
       <div class="analytics-kpis"><article><small>Demo revenue</small><strong id="analytics-revenue">$0.00</strong><span>Simulation only</span></article><article><small>Demo net</small><strong id="analytics-net">$0.00</strong><span>Revenue minus recorded costs</span></article><article><small>Tasks completed</small><strong id="analytics-tasks">0</strong><span>Across rolling demo weeks</span></article><article><small>Agent quality</small><strong id="analytics-quality">--</strong><span>Measured training average</span></article></div>
@@ -561,6 +586,7 @@
 
     <section class="view" id="approvals" aria-labelledby="approvals-title">
       <div class="approval-page-heading"><div><p class="eyebrow">Mayor's Desk</p><h2 id="approvals-title">Approvals</h2></div><div><span id="approval-summary">3 decisions waiting</span><button type="button" id="reset-demo-decisions"><i data-lucide="rotate-ccw"></i> Reset demo decisions</button></div></div>
+      <div id="job-approval-slot"></div>
       <div id="property-approval-slot"></div>
       <section class="big-boss-policy" aria-labelledby="big-boss-policy-title">
         <header><div><p class="eyebrow">Decision Engine</p><h3 id="big-boss-policy-title">Big Boss Guarded Autopilot</h3></div><label><span>Mode</span><select id="autopilot-mode"><option value="guarded">Guarded</option><option value="manual">Manual</option><option value="observe">Observe only</option></select></label></header>
@@ -816,6 +842,9 @@
     <button class="nav-item active" data-view="city" type="button"><i data-lucide="map"></i><span>City</span></button>
     <button class="nav-item" data-view="agents" type="button"><i data-lucide="bot"></i><span>Agents</span></button>
     <button class="nav-item" data-view="businesses" type="button"><i data-lucide="store"></i><span>Business</span></button>
+    <button class="nav-item" data-view="creative" type="button"><i data-lucide="palette"></i><span>Creative</span></button>
+    <button class="nav-item" data-view="factories" type="button"><i data-lucide="factory"></i><span>Factories</span></button>
+    <button class="nav-item" data-view="jobs" type="button"><i data-lucide="list-checks"></i><span>Jobs</span></button>
     <button class="nav-item" data-view="analytics" type="button"><i data-lucide="chart-no-axes-combined"></i><span>Analytics</span></button>
     <button class="nav-item approval-link" data-view="approvals" type="button"><i data-lucide="circle-check-big"></i><span>Approvals</span><b id="nav-approval-count">3</b></button>
     <button class="nav-item" data-view="memory" type="button"><i data-lucide="brain"></i><span>Memory</span></button>
@@ -975,7 +1004,19 @@
     </form>
   </dialog>
 
+  <dialog class="property-dialog" id="job-dialog">
+    <form method="dialog" id="job-form">
+      <button class="dialog-close" value="cancel" title="Close" aria-label="Close job creator"><i data-lucide="x"></i></button>
+      <p class="eyebrow">Agent Orchestrator</p><h2>Create focused job</h2>
+      <label>Job goal<input id="job-goal" required maxlength="140" placeholder="One measurable outcome"></label>
+      <label>Factory<select id="job-factory"><option value="thumbnail">Thumbnail Factory</option><option value="pod">POD Product Factory</option></select></label>
+      <label>Maximum demo budget<input id="job-budget" type="number" min="0" max="100" step="0.01" value="2.00"></label>
+      <p class="field-note">This creates a recorded demo workflow. It does not publish, spend real money, or contact a customer.</p>
+      <div class="dialog-actions"><button value="cancel" type="submit">Cancel</button><button class="primary-action" value="default" type="submit"><i data-lucide="workflow"></i> Create workflow</button></div>
+    </form>
+  </dialog>
+
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-  <script src="app.js?v=operations-audit-1"></script>
+  <script src="app.js?v=orchestrator-mvp-1"></script>
 </body>
 </html>

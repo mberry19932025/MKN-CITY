@@ -75,6 +75,168 @@ function openBusinessTab(tabId) {
 document.querySelectorAll('[data-business-tab]').forEach((button) => button.addEventListener('click', () => openBusinessTab(button.dataset.businessTab)));
 openBusinessTab('commerce');
 
+const coreAgents = [
+  { id: 'overseer', name: 'Director', role: 'MKN Overseer', manager: 'Michh', tools: ['Delegate', 'Reports'], permission: 'Approval-gated' },
+  { id: 'market-scout', name: 'Maya', role: 'Market Scout', manager: 'Director', tools: ['Research', 'Files'], permission: 'No spend or publish' },
+  { id: 'originality', name: 'Sage', role: 'Originality Guard', manager: 'POD Manager', tools: ['Database', 'Files'], permission: 'Review only' },
+  { id: 'creative', name: 'Marcus', role: 'Creative Agent', manager: 'Factory Manager', tools: ['Images', 'Files'], permission: 'Draft only' },
+  { id: 'qa', name: 'Quinn', role: 'QA Agent', manager: 'Factory Manager', tools: ['Files', 'Reports'], permission: 'Cannot publish' },
+  { id: 'pod-manager', name: 'Nova', role: 'POD Manager', manager: 'Director', tools: ['Delegate', 'Orders'], permission: 'Spend by approval' },
+  { id: 'thumbnail-manager', name: 'Avery', role: 'Thumbnail Manager', manager: 'Director', tools: ['Delegate', 'Briefs'], permission: 'Delivery by approval' }
+];
+
+const factoryWorkflows = {
+  thumbnail: {
+    business: 'Fiverr Thumbnail Service', factory: 'Thumbnail Factory', manager: 'Avery', defaultGoal: 'Create one original gaming-channel thumbnail concept',
+    steps: [
+      ['Brief analysis', 'Avery', 'Brief', 0.03], ['Market research', 'Maya', 'Research', 0.08], ['Creative direction', 'Avery', 'Brief', 0.04],
+      ['Thumbnail creation', 'Marcus', 'Creative', 0.28], ['Quality assurance', 'Quinn', 'QA', 0.08], ['Founder approval', 'Michh', 'Approval', 0]
+    ]
+  },
+  pod: {
+    business: 'Etsy + Printify POD', factory: 'POD Product Factory', manager: 'Nova', defaultGoal: 'Develop one original low-risk shirt opportunity',
+    steps: [
+      ['Trend research', 'Maya', 'Research', 0.08], ['Originality and IP screen', 'Sage', 'Originality', 0.05], ['Creative brief', 'Nova', 'Brief', 0.04],
+      ['Original design concept', 'Marcus', 'Creative', 0.32], ['Mockup preparation', 'Marcus', 'Creative', 0.18], ['Quality assurance', 'Quinn', 'QA', 0.08],
+      ['Listing draft', 'Avery', 'Listing', 0.07], ['Founder approval', 'Michh', 'Approval', 0]
+    ]
+  }
+};
+
+function getCityJobs() {
+  try { return JSON.parse(localStorage.getItem('mkn-city-jobs') || '[]'); }
+  catch { return []; }
+}
+
+function getCityEvents() {
+  try { return JSON.parse(localStorage.getItem('mkn-city-events') || '[]'); }
+  catch { return []; }
+}
+
+function recordCityEvent(type, job, detail) {
+  const events = getCityEvents();
+  events.unshift({ id: crypto.randomUUID?.() || String(Date.now()), type, jobId: job.id, factory: job.factory, detail, createdAt: new Date().toISOString() });
+  localStorage.setItem('mkn-city-events', JSON.stringify(events.slice(0, 100)));
+}
+
+function saveCityJobs(jobs) {
+  localStorage.setItem('mkn-city-jobs', JSON.stringify(jobs.slice(-100)));
+  renderOperatingSystem();
+  if (typeof updateApprovalCount === 'function') updateApprovalCount();
+}
+
+function createFactoryJob(factoryId, goal, budget = 2) {
+  const workflow = factoryWorkflows[factoryId];
+  const now = new Date().toISOString();
+  const job = {
+    id: `MKN-${String(Date.now()).slice(-6)}`, business: workflow.business, factory: workflow.factory, factoryId, workflow: `${workflow.factory} v1`,
+    goal: goal || workflow.defaultGoal, owner: 'Michh', manager: workflow.manager, priority: 'Normal', budget: Number(budget), cost: 0,
+    status: 'running', currentStep: 0, progress: 0, approvalStatus: 'not-required', createdAt: now, updatedAt: now,
+    tasks: workflow.steps.map(([name, agent, capability, cost], index) => ({ id: `${Date.now()}-${index}`, name, agent, capability, allowedTools: coreAgents.find((item) => item.name === agent)?.tools || [], budget: cost, cost: 0, status: index === 0 ? 'working' : 'queued', retryCount: 0 }))
+  };
+  const jobs = getCityJobs();
+  jobs.push(job);
+  recordCityEvent('job.created', job, `${workflow.manager} accepted: ${job.goal}`);
+  recordCityEvent('task.started', job, `${job.tasks[0].agent} started ${job.tasks[0].name}`);
+  saveCityJobs(jobs);
+  showToast(`${job.id} created. ${job.tasks[0].agent} started ${job.tasks[0].name}.`);
+  return job;
+}
+
+function advanceCityJob(jobId) {
+  const jobs = getCityJobs();
+  const job = jobs.find((item) => item.id === jobId);
+  if (!job || !['running', 'failed'].includes(job.status)) return;
+  const task = job.tasks[job.currentStep];
+  if (!task) return;
+  task.status = 'completed';
+  task.cost = task.budget;
+  task.completedAt = new Date().toISOString();
+  job.cost = Number(job.tasks.reduce((sum, item) => sum + Number(item.cost || 0), 0).toFixed(2));
+  recordCityEvent('task.completed', job, `${task.agent} completed ${task.name} · $${task.cost.toFixed(2)} demo cost`);
+  const nextIndex = job.currentStep + 1;
+  if (nextIndex >= job.tasks.length) {
+    job.status = 'completed';
+    job.progress = 100;
+    job.completedAt = new Date().toISOString();
+    recordCityEvent('job.completed', job, `${job.goal} completed`);
+  } else {
+    job.currentStep = nextIndex;
+    job.progress = Math.round((nextIndex / job.tasks.length) * 100);
+    const next = job.tasks[nextIndex];
+    if (next.capability === 'Approval') {
+      next.status = 'waiting_owner';
+      job.status = 'waiting_approval';
+      job.approvalStatus = 'required';
+      recordCityEvent('approval.required', job, `${job.id} needs Founder approval before external action`);
+    } else {
+      next.status = 'working';
+      recordCityEvent('task.started', job, `${next.agent} started ${next.name}`);
+    }
+  }
+  job.updatedAt = new Date().toISOString();
+  saveCityJobs(jobs);
+}
+
+function approveCityJob(jobId, decision) {
+  const jobs = getCityJobs();
+  const job = jobs.find((item) => item.id === jobId);
+  if (!job || job.status !== 'waiting_approval') return;
+  const task = job.tasks[job.currentStep];
+  job.approvalStatus = decision;
+  task.status = decision === 'approved' ? 'completed' : 'blocked';
+  job.status = decision === 'approved' ? 'completed' : 'denied';
+  job.progress = decision === 'approved' ? 100 : job.progress;
+  job.updatedAt = new Date().toISOString();
+  recordCityEvent(decision === 'approved' ? 'approval.granted' : 'approval.denied', job, `${job.id} ${decision} by Michh. No external action was performed.`);
+  saveCityJobs(jobs);
+  updateApprovalCount();
+  showToast(`${job.id} ${decision}. The demo did not publish or deliver externally.`);
+}
+
+function renderJobApprovals(jobs) {
+  const slot = document.querySelector('#job-approval-slot');
+  const waiting = jobs.filter((job) => job.status === 'waiting_approval');
+  slot.innerHTML = waiting.map((job) => `<article class="job-approval-card"><header><div><p class="eyebrow">${safeDemoText(job.id)} · ${safeDemoText(job.factory)}</p><h3>${safeDemoText(job.goal)}</h3></div><span>Founder action required</span></header><div><p>Internal workflow complete. Demo cost: <strong>$${job.cost.toFixed(2)}</strong> of $${job.budget.toFixed(2)} budget.</p><small>Approval completes the demo record only. Publishing and delivery remain manual until a verified integration exists.</small></div><footer><button class="decline-button" type="button" data-job-decision="denied" data-job-id="${job.id}">Deny</button><button class="approve-button" type="button" data-job-decision="approved" data-job-id="${job.id}">Approve result</button></footer></article>`).join('');
+  slot.querySelectorAll('[data-job-decision]').forEach((button) => button.addEventListener('click', () => approveCityJob(button.dataset.jobId, button.dataset.jobDecision)));
+}
+
+function renderOperatingSystem() {
+  const jobs = getCityJobs();
+  const events = getCityEvents();
+  const filter = document.querySelector('#job-filter')?.value || 'all';
+  const visible = jobs.filter((job) => filter === 'all' || (filter === 'approval' ? job.status === 'waiting_approval' : job.status === filter)).slice().reverse();
+  document.querySelector('#job-total').textContent = jobs.length;
+  document.querySelector('#job-running').textContent = jobs.filter((job) => job.status === 'running').length;
+  document.querySelector('#job-waiting').textContent = jobs.filter((job) => job.status === 'waiting_approval').length;
+  document.querySelector('#job-cost').textContent = `$${jobs.reduce((sum, job) => sum + Number(job.cost || 0), 0).toFixed(2)}`;
+  document.querySelector('#job-list').innerHTML = visible.length ? visible.map((job) => {
+    const task = job.tasks[job.currentStep] || job.tasks.at(-1);
+    return `<article class="job-row"><header><div><small>${safeDemoText(job.id)} · ${safeDemoText(job.factory)}</small><strong>${safeDemoText(job.goal)}</strong></div><span class="job-state state-${safeDemoText(job.status)}">${safeDemoText(job.status.replace('_', ' '))}</span></header><div class="job-progress"><i style="width:${job.progress}%"></i></div><dl><div><dt>Manager</dt><dd>${safeDemoText(job.manager)}</dd></div><div><dt>Current step</dt><dd>${safeDemoText(task.name)}</dd></div><div><dt>Agent</dt><dd>${safeDemoText(task.agent)}</dd></div><div><dt>Cost / budget</dt><dd>$${job.cost.toFixed(2)} / $${job.budget.toFixed(2)}</dd></div></dl><footer><span>${job.tasks.filter((item) => item.status === 'completed').length}/${job.tasks.length} tasks complete</span>${job.status === 'running' ? `<button type="button" data-advance-job="${job.id}"><i data-lucide="step-forward"></i> Run next step</button>` : job.status === 'waiting_approval' ? '<button type="button" data-open-job-approvals><i data-lucide="badge-check"></i> Review approval</button>' : '<span>Workflow closed</span>'}</footer></article>`;
+  }).join('') : '<p class="empty-operation">No jobs match this filter. Start one from Factories.</p>';
+  document.querySelector('#event-list').innerHTML = events.length ? events.slice(0, 30).map((event) => `<article><i></i><div><small>${safeDemoText(event.type)} · ${safeDemoText(event.jobId)}</small><strong>${safeDemoText(event.detail)}</strong><span>${new Date(event.createdAt).toLocaleString()}</span></div></article>`).join('') : '<p>No events recorded.</p>';
+  const creativeJobs = jobs.filter((job) => job.tasks.some((task) => task.capability === 'Creative'));
+  document.querySelector('#creative-job-count').textContent = creativeJobs.length;
+  document.querySelector('#creative-ready-count').textContent = creativeJobs.filter((job) => job.tasks[job.currentStep]?.capability === 'Creative').length;
+  document.querySelector('#creative-qa-count').textContent = creativeJobs.filter((job) => job.tasks[job.currentStep]?.capability === 'QA').length;
+  document.querySelector('#creative-work-list').innerHTML = creativeJobs.length ? creativeJobs.slice().reverse().map((job) => { const task = job.tasks.find((item) => item.capability === 'Creative'); return `<article><div><small>${safeDemoText(job.id)} · ${safeDemoText(job.factory)}</small><strong>${safeDemoText(job.goal)}</strong><p>${safeDemoText(task.name)} assigned to ${safeDemoText(task.agent)}</p></div><span>${safeDemoText(task.status)}</span><button type="button" data-view-job="${job.id}">Open job</button></article>`; }).join('') : '<p>No creative work is queued. Start a factory workflow or create a brief.</p>';
+  renderJobApprovals(jobs);
+  document.querySelector('#core-agent-grid').innerHTML = coreAgents.map((agent) => `<button type="button" data-core-agent="${agent.name}"><i data-lucide="bot"></i><div><small>${safeDemoText(agent.role)}</small><strong>${safeDemoText(agent.name)}</strong><span>Reports to ${safeDemoText(agent.manager)}</span></div><b>${safeDemoText(agent.permission)}</b></button>`).join('');
+  refreshIcons();
+}
+
+document.querySelectorAll('[data-start-factory]').forEach((button) => button.addEventListener('click', () => { const job = createFactoryJob(button.dataset.startFactory); openView('jobs'); setTimeout(() => document.querySelector(`[data-advance-job="${job.id}"]`)?.focus(), 0); }));
+document.querySelectorAll('[data-factory-office]').forEach((button) => button.addEventListener('click', () => button.dataset.factoryOffice === 'creative' ? openView('creative') : renderOffice(button.dataset.factoryOffice)));
+document.querySelector('[data-creative-action="new"]').addEventListener('click', () => { document.querySelector('#job-factory').value = 'thumbnail'; document.querySelector('#job-dialog').showModal(); });
+document.querySelector('#create-custom-job').addEventListener('click', () => document.querySelector('#job-dialog').showModal());
+document.querySelector('#job-form').addEventListener('submit', (event) => { if (event.submitter?.value === 'cancel') return; const goal = document.querySelector('#job-goal').value.trim(); if (!goal) { event.preventDefault(); return; } createFactoryJob(document.querySelector('#job-factory').value, goal, Number(document.querySelector('#job-budget').value)); });
+document.querySelector('#job-filter').addEventListener('change', renderOperatingSystem);
+document.querySelector('#job-list').addEventListener('click', (event) => { const advance = event.target.closest('[data-advance-job]'); if (advance) return advanceCityJob(advance.dataset.advanceJob); if (event.target.closest('[data-open-job-approvals]')) openView('approvals'); });
+document.querySelector('#creative-work-list').addEventListener('click', (event) => { if (event.target.closest('[data-view-job]')) openView('jobs'); });
+document.querySelector('#core-agent-grid').addEventListener('click', (event) => { const agent = event.target.closest('[data-core-agent]'); if (!agent) return; setConsole(true); submitCommand(`talk to ${agent.dataset.coreAgent}`); });
+document.querySelector('#clear-demo-jobs').addEventListener('click', () => { if (!window.confirm('Reset all locally recorded demo jobs and events?')) return; localStorage.removeItem('mkn-city-jobs'); localStorage.removeItem('mkn-city-events'); renderOperatingSystem(); updateApprovalCount(); showToast('Demo jobs and events reset.'); });
+renderOperatingSystem();
+
 function getCampaignState() {
   try { return JSON.parse(localStorage.getItem('mkn-revenue-campaign') || '{"engine":"service","step":0}'); }
   catch { return { engine: 'service', step: 0 }; }
@@ -116,7 +278,8 @@ function replaceControlledWork(controlledTestId, orders = []) {
 
 function updateApprovalCount() {
   const propertyWaiting = localStorage.getItem('mkn-property-request') && !localStorage.getItem('mkn-property-decision') ? 1 : 0;
-  const waiting = decisionKeys.filter((key) => !localStorage.getItem(key)).length + propertyWaiting;
+  const jobWaiting = getCityJobs().filter((job) => job.status === 'waiting_approval').length;
+  const waiting = decisionKeys.filter((key) => !localStorage.getItem(key)).length + propertyWaiting + jobWaiting;
   document.querySelector('#founder-approval-count').textContent = waiting;
   document.querySelector('#nav-approval-count').textContent = waiting;
   document.querySelector('#approval-summary').textContent = waiting ? `${waiting} ${waiting === 1 ? 'decision' : 'decisions'} waiting` : 'All decisions reviewed';
@@ -252,6 +415,7 @@ const systemAuditChecks = [
   { id: 'orders', label: 'Customer orders and profit ledger', test: () => Array.isArray(getCustomerOrders()) && Boolean(document.querySelector('#order-form')) },
   { id: 'treasury', label: 'Treasury limits and growth plan', test: () => { const plan = getGrowthPlan(); return plan.reserve + plan.activeCapital <= plan.capital && plan.experimentCap <= plan.activeCapital; } },
   { id: 'contracts', label: 'Government bid intake and safeguards', test: () => Boolean(document.querySelector('#bid-intake-form') && document.querySelector('#bid-notice') && document.querySelector('#bid-capability')) },
+  { id: 'orchestrator', label: 'Jobs, factories, tasks, and event stream', test: () => Boolean(document.querySelector('#jobs') && document.querySelector('#factories') && document.querySelector('#event-list') && factoryWorkflows.thumbnail && factoryWorkflows.pod) },
   { id: 'ai', label: 'OpenAI command and live research route', external: true }
 ];
 
@@ -413,6 +577,8 @@ function runDemoDay(source = 'manual') {
   localStorage.setItem('mkn-demo-season', JSON.stringify(season));
   localStorage.setItem('mkn-demo-last-run', new Date().toISOString());
   advanceAutonomousWork();
+  const operatingJob = getCityJobs().find((job) => job.status === 'running');
+  if (operatingJob) advanceCityJob(operatingJob.id);
   renderDemoSeason();
   updateDemoAutonomyStatus();
   runSystemsAudit({ quiet: true });
@@ -682,6 +848,7 @@ function renderOffice(officeId) {
 
 document.querySelectorAll('[data-office]').forEach((district) => district.addEventListener('click', () => {
   if (document.querySelector('.city-map')?.classList.contains('build-mode')) return;
+  if (district.classList.contains('district') && district.dataset.office === 'creative') return openView('creative');
   const thresholds = { factory: 25, university: 100, government: 250 };
   const threshold = thresholds[district.dataset.office];
   const records = getDemoSeason().records;
@@ -1664,6 +1831,9 @@ function runLocalCommand(command) {
   const routes = [
     { terms: ['show agents', 'view agents', 'go to agents'], view: 'agents', reply: 'Opening the Employment Center and agent roster.' },
     { terms: ['show businesses', 'view businesses', 'go to business'], view: 'businesses', reply: 'Opening the Business District.' },
+    { terms: ['show creative', 'creative studio', 'design studio'], view: 'creative', reply: 'Opening the Creative Studio and its assigned design work.' },
+    { terms: ['show factories', 'view factories', 'thumbnail factory', 'pod factory'], view: 'factories', reply: 'Opening the two approved MKN factory workflows.' },
+    { terms: ['show jobs', 'view jobs', 'job queue', 'event stream'], view: 'jobs', reply: 'Opening Jobs and the recorded city event stream.' },
     { terms: ['show analytics', 'view analytics', 'show graphs', 'performance dashboard'], view: 'analytics', reply: 'Opening the Analytics Center.' },
     { terms: ['government contract', 'contracting center', 'show government', 'sam.gov', 'sam gov'], view: 'businesses', office: 'government', reply: 'Opening the Government Contracting Center. Readiness must be verified before any bid is submitted.' },
     { terms: ['show approvals', 'view approvals', 'go to approvals'], view: 'approvals', reply: 'Opening your approval queue.' },
