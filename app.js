@@ -83,7 +83,8 @@ const coreAgents = [
   { id: 'creative', name: 'Marcus', role: 'Creative Agent', field: 'Visual Production', examScore: 90, manager: 'Factory Manager', tools: ['Images', 'Files'], permission: 'Draft only' },
   { id: 'qa', name: 'Quinn', role: 'QA Agent', field: 'Quality Assurance', examScore: 95, manager: 'Factory Manager', tools: ['Files', 'Reports'], permission: 'Cannot publish' },
   { id: 'pod-manager', name: 'Nova', role: 'POD Manager', field: 'Production Operations', examScore: 89, manager: 'Director', tools: ['Delegate', 'Orders'], permission: 'Spend by approval' },
-  { id: 'thumbnail-manager', name: 'Avery', role: 'Thumbnail Manager', field: 'Marketplace Delivery', examScore: 92, manager: 'Director', tools: ['Delegate', 'Briefs'], permission: 'Delivery by approval' }
+  { id: 'thumbnail-manager', name: 'Avery', role: 'Thumbnail Manager', field: 'Marketplace Delivery', examScore: 92, manager: 'Director', tools: ['Delegate', 'Briefs'], permission: 'Delivery by approval' },
+  { id: 'listing-copy', name: 'Nia', role: 'Listing & Copy Agent', field: 'Marketplace Copy', examScore: 91, manager: 'Nova', tools: ['Files', 'Keywords'], permission: 'Draft only' }
 ];
 
 function getAgentRecords() {
@@ -143,10 +144,44 @@ const factoryWorkflows = {
     steps: [
       ['Trend research', 'Maya', 'Research', 0.08], ['Originality and IP screen', 'Sage', 'Originality', 0.05], ['Creative brief', 'Nova', 'Brief', 0.04],
       ['Original design concept', 'Marcus', 'Creative', 0.32], ['Mockup preparation', 'Marcus', 'Creative', 0.18], ['Quality assurance', 'Quinn', 'QA', 0.08],
-      ['Listing draft', 'Avery', 'Listing', 0.07], ['Founder approval', 'Michh', 'Approval', 0]
+      ['Listing draft', 'Nia', 'Listing', 0.07], ['Founder approval', 'Michh', 'Approval', 0]
     ]
   }
 };
+
+function getLaunchState() {
+  try { return { utilities: false, ...JSON.parse(localStorage.getItem('mkn-founder-launch') || '{}') }; }
+  catch { return { utilities: false }; }
+}
+
+function getLaunchSteps() {
+  const state = getLaunchState();
+  const records = getAgentRecords();
+  const jobs = getCityJobs();
+  const certifiedCount = coreAgents.filter((agent) => records[agent.id].certified).length;
+  return [
+    { id: 'utilities', title: 'Power city utilities', detail: 'Compute, research, files, memory, images, and dispatch.', complete: state.utilities },
+    { id: 'director', title: 'Certify city leadership', detail: 'Director must pass Executive Operations.', complete: records.overseer.certified },
+    { id: 'crew', title: 'Qualify the permanent crew', detail: `${certifiedCount}/${coreAgents.length} field certifications passed.`, complete: certifiedCount === coreAgents.length },
+    { id: 'pod', title: 'Run the POD practice line', detail: 'Complete an internal Etsy + Printify product workflow.', complete: jobs.some((job) => job.factoryId === 'pod') },
+    { id: 'thumbnail', title: 'Run the thumbnail practice line', detail: 'Complete an internal Fiverr thumbnail workflow.', complete: jobs.some((job) => job.factoryId === 'thumbnail') }
+  ];
+}
+
+function renderFounderLaunch() {
+  const list = document.querySelector('#launch-step-list');
+  if (!list) return;
+  const steps = getLaunchSteps();
+  const complete = steps.filter((step) => step.complete).length;
+  const next = steps.find((step) => !step.complete);
+  document.querySelector('#launch-progress-copy').textContent = `${complete}/${steps.length} launch systems ready`;
+  document.querySelector('#launch-progress-fill').style.width = `${(complete / steps.length) * 100}%`;
+  document.querySelector('#launch-permission-stage').textContent = complete === steps.length ? 'Stage 2 candidate · owner approval remains required' : 'Stage 1 · internal only';
+  list.innerHTML = steps.map((step, index) => `<article class="${step.complete ? 'complete' : next?.id === step.id ? 'current' : ''}"><b>${step.complete ? '<i data-lucide="check"></i>' : index + 1}</b><div><strong>${safeDemoText(step.title)}</strong><span>${safeDemoText(step.detail)}</span></div><small>${step.complete ? 'Ready' : next?.id === step.id ? 'Next' : 'Locked'}</small></article>`).join('');
+  const nextButton = document.querySelector('#launch-next-action');
+  nextButton.dataset.launchAction = next?.id || 'connections';
+  nextButton.innerHTML = next ? `<i data-lucide="play"></i>${safeDemoText(next.title)}` : '<i data-lucide="key-round"></i>Review account connections';
+}
 
 function getCityJobs() {
   try { return JSON.parse(localStorage.getItem('mkn-city-jobs') || '[]'); }
@@ -289,6 +324,7 @@ function renderOperatingSystem() {
   renderJobApprovals(jobs);
   document.querySelector('#core-agent-grid').innerHTML = coreAgents.map((agent) => `<button type="button" data-core-agent="${agent.name}"><i data-lucide="bot"></i><div><small>${safeDemoText(agent.role)}</small><strong>${safeDemoText(agent.name)}</strong><span>Reports to ${safeDemoText(agent.manager)}</span></div><b>${safeDemoText(agent.permission)}</b></button>`).join('');
   renderCertificationCenter();
+  renderFounderLaunch();
   refreshIcons();
 }
 
@@ -301,6 +337,27 @@ document.querySelector('#job-filter').addEventListener('change', renderOperating
 document.querySelector('#job-list').addEventListener('click', (event) => { const advance = event.target.closest('[data-advance-job]'); if (advance) return advanceCityJob(advance.dataset.advanceJob); const retry = event.target.closest('[data-retry-job]'); if (retry) return recoverCityJob(retry.dataset.retryJob, 'retry'); const archive = event.target.closest('[data-archive-job]'); if (archive) return recoverCityJob(archive.dataset.archiveJob, 'archive'); if (event.target.closest('[data-open-job-approvals]')) openView('approvals'); });
 document.querySelector('#creative-work-list').addEventListener('click', (event) => { if (event.target.closest('[data-view-job]')) openView('jobs'); });
 document.querySelector('#core-agent-grid').addEventListener('click', (event) => { const agent = event.target.closest('[data-core-agent]'); if (!agent) return; setConsole(true); submitCommand(`talk to ${agent.dataset.coreAgent}`); });
+document.querySelector('#launch-next-action').addEventListener('click', (event) => {
+  const action = event.currentTarget.dataset.launchAction;
+  if (action === 'utilities') {
+    localStorage.setItem('mkn-founder-launch', JSON.stringify({ ...getLaunchState(), utilities: true, activatedAt: new Date().toISOString() }));
+    recordCityEvent('utilities.activated', { id: 'CITY-GRID', factory: 'Infrastructure' }, 'Compute, research, files, memory, images, and internal dispatch are available in demo mode.');
+    renderOperatingSystem();
+    return showToast('City utilities powered. External services remain disconnected.');
+  }
+  if (action === 'director') return document.querySelector('[data-field-exam="overseer"]')?.click();
+  if (action === 'crew') {
+    document.querySelector('#certification-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return showToast('Run each specialist field exam. Failed exams may be retaken after retraining.');
+  }
+  if (action === 'pod' || action === 'thumbnail') {
+    const job = createFactoryJob(action, action === 'pod' ? 'Founder launch qualification: original POD product draft' : 'Founder launch qualification: original thumbnail service draft', 2);
+    openView('jobs');
+    return showToast(`${job.id} started as an internal-only launch test.`);
+  }
+  document.querySelector('.connections-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showToast('Connections stay owner-controlled. Use read-only access first when supported.');
+});
 document.querySelector('#certification-grid').addEventListener('click', (event) => {
   const button = event.target.closest('[data-field-exam]');
   if (!button) return;
@@ -783,7 +840,8 @@ const officeData = {
   ] },
   business: { district: 'Commerce & Operations', title: 'Commerce Operations Floor', description: 'Listings, order flow, capacity, and customer operations.', zone: 'Order Control', zoneDetail: 'Listings, customer care, and delivery queues', zoneIcon: 'shopping-bag', agents: [
     { name: 'Avery', role: 'Listing / SEO Specialist', task: 'Prepare one compliant marketplace listing', sprite: 'business-sprite', status: 'Optimizing' },
-    { name: 'Nova', role: 'Operations Specialist', task: 'Monitor one active production queue', sprite: 'operations-sprite', status: 'Monitoring' }
+    { name: 'Nova', role: 'Operations Specialist', task: 'Monitor one active production queue', sprite: 'operations-sprite', status: 'Monitoring' },
+    { name: 'Nia', role: 'Listing & Copy Agent', task: 'Draft original marketplace copy from verified product facts', sprite: 'research-sprite', status: 'Drafting' }
   ] },
   factory: { district: 'Industrial District', title: 'MKN Production Works', description: 'Approved work orders move through creation, quality control, and delivery.', zone: 'Production Line', zoneDetail: 'Create · inspect · package · release', zoneIcon: 'factory', agents: [
     { name: 'Forge', role: 'Production Manager', task: 'Move one approved work order through production', sprite: 'operations-sprite', status: 'Scheduling' },
@@ -1670,13 +1728,13 @@ agentForm.addEventListener('submit', (event) => {
   localStorage.setItem('mkn-agent-candidates', JSON.stringify(createdAgents));
   const current = Number(localStorage.getItem('mkn-created-agents') || '0') + 1;
   localStorage.setItem('mkn-created-agents', String(current));
-  agentCount.textContent = `8 active · ${current} probation`;
+  agentCount.textContent = `${coreAgents.length} active · ${current} probation`;
   renderCandidateRoster();
   showToast(`${agentName.value.trim()} created with one focus-locked task.`);
 });
 
 const savedAgentCount = Number(localStorage.getItem('mkn-created-agents') || '0');
-agentCount.textContent = `8 active · ${savedAgentCount} probation`;
+agentCount.textContent = `${coreAgents.length} active · ${savedAgentCount} probation`;
 renderCandidateRoster();
 
 const connectionDialog = document.querySelector('#connection-dialog');

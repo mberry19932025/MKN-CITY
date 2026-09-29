@@ -42,6 +42,8 @@ async function run() {
   assert.match(homeMarkup, /data-approval-action="opportunity-approved"/);
   assert.match(homeMarkup, /id="certification-grid"/);
   assert.match(homeMarkup, /id="run-enforcer-audit"/);
+  assert.match(homeMarkup, /id="launch-next-action"/);
+  assert.match(homeMarkup, /Founder Launch Program/);
   assert.match(home.headers.get('cache-control'), /no-store/);
 
   const app = await fetch(`${base}/app.js?smoke=1`);
@@ -59,6 +61,8 @@ async function run() {
   assert.match(appSource, /mkn-agent-records/);
   assert.match(appSource, /awardAgentXp/);
   assert.match(appSource, /City Enforcer/);
+  assert.match(appSource, /mkn-founder-launch/);
+  assert.match(appSource, /Listing & Copy Agent/);
 
   const css = await fetch(`${base}/styles.css?smoke=1`);
   assert.equal(css.status, 200);
