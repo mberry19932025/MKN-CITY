@@ -39,6 +39,7 @@ async function run() {
   assert.match(homeMarkup, /id="factories"/);
   assert.match(homeMarkup, /id="jobs"/);
   assert.match(homeMarkup, /id="job-approval-slot"/);
+  assert.match(homeMarkup, /data-approval-action="opportunity-approved"/);
   assert.match(home.headers.get('cache-control'), /no-store/);
 
   const app = await fetch(`${base}/app.js?smoke=1`);
@@ -51,6 +52,12 @@ async function run() {
   assert.match(appSource, /createFactoryJob/);
   assert.match(appSource, /advanceCityJob/);
   assert.match(appSource, /recordCityEvent/);
+  assert.match(appSource, /recoverCityJob/);
+  assert.match(appSource, /data-approval-action/);
+
+  const css = await fetch(`${base}/styles.css?smoke=1`);
+  assert.equal(css.status, 200);
+  assert.match(await css.text(), /\[hidden\]\s*\{\s*display:\s*none\s*!important/);
 
   const command = await fetch(`${base}/api/command?smoke=1`, {
     method: 'POST',

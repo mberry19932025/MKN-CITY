@@ -178,6 +178,25 @@ function advanceCityJob(jobId) {
   saveCityJobs(jobs);
 }
 
+function recoverCityJob(jobId, action) {
+  const jobs = getCityJobs();
+  const job = jobs.find((item) => item.id === jobId);
+  if (!job || !['failed', 'needs_review'].includes(job.status)) return;
+  const task = job.tasks[job.currentStep];
+  if (action === 'archive') {
+    job.status = 'archived';
+    job.archivedAt = new Date().toISOString();
+    recordCityEvent('job.archived', job, `${job.id} failure preserved as a lesson. New opportunities remain open.`);
+  } else {
+    job.status = 'running';
+    task.status = 'working';
+    task.retryCount = Number(task.retryCount || 0) + 1;
+    recordCityEvent('task.retry', job, `${task.agent} retrying ${task.name}. Retry ${task.retryCount}.`);
+  }
+  job.updatedAt = new Date().toISOString();
+  saveCityJobs(jobs);
+}
+
 function approveCityJob(jobId, decision) {
   const jobs = getCityJobs();
   const job = jobs.find((item) => item.id === jobId);
@@ -212,7 +231,8 @@ function renderOperatingSystem() {
   document.querySelector('#job-cost').textContent = `$${jobs.reduce((sum, job) => sum + Number(job.cost || 0), 0).toFixed(2)}`;
   document.querySelector('#job-list').innerHTML = visible.length ? visible.map((job) => {
     const task = job.tasks[job.currentStep] || job.tasks.at(-1);
-    return `<article class="job-row"><header><div><small>${safeDemoText(job.id)} · ${safeDemoText(job.factory)}</small><strong>${safeDemoText(job.goal)}</strong></div><span class="job-state state-${safeDemoText(job.status)}">${safeDemoText(job.status.replace('_', ' '))}</span></header><div class="job-progress"><i style="width:${job.progress}%"></i></div><dl><div><dt>Manager</dt><dd>${safeDemoText(job.manager)}</dd></div><div><dt>Current step</dt><dd>${safeDemoText(task.name)}</dd></div><div><dt>Agent</dt><dd>${safeDemoText(task.agent)}</dd></div><div><dt>Cost / budget</dt><dd>$${job.cost.toFixed(2)} / $${job.budget.toFixed(2)}</dd></div></dl><footer><span>${job.tasks.filter((item) => item.status === 'completed').length}/${job.tasks.length} tasks complete</span>${job.status === 'running' ? `<button type="button" data-advance-job="${job.id}"><i data-lucide="step-forward"></i> Run next step</button>` : job.status === 'waiting_approval' ? '<button type="button" data-open-job-approvals><i data-lucide="badge-check"></i> Review approval</button>' : '<span>Workflow closed</span>'}</footer></article>`;
+    const failureControls = ['failed', 'needs_review'].includes(job.status) ? `<div><button type="button" data-retry-job="${job.id}"><i data-lucide="rotate-cw"></i> Retry task</button><button type="button" data-archive-job="${job.id}"><i data-lucide="archive"></i> Archive lesson</button></div>` : '';
+    return `<article class="job-row"><header><div><small>${safeDemoText(job.id)} · ${safeDemoText(job.factory)}</small><strong>${safeDemoText(job.goal)}</strong></div><span class="job-state state-${safeDemoText(job.status)}">${safeDemoText(job.status.replace('_', ' '))}</span></header><div class="job-progress"><i style="width:${job.progress}%"></i></div><dl><div><dt>Manager</dt><dd>${safeDemoText(job.manager)}</dd></div><div><dt>Current step</dt><dd>${safeDemoText(task.name)}</dd></div><div><dt>Agent</dt><dd>${safeDemoText(task.agent)}</dd></div><div><dt>Cost / budget</dt><dd>$${job.cost.toFixed(2)} / $${job.budget.toFixed(2)}</dd></div></dl><footer><span>${job.tasks.filter((item) => item.status === 'completed').length}/${job.tasks.length} tasks complete</span>${job.status === 'running' ? `<button type="button" data-advance-job="${job.id}"><i data-lucide="step-forward"></i> Run next step</button>` : job.status === 'waiting_approval' ? '<button type="button" data-open-job-approvals><i data-lucide="badge-check"></i> Review approval</button>' : failureControls || '<span>Workflow closed</span>'}</footer></article>`;
   }).join('') : '<p class="empty-operation">No jobs match this filter. Start one from Factories.</p>';
   document.querySelector('#event-list').innerHTML = events.length ? events.slice(0, 30).map((event) => `<article><i></i><div><small>${safeDemoText(event.type)} · ${safeDemoText(event.jobId)}</small><strong>${safeDemoText(event.detail)}</strong><span>${new Date(event.createdAt).toLocaleString()}</span></div></article>`).join('') : '<p>No events recorded.</p>';
   const creativeJobs = jobs.filter((job) => job.tasks.some((task) => task.capability === 'Creative'));
@@ -231,7 +251,7 @@ document.querySelector('[data-creative-action="new"]').addEventListener('click',
 document.querySelector('#create-custom-job').addEventListener('click', () => document.querySelector('#job-dialog').showModal());
 document.querySelector('#job-form').addEventListener('submit', (event) => { if (event.submitter?.value === 'cancel') return; const goal = document.querySelector('#job-goal').value.trim(); if (!goal) { event.preventDefault(); return; } createFactoryJob(document.querySelector('#job-factory').value, goal, Number(document.querySelector('#job-budget').value)); });
 document.querySelector('#job-filter').addEventListener('change', renderOperatingSystem);
-document.querySelector('#job-list').addEventListener('click', (event) => { const advance = event.target.closest('[data-advance-job]'); if (advance) return advanceCityJob(advance.dataset.advanceJob); if (event.target.closest('[data-open-job-approvals]')) openView('approvals'); });
+document.querySelector('#job-list').addEventListener('click', (event) => { const advance = event.target.closest('[data-advance-job]'); if (advance) return advanceCityJob(advance.dataset.advanceJob); const retry = event.target.closest('[data-retry-job]'); if (retry) return recoverCityJob(retry.dataset.retryJob, 'retry'); const archive = event.target.closest('[data-archive-job]'); if (archive) return recoverCityJob(archive.dataset.archiveJob, 'archive'); if (event.target.closest('[data-open-job-approvals]')) openView('approvals'); });
 document.querySelector('#creative-work-list').addEventListener('click', (event) => { if (event.target.closest('[data-view-job]')) openView('jobs'); });
 document.querySelector('#core-agent-grid').addEventListener('click', (event) => { const agent = event.target.closest('[data-core-agent]'); if (!agent) return; setConsole(true); submitCommand(`talk to ${agent.dataset.coreAgent}`); });
 document.querySelector('#clear-demo-jobs').addEventListener('click', () => { if (!window.confirm('Reset all locally recorded demo jobs and events?')) return; localStorage.removeItem('mkn-city-jobs'); localStorage.removeItem('mkn-city-events'); renderOperatingSystem(); updateApprovalCount(); showToast('Demo jobs and events reset.'); });
@@ -1615,6 +1635,7 @@ function calculateTrueProfit() {
 document.querySelectorAll('.profit-input').forEach((input) => input.addEventListener('input', calculateTrueProfit));
 calculateTrueProfit();
 
+let resolveValidationDecision = () => {};
 document.querySelectorAll('.validation-request').forEach((request) => {
   const status = request.querySelector('header > span');
   const approve = request.querySelector('.approve-button');
@@ -1635,11 +1656,7 @@ document.querySelectorAll('.validation-request').forEach((request) => {
     localStorage.setItem('mkn-validation-decision', decision);
     updateApprovalCount();
   };
-  approve.addEventListener('click', () => {
-    resolve('approved');
-    showToast('Approved by Michh. The decision was saved.');
-  });
-  decline.addEventListener('click', () => resolve('declined'));
+  resolveValidationDecision = resolve;
   const savedDecision = localStorage.getItem('mkn-validation-decision');
   if (savedDecision) resolve(savedDecision);
 });
@@ -1688,8 +1705,6 @@ function resolveStaffing(decision) {
   updateApprovalCount();
 }
 
-staffingApprove.addEventListener('click', () => { resolveStaffing('approved'); showToast('Approved. Two temporary Production Helpers were added to Agents.'); });
-staffingDecline.addEventListener('click', () => { resolveStaffing('declined'); showToast('Staffing declined. Decision saved.'); });
 const savedStaffingDecision = localStorage.getItem('mkn-staffing-decision');
 if (savedStaffingDecision) resolveStaffing(savedStaffingDecision);
 
@@ -1729,11 +1744,29 @@ function resolveOpportunity0142(decision) {
   updateApprovalCount();
 }
 
-opportunity0142Approve.addEventListener('click', () => { resolveOpportunity0142('approved'); showToast('Controlled test approved. Research, Creative, and Commerce tasks were queued.'); });
-opportunity0142Decline.addEventListener('click', () => { resolveOpportunity0142('declined'); showToast('Opportunity declined. Decision saved.'); });
 opportunity0142Work.addEventListener('click', () => { openView('businesses'); openBusinessTab('production'); renderOffice('business'); });
 const savedOpportunity0142 = localStorage.getItem('mkn-opportunity-0142-decision');
 if (savedOpportunity0142) resolveOpportunity0142(savedOpportunity0142);
+
+document.querySelector('#approvals').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-approval-action]');
+  if (!button) return;
+  event.preventDefault();
+  const [kind, decision] = button.dataset.approvalAction.split('-');
+  if (kind === 'staffing') {
+    resolveStaffing(decision);
+    return showToast(decision === 'approved' ? 'Approved. Two temporary Production Helpers were created.' : 'Staffing request declined.');
+  }
+  if (kind === 'opportunity') {
+    resolveOpportunity0142(decision);
+    return showToast(decision === 'approved' ? 'Approved. Three controlled-test tasks were queued.' : 'Opportunity declined.');
+  }
+  const request = button.closest('.validation-request');
+  if (kind === 'validation' && request) {
+    resolveValidationDecision(decision);
+    showToast(decision === 'approved' ? 'Approved. Research and Business validation tasks were queued.' : 'Validation test declined.');
+  }
+});
 
 document.querySelector('#reset-demo-decisions').addEventListener('click', () => {
   decisionKeys.forEach((key) => localStorage.removeItem(key));
